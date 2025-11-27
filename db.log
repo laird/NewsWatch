@@ -15,3 +15,11 @@
 2025-11-26 16:14:28.874 EST [13233] LOG:  checkpoint complete: wrote 44 buffers (0.3%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=4.414 s, sync=0.031 s, total=4.484 s; sync files=35, longest=0.011 s, average=0.001 s; distance=202 kB, estimate=4346 kB; lsn=0/1C48648, redo lsn=0/1C485F0
 2025-11-26 16:19:24.974 EST [13233] LOG:  checkpoint starting: time
 2025-11-26 16:19:28.454 EST [13233] LOG:  checkpoint complete: wrote 34 buffers (0.2%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=3.460 s, sync=0.017 s, total=3.481 s; sync files=18, longest=0.007 s, average=0.001 s; distance=227 kB, estimate=3934 kB; lsn=0/1C81430, redo lsn=0/1C813D8
+2025-11-26 16:34:24.720 EST [13233] LOG:  checkpoint starting: time
+2025-11-26 16:34:25.476 EST [13233] LOG:  checkpoint complete: wrote 7 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.703 s, sync=0.015 s, total=0.757 s; sync files=8, longest=0.011 s, average=0.002 s; distance=23 kB, estimate=3543 kB; lsn=0/1C87358, redo lsn=0/1C87300
+2025-11-26 18:40:05.637 EST [13233] LOG:  checkpoint starting: time
+2025-11-26 18:40:11.102 EST [13233] LOG:  checkpoint complete: wrote 54 buffers (0.3%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=5.415 s, sync=0.012 s, total=5.466 s; sync files=21, longest=0.001 s, average=0.001 s; distance=314 kB, estimate=3220 kB; lsn=0/1CD5F60, redo lsn=0/1CD5ED0
+2025-11-26 21:11:46.548 EST [13233] LOG:  checkpoint starting: time
+2025-11-26 21:11:47.670 EST [13233] LOG:  checkpoint complete: wrote 11 buffers (0.1%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=1.104 s, sync=0.014 s, total=1.132 s; sync files=7, longest=0.010 s, average=0.002 s; distance=60 kB, estimate=2904 kB; lsn=0/1CE50E0, redo lsn=0/1CE5088
+2025-11-26 21:21:46.870 EST [13233] LOG:  checkpoint starting: time
+2025-11-26 21:21:47.596 EST [13233] LOG:  checkpoint complete: wrote 7 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.702 s, sync=0.011 s, total=0.727 s; sync files=2, longest=0.011 s, average=0.006 s; distance=39 kB, estimate=2617 kB; lsn=0/1CEEDD8, redo lsn=0/1CEED80

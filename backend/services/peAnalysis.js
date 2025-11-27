@@ -74,11 +74,11 @@ async function analyzeWithGemini(story) {
             .replace('{source}', story.source || 'Unknown');
 
         const result = await model.generateContent(prompt);
-        const response = await result.response;
+        const response = result.response;
         const text = response.text();
 
         // Clean up markdown code blocks if present
-        const jsonStr = text.replace(/```json\n?|\n?```/g, '').trim();
+        const jsonStr = text.replaceAll(/```json\n?|\n?```/g, '').trim();
         const analysis = JSON.parse(jsonStr);
 
         // Store analysis in database
@@ -145,35 +145,20 @@ function generateMockAnalysis(story) {
     const content = (story.content || story.summary || '').toLowerCase();
     const text = headline + ' ' + content;
 
-    let investmentScore = 5;
-    let dealScore = 5;
-    let portfolioScore = 5;
-
-    // Boost scores based on keywords
-    if (text.match(/\b(acqui|merger|m&a|acquisition|bought)\b/)) dealScore += 3;
-    if (text.match(/\b(valuation|funding|raised|investment|billion|million)\b/)) investmentScore += 2;
-    if (text.match(/\b(saas|software|cloud|ai|fintech)\b/)) portfolioScore += 2;
-    if (text.match(/\b(ipo|public|listing)\b/)) dealScore += 2;
-    if (text.match(/\b(growth|revenue|arr|earnings)\b/)) portfolioScore += 1;
-
-    // Cap at 10
-    investmentScore = Math.min(10, investmentScore);
-    dealScore = Math.min(10, dealScore);
-    portfolioScore = Math.min(10, portfolioScore);
-
+    const { investmentScore, dealScore, portfolioScore } = calculateScores(text);
     const overallScore = ((investmentScore + dealScore + portfolioScore) / 3).toFixed(1);
 
     const analysis = {
         investment_opportunity_score: investmentScore,
         deal_impact_score: dealScore,
         portfolio_relevance_score: portfolioScore,
-        overall_pe_impact_score: parseFloat(overallScore),
+        overall_pe_impact_score: Number.parseFloat(overallScore),
         key_insights: [
-            `${dealScore >= 7 ? 'High' : dealScore >= 5 ? 'Moderate' : 'Low'} M&A activity relevance`,
-            `${investmentScore >= 7 ? 'Strong' : investmentScore >= 5 ? 'Moderate' : 'Limited'} investment opportunity signals`,
-            `${portfolioScore >= 7 ? 'Significant' : portfolioScore >= 5 ? 'Moderate' : 'Minimal'} portfolio company impact`
+            `${getScoreLevel(dealScore)} M&A activity relevance`,
+            `${getScoreLevel(investmentScore, 'investment')} investment opportunity signals`,
+            `${getScoreLevel(portfolioScore, 'impact')} portfolio company impact`
         ],
-        investment_implications: `This ${overallScore >= 7 ? 'highly relevant' : overallScore >= 5 ? 'moderately relevant' : 'less critical'} development should be monitored for potential PE implications.`,
+        investment_implications: `This ${getRelevanceLevel(overallScore)} development should be monitored for potential PE implications.`,
         sectors_affected: extractSectors(text),
         action_items: generateActionItems(investmentScore, dealScore, portfolioScore),
         risk_level: overallScore >= 7 ? 'medium' : 'low'
@@ -188,17 +173,56 @@ function generateMockAnalysis(story) {
     return analysis;
 }
 
+function calculateScores(text) {
+    let investmentScore = 5;
+    let dealScore = 5;
+    let portfolioScore = 5;
+
+    // Boost scores based on keywords
+    if (/\b(acqui|merger|m&a|acquisition|bought)\b/.test(text)) dealScore += 3;
+    if (/\b(valuation|funding|raised|investment|billion|million)\b/.test(text)) investmentScore += 2;
+    if (/\b(saas|software|cloud|ai|fintech)\b/.test(text)) portfolioScore += 2;
+    if (/\b(ipo|public|listing)\b/.test(text)) dealScore += 2;
+    if (/\b(growth|revenue|arr|earnings)\b/.test(text)) portfolioScore += 1;
+
+    return {
+        investmentScore: Math.min(10, investmentScore),
+        dealScore: Math.min(10, dealScore),
+        portfolioScore: Math.min(10, portfolioScore)
+    };
+}
+
+function getScoreLevel(score, type = 'standard') {
+    if (score >= 7) {
+        if (type === 'investment') return 'Strong';
+        if (type === 'impact') return 'Significant';
+        return 'High';
+    }
+    if (score >= 5) {
+        return 'Moderate';
+    }
+    if (type === 'investment') return 'Limited';
+    if (type === 'impact') return 'Minimal';
+    return 'Low';
+}
+
+function getRelevanceLevel(score) {
+    if (score >= 7) return 'highly relevant';
+    if (score >= 5) return 'moderately relevant';
+    return 'less critical';
+}
+
 /**
  * Extract sectors from text
  */
 function extractSectors(text) {
     const sectors = [];
-    if (text.match(/\b(saas|software)\b/)) sectors.push('SaaS');
-    if (text.match(/\b(fintech|payment|banking)\b/)) sectors.push('FinTech');
-    if (text.match(/\b(ai|artificial intelligence|machine learning)\b/)) sectors.push('AI/ML');
-    if (text.match(/\b(cloud|aws|azure|gcp)\b/)) sectors.push('Cloud Infrastructure');
-    if (text.match(/\b(cyber|security)\b/)) sectors.push('Cybersecurity');
-    if (text.match(/\b(data|analytics)\b/)) sectors.push('Data & Analytics');
+    if (/\b(saas|software)\b/.test(text)) sectors.push('SaaS');
+    if (/\b(fintech|payment|banking)\b/.test(text)) sectors.push('FinTech');
+    if (/\b(ai|artificial intelligence|machine learning)\b/.test(text)) sectors.push('AI/ML');
+    if (/\b(cloud|aws|azure|gcp)\b/.test(text)) sectors.push('Cloud Infrastructure');
+    if (/\b(cyber|security)\b/.test(text)) sectors.push('Cybersecurity');
+    if (/\b(data|analytics)\b/.test(text)) sectors.push('Data & Analytics');
 
     return sectors.length > 0 ? sectors : ['Technology'];
 }
