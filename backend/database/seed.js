@@ -1,4 +1,4 @@
-const db = require('../database/db');
+const { stories, subscribers, invitations } = require('./firestore');
 const { analyzePEImpact } = require('../services/peAnalysis');
 
 // Sample stories for development/testing
@@ -70,32 +70,24 @@ async function seedDatabase() {
 
         for (const story of SAMPLE_STORIES) {
             // Check if story already exists
-            const existing = await db.query(
-                'SELECT id FROM stories WHERE url = $1',
-                [story.url]
-            );
+            const existing = await stories.getByUrl(story.url);
 
-            if (existing.rows.length > 0) {
+            if (existing) {
                 console.log(`  ⏭️  Skipping: ${story.headline.substring(0, 60)}... (already exists)`);
                 continue;
             }
 
             // Insert story
-            const result = await db.query(`
-        INSERT INTO stories (headline, source, author, url, content, summary, published_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
-        RETURNING *
-      `, [
-                story.headline,
-                story.source,
-                story.author,
-                story.url,
-                story.content,
-                story.summary,
-                story.published_at
-            ]);
+            const insertedStory = await stories.create({
+                headline: story.headline,
+                source: story.source,
+                author: story.author,
+                url: story.url,
+                content: story.content,
+                summary: story.summary,
+                published_at: story.published_at
+            });
 
-            const insertedStory = result.rows[0];
             inserted++;
 
             console.log(`  ✓ Inserted: ${story.headline.substring(0, 60)}...`);
@@ -109,15 +101,12 @@ async function seedDatabase() {
 
         // Add admin/test subscriber
         const testEmail = 'laird@popk.in'; // User's personal email
-        const subscriberResult = await db.query(
-            `INSERT INTO subscribers (email, name)
-       VALUES ($1, $2)
-       ON CONFLICT (email) DO NOTHING
-       RETURNING *`,
-            [testEmail, 'Laird']
-        );
+        const subscriber = await subscribers.create({
+            email: testEmail,
+            name: 'Laird'
+        });
 
-        if (subscriberResult.rows.length > 0) {
+        if (subscriber) {
             console.log(`✓ Added test subscriber: ${testEmail}`);
         } else {
             console.log(`✓ Test subscriber already exists: ${testEmail}`);
@@ -126,11 +115,10 @@ async function seedDatabase() {
         // Generate some invitation codes
         const codes = ['WELCOME2025', 'PE_INSIDER', 'ALPHA_TEST'];
         for (const code of codes) {
-            await db.query(
-                `INSERT INTO invitations (code) VALUES ($1)
-         ON CONFLICT (code) DO NOTHING`,
-                [code]
-            );
+            const existingInvite = await invitations.getByCode(code);
+            if (!existingInvite) {
+                await invitations.create(code);
+            }
         }
         console.log(`✓ Generated invitation codes: ${codes.join(', ')}\n`);
 

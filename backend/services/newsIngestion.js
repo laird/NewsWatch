@@ -1,5 +1,5 @@
 const Parser = require('rss-parser');
-const db = require('../database/db');
+const { stories, sourceQuality } = require('../database/firestore');
 const { analyzePEImpact } = require('./peAnalysis');
 
 const parser = new Parser({
@@ -38,8 +38,8 @@ async function ingestNews() {
     let totalAnalyzed = 0;
 
     // 1. Get source quality scores
-    const qualityResult = await db.query('SELECT domain, quality_score FROM source_quality');
-    const qualityMap = new Map(qualityResult.rows.map(r => [r.domain, parseFloat(r.quality_score)]));
+    const qualityList = await sourceQuality.getAll();
+    const qualityMap = new Map(qualityList.map(r => [r.domain, parseFloat(r.quality_score)]));
 
     for (const source of NEWS_SOURCES) {
         try {
@@ -61,12 +61,9 @@ async function ingestNews() {
             for (const item of feed.items) {
                 try {
                     // Check if story already exists
-                    const existing = await db.query(
-                        'SELECT id FROM stories WHERE url = $1',
-                        [item.link]
-                    );
+                    const existing = await stories.getByUrl(item.link);
 
-                    if (existing.rows.length > 0) {
+                    if (existing) {
                         continue; // Skip duplicates
                     }
 
@@ -75,20 +72,15 @@ async function ingestNews() {
                     const summary = content.substring(0, 300) + (content.length > 300 ? '...' : '');
 
                     // Store story
-                    const storyResult = await db.query(`
-            INSERT INTO stories (headline, url, content, summary, source, published_at)
-            VALUES ($1, $2, $3, $4, $5, $6)
-            RETURNING *
-          `, [
-                        item.title,
-                        item.link,
+                    const story = await stories.create({
+                        headline: item.title,
+                        url: item.link,
                         content,
                         summary,
-                        source.name,
-                        item.pubDate ? new Date(item.pubDate) : new Date()
-                    ]);
+                        source: source.name,
+                        published_at: item.pubDate ? new Date(item.pubDate) : new Date()
+                    });
 
-                    const story = storyResult.rows[0];
                     sourceIngested++;
                     totalIngested++;
 

@@ -1,22 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../database/db');
+const { newsletters } = require('../database/firestore');
 const { generateAndSendNewsletter } = require('../services/newsletter');
 
 // Get latest newsletter
 router.get('/latest', async (req, res) => {
     try {
-        const result = await db.query(
-            `SELECT * FROM newsletters
-       ORDER BY date DESC
-       LIMIT 1`
-        );
+        const newsletter = await newsletters.getLatest();
 
-        if (result.rows.length === 0) {
+        if (!newsletter) {
             return res.status(404).json({ error: 'No newsletters found' });
         }
 
-        res.json(result.rows[0]);
+        res.json(newsletter);
 
     } catch (error) {
         console.error('Error fetching latest newsletter:', error);
@@ -30,18 +26,13 @@ router.get('/history', async (req, res) => {
         const limit = parseInt(req.query.limit) || 30;
         const offset = parseInt(req.query.offset) || 0;
 
-        const result = await db.query(
-            `SELECT * FROM newsletters
-       ORDER BY date DESC
-       LIMIT $1 OFFSET $2`,
-            [limit, offset]
-        );
+        const newsletterList = await newsletters.getHistory({ limit, offset });
 
         res.json({
-            newsletters: result.rows,
+            newsletters: newsletterList,
             limit,
             offset,
-            count: result.rows.length
+            count: newsletterList.length
         });
 
     } catch (error) {

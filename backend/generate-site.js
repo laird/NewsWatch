@@ -1,6 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
-const db = require('./database/db');
+const { stories } = require('./database/firestore');
 const { ingestNews } = require('./services/newsIngestion');
 
 const OUTPUT_DIR = path.join(__dirname, '../public');
@@ -16,26 +16,19 @@ async function generateStaticSite() {
     await fs.mkdir(path.join(OUTPUT_DIR, 'story'), { recursive: true });
 
     // 3. Fetch top stories
-    const storiesResult = await db.query(`
-    SELECT id, headline, source, author, url, summary, content, published_at,
-           pe_impact_score, pe_analysis
-    FROM stories
-    ORDER BY pe_impact_score DESC NULLS LAST, ingested_at DESC
-    LIMIT 12
-  `);
-    const stories = storiesResult.rows;
+    const storyList = await stories.getTopStories({ limit: 12 });
 
     // 4. Generate Index Page (Cover)
-    const indexHtml = generateIndexHtml(stories);
+    const indexHtml = generateIndexHtml(storyList);
     await fs.writeFile(path.join(OUTPUT_DIR, 'index.html'), indexHtml);
     console.log('✓ Generated index.html');
 
     // 5. Generate Story Detail Pages
-    for (const story of stories) {
+    for (const story of storyList) {
         const storyHtml = generateStoryHtml(story);
         await fs.writeFile(path.join(OUTPUT_DIR, 'story', `${story.id}.html`), storyHtml);
     }
-    console.log(`✓ Generated ${stories.length} story pages`);
+    console.log(`✓ Generated ${storyList.length} story pages`);
 
     // 6. Copy CSS and JS
     await fs.copyFile(path.join(__dirname, '../styles.css'), path.join(OUTPUT_DIR, 'styles.css'));
@@ -45,10 +38,10 @@ async function generateStaticSite() {
     console.log('\n✅ Static site generation complete!');
 }
 
-function generateIndexHtml(stories) {
+function generateIndexHtml(storyList) {
     const date = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-    const storiesHtml = stories.map(story => `
+    const storiesHtml = storyList.map(story => `
     <a href="story/${story.id}.html" class="story-compact" data-story-id="${story.id}">
         <div class="feedback-buttons">
             <button class="thumb-btn thumb-up" onclick="handleThumb('${story.id}', 'up', event)" title="Relevant"><span class="thumb-icon">👍</span></button>
@@ -57,7 +50,7 @@ function generateIndexHtml(stories) {
         <div class="story-content-wrapper">
             <h3 class="headline">${story.headline}</h3>
             <div class="story-meta">
-                <span class="byline">${story.source || 'Unknown'} | ${new Date(story.published_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>
+                <span class="byline">${story.source || 'Unknown'} | ${story.published_at ? new Date(story.published_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : ''}</span>
             </div>
             <p class="story-preview">${story.summary || ''}</p>
         </div>
@@ -80,7 +73,7 @@ function generateIndexHtml(stories) {
                 <span class="separator">|</span>
                 <span class="edition">Static Edition</span>
                 <span class="separator">|</span>
-                <span class="story-count">${stories.length} Stories</span>
+                <span class="story-count">${storyList.length} Stories</span>
             </div>
             <h1 class="title">NewsWatch</h1>
             <div class="tagline">Daily Software Economy Brief for Private Equity Investors</div>
@@ -122,9 +115,9 @@ function generateStoryHtml(story) {
                 <div class="story-meta-large">
                     <span class="source">${story.source}</span>
                     <span class="separator">|</span>
-                    <span class="time">${new Date(story.published_at).toLocaleString()}</span>
+                    <span class="time">${story.published_at ? new Date(story.published_at).toLocaleString() : ''}</span>
                 </div>
-                
+
                 ${story.pe_impact_score ? `
                 <div class="pe-analysis-box">
                     <h3>PE Investor Analysis</h3>
@@ -138,7 +131,7 @@ function generateStoryHtml(story) {
                 <div class="story-body">
                     ${story.content ? story.content.split('\n').map(p => `<p>${p}</p>`).join('') : `<p>${story.summary}</p>`}
                 </div>
-                
+
                 <div class="original-link">
                     <a href="${story.url}" target="_blank">Read original article at ${story.source} &rarr;</a>
                 </div>

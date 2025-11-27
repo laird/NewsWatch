@@ -1,4 +1,4 @@
-const db = require('../database/db');
+const { stories, subscribers, newsletters } = require('../database/firestore');
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -10,19 +10,11 @@ async function generateAndSendNewsletter() {
 
     try {
         // 1. Fetch top stories from last 24 hours
-        const storiesResult = await db.query(`
-      SELECT id, headline, source, author, url, summary, published_at,
-             pe_impact_score, pe_analysis, relevance_score
-      FROM stories
-      WHERE ingested_at > NOW() - INTERVAL '24 hours'
-      ORDER BY pe_impact_score DESC NULLS LAST, relevance_score DESC NULLS LAST
-      LIMIT 12
-    `);
+        const storyList = await stories.getTopForNewsletter({ hours: 24, limit: 12 });
 
-        const stories = storiesResult.rows;
-        console.log(`✓ Found ${stories.length} stories for newsletter`);
+        console.log(`✓ Found ${storyList.length} stories for newsletter`);
 
-        if (stories.length === 0) {
+        if (storyList.length === 0) {
             console.log('⚠️  No stories found for newsletter');
             return {
                 recipientCount: 0,
@@ -32,15 +24,12 @@ async function generateAndSendNewsletter() {
         }
 
         // 2. Generate newsletter HTML
-        const html = await generateNewsletterHTML(stories);
+        const html = await generateNewsletterHTML(storyList);
 
         // 3. Get active subscribers
-        const subscribersResult = await db.query(
-            'SELECT email, name FROM subscribers WHERE is_active = true'
-        );
+        const subscriberList = await subscribers.getActive();
 
-        const subscribers = subscribersResult.rows;
-        console.log(`✓ Found ${subscribers.length} active subscribers`);
+        console.log(`✓ Found ${subscriberList.length} active subscribers`);
 
         // 4. Send emails
         const subject = `NewsWatch Daily Brief - ${new Date().toLocaleDateString('en-US', {
@@ -50,34 +39,32 @@ async function generateAndSendNewsletter() {
             day: 'numeric'
         })}`;
 
-        if (subscribers.length > 0) {
+        if (subscriberList.length > 0) {
             await sendBulkEmail({
-                to: subscribers.map(s => s.email),
+                to: subscriberList.map(s => s.email),
                 subject,
                 html
             });
-            console.log(`✓ Newsletter sent to ${subscribers.length} subscribers`);
+            console.log(`✓ Newsletter sent to ${subscriberList.length} subscribers`);
         } else {
             console.log('⚠️  No active subscribers, skipping email send');
             console.log('📄 Newsletter HTML generated (would be sent to subscribers)');
         }
 
         // 5. Record newsletter send
-        await db.query(`
-      INSERT INTO newsletters (date, subject, sent_at, recipient_count, story_ids)
-      VALUES ($1, $2, NOW(), $3, $4)
-    `, [
-            new Date(),
+        await newsletters.create({
+            date: new Date(),
             subject,
-            subscribers.length,
-            stories.map(s => s.id)
-        ]);
+            sent_at: new Date(),
+            recipient_count: subscriberList.length,
+            story_ids: storyList.map(s => s.id)
+        });
 
         console.log('✅ Newsletter generation complete\n');
 
         return {
-            recipientCount: subscribers.length,
-            storyCount: stories.length,
+            recipientCount: subscriberList.length,
+            storyCount: storyList.length,
             sentAt: new Date()
         };
 
@@ -90,7 +77,7 @@ async function generateAndSendNewsletter() {
 /**
  * Generate newsletter HTML from stories
  */
-async function generateNewsletterHTML(stories) {
+async function generateNewsletterHTML(storyList) {
     const date = new Date().toLocaleDateString('en-US', {
         weekday: 'long',
         year: 'numeric',
@@ -98,7 +85,7 @@ async function generateNewsletterHTML(stories) {
         day: 'numeric'
     });
 
-    const storiesHTML = stories.map((story, index) => {
+    const storiesHTML = storyList.map((story, index) => {
         const peScore = story.pe_impact_score || 0;
         const peAnalysis = story.pe_analysis || {};
 
@@ -154,12 +141,12 @@ async function generateNewsletterHTML(stories) {
             Daily Software Economy Brief for Private Equity Investors
           </div>
         </div>
-        
+
         <!-- Stories -->
         <div style="padding: 30px;">
           ${storiesHTML}
         </div>
-        
+
         <!-- Footer -->
         <div style="border-top: 3px solid #1a1a1a; padding: 20px 30px; text-align: center; background-color: #f9f9f9; font-family: Arial, sans-serif; font-size: 12px; color: #666;">
           <p style="margin: 0 0 10px 0;">NewsWatch delivers curated software economy news daily.</p>

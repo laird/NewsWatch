@@ -8,7 +8,6 @@
     "feedback": "node backend/feedback-server.js",
     "dev": "nodemon backend/server.js",
     "generate": "node backend/generate-site.js",
-    "db:setup": "psql $DATABASE_URL -f backend/database/schema.sql",
     "db:seed": "node backend/database/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -31,6 +30,7 @@
   },
   "homepage": "https://github.com/laird/NewsWatch#readme",
   "dependencies": {
+    "@google-cloud/firestore": "^7.11.0",
     "@google/generative-ai": "^0.24.1",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
@@ -38,8 +38,8 @@
     "express": "^4.21.2",
     "node-cron": "^3.0.3",
     "openai": "^6.9.1",
-    "pg": "^8.13.1",
-    "rss-parser": "^3.13.0"
+    "rss-parser": "^3.13.0",
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

@@ -1,4 +1,4 @@
-const db = require('../database/db');
+const { stories } = require('../database/firestore');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const OpenAI = require('openai');
 
@@ -82,10 +82,10 @@ async function analyzeWithGemini(story) {
         const analysis = JSON.parse(jsonStr);
 
         // Store analysis in database
-        await db.query(
-            'UPDATE stories SET pe_analysis = $1, pe_impact_score = $2 WHERE id = $3',
-            [analysis, analysis.overall_pe_impact_score, story.id]
-        );
+        await stories.update(story.id, {
+            pe_analysis: analysis,
+            pe_impact_score: analysis.overall_pe_impact_score
+        });
 
         return analysis;
     } catch (error) {
@@ -124,10 +124,10 @@ async function analyzeWithOpenAI(story) {
         const analysis = JSON.parse(content);
 
         // Store analysis in database
-        await db.query(
-            'UPDATE stories SET pe_analysis = $1, pe_impact_score = $2 WHERE id = $3',
-            [analysis, analysis.overall_pe_impact_score, story.id]
-        );
+        await stories.update(story.id, {
+            pe_analysis: analysis,
+            pe_impact_score: analysis.overall_pe_impact_score
+        });
 
         return analysis;
     } catch (error) {
@@ -165,10 +165,10 @@ function generateMockAnalysis(story) {
     };
 
     // Store in database
-    db.query(
-        'UPDATE stories SET pe_analysis = $1, pe_impact_score = $2 WHERE id = $3',
-        [analysis, analysis.overall_pe_impact_score, story.id]
-    ).catch(err => console.error('Error storing mock analysis:', err));
+    stories.update(story.id, {
+        pe_analysis: analysis,
+        pe_impact_score: analysis.overall_pe_impact_score
+    }).catch(err => console.error('Error storing mock analysis:', err));
 
     return analysis;
 }
