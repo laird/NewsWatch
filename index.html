@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsWatch - Daily Software Economy Brief</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="newspaper">
+        <!-- Masthead -->
+        <header class="masthead">
+            <div class="edition-info">
+                <span class="date">Tuesday, November 26, 2025</span>
+                <span class="separator">|</span>
+                <span class="edition">Morning Edition</span>
+                <span class="separator">|</span>
+                <span class="story-count">12 Stories</span>
+            </div>
+            <h1 class="title">NewsWatch</h1>
+            <div class="tagline">Daily Software Economy Brief for Private Equity Investors</div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="content">
+            <!-- Story Grid - Ultra Compact -->
+            <div class="story-grid-compact">
+                <!-- Story 1 -->
+                <a href="story.html?id=1" class="story-compact" data-story-id="1">
+                    <div class="feedback-buttons">
+                        <button class="thumb-btn thumb-up" onclick="handleThumb(1, 'up', event)" data-active="false"
+                            title="Relevant"><span class="thumb-icon">👍</span></button>
+                        <button class="thumb-btn thumb-down" onclick="handleThumb(1, 'down', event)" data-active="false"
+                            title="Not Relevant"><span class="thumb-icon">👎</span></button>
+                    </div>
+                    <div class="story-content-wrapper">
+                        <h3 class="headline">OpenAI Announces GPT-5 with Breakthrough Reasoning Capabilities</h3>
+                        <div class="story-meta">
+                            <span class="byline">TechCrunch | 6:00 AM</span>
+                        </div>
+                        <p class="story-preview">OpenAI unveiled GPT-5 this morning, marking what CEO Sam Altman calls
+                            "the most significant leap in AI reasoning since GPT-4." Early benchmarks show 95% accuracy
+                            on graduate-level mathematics...</p>
+                    </div>
+                </a>
+
+                <!-- Story 2 -->
+                <a href="story.html?id=2" class="story-compact" data-story-id="2">
+                    <div class="feedback-buttons">
+                        <button class="thumb-btn thumb-up" onclick="handleThumb(2, 'up', event)" data-active="false"
+                            title="Relevant"><span class="thumb-icon">👍</span></button>
+                        <button class="thumb-btn thumb-down" onclick="handleThumb(2, 'down', event)" data-active="false"
+                            title="Not Relevant"><span class="thumb-icon">👎</span></button>
+                    </div>
+                    <div class="story-content-wrapper">
+                        <h3 class="headline">Stripe Acquires Fintech Startup Lemon for $850M</h3>
+                        <div class="story-meta">
+                            <span class="byline">Bloomberg | 5:30 AM</span>
+                        </div>
+                        <p class="story-preview">Payment giant Stripe announced the acquisition of Lemon, a Y
+                            Combinator-backed fintech startup specializing in embedded banking solutions for SaaS
+                            companies...</p>
+                    </div>
+                </a>
+
+                <!-- Story 3 -->
+                <a href="story.html?id=3" class="story-compact" data-story-id="3">
+                    <div class="feedback-buttons">
+                        <button class="thumb-btn thumb-up" onclick="handleThumb(3, 'up', event)" data-active="false"
+                            title="Relevant"><span class="thumb-icon">👍</span></button>
+                        <button class="thumb-btn thumb-down" onclick="handleThumb(3, 'down', event)" data-active="false"
+                            title="Not Relevant"><span class="thumb-icon">👎</span></button>
+                    </div>
+                    <div class="story-content-wrapper">
+                        <h3 class="headline">AWS Launches New AI Chip to Compete with NVIDIA</h3>
+                        <div class="story-meta">
+                            <span class="byline">The Information | 7:15 AM</span>
+                        </div>
+                        <p class="story-preview">Amazon Web Services introduced Trainium2, its latest custom AI training
+                            chip, claiming 40% better performance per dollar compared to NVIDIA's H100 GPUs...</p>
+                    </div>
+                </a>
+
+                <!-- Story 4 -->
+                <a href="story.html?id=4" class="story-compact" data-story-id="4">
+                    <div class="feedback-buttons">
+                        <button class="thumb-btn thumb-up" onclick="handleThumb(4, 'up', event)" data-active="false"
+                            title="Relevant"><span class="thumb-icon">👍</span></button>
+                        <button class="thumb-btn thumb-down" onclick="handleThumb(4, 'down', event)" data-active="false"
+                            title="Not Relevant"><span class="thumb-icon">👎</span></button>
+                    </div>
+                    <div class="story-content-wrapper">
+                        <h3 class="headline">Databricks Eyes $55B Valuation in New Funding Round</h3>
+                        <div class="story-meta">
+                            <span class="byline">WSJ | 8:30 AM</span>
+                        </div>
+                        <p class="story-preview">Data analytics platform Databricks is in advanced talks to raise $1.5
+                            billion at a $55 billion valuation, making it one of the most valuable private software
+                            companies...</p>
+                    </div>
+                </a>
+
+                <!-- Story 5 -->
+                <a href="story.html?id=5" class="story-compact" data-story-id="5">
+                    <div class="feedback-buttons">
+                        <button class="thumb-btn thumb-up" onclick="handleThumb(5, 'up', event)" data-active="false"
+                            title="Relevant"><span class="thumb-icon">👍</span></button>
+                        <button class="thumb-btn thumb-down" onclick="handleThumb(5, 'down', event)" data-active="false"
+                            title="Not Relevant"><span class="thumb-icon">👎</span></button>
+                    </div>
+                    <div class="story-content-wrapper">
+                        <h3 class="headline">SaaS Valuations Rebound to 8.2x Revenue Multiple</h3>
+                        <div class="story-meta">
+                            <span class="byline">WSJ | 6:45 AM</span>
+                        </div>
+                        <p class="story-preview">Software-as-a-Service companies saw median valuations rise to 8.2x
+                            revenue in Q4 2025, up from 6.1x a year ago, signaling renewed investor confidence...</p>
+                    </div>
+                </a>
+
+                <!-- Story 6 -->
+                <a href="story.html?id=6" class="story-compact" data-story-id="6">
+                    <div class="feedback-buttons">
+                        <button class="thumb-btn thumb-up" onclick="handleThumb(6, 'up', event)" data-active="false"
+                            title="Relevant"><span class="thumb-icon">👍</span></button>
+                        <button class="thumb-btn thumb-down" onclick="handleThumb(6, 'down', event)" data-active="false"
+                            title="Not Relevant"><span class="thumb-icon">👎</span></button>
+                    </div>
+                    <div class="story-content-wrapper">
+                        <h3 class="headline">Wiz Raises $300M at $12B Valuation</h3>
+                        <div class="story-meta">
+                            <span class="byline">TechCrunch | 7:30 AM</span>
+                        </div>
+                        <p class="story-preview">Cloud security platform Wiz closed a $300 million Series D funding
+                            round led by Sequoia Capital, valuing the four-year-old company at $12 billion...</p>
+                    </div>
+                </a>
+
+                <!-- Story 7 -->
+                <a href="story.html?id=7" class="story-compact" data-story-id="7">
+                    <div class="feedback-buttons">
+                        <button class="thumb-btn thumb-up" onclick="handleThumb(7, 'up', event)" data-active="false"
+                            title="Relevant"><span class="thumb-icon">👍</span></button>
+                        <button class="thumb-btn thumb-down" onclick="handleThumb(7, 'down', event)" data-active="false"
+                            title="Not Relevant"><span class="thumb-icon">👎</span></button>
+                    </div>
+                    <div class="story-content-wrapper">
+                        <h3 class="headline">GitHub Copilot Hits 2M Paid Users, $400M ARR</h3>
+                        <div class="story-meta">
+                            <span class="byline">VentureBeat | 8:00 AM</span>
+                        </div>
+                        <p class="story-preview">Microsoft-owned GitHub announced that Copilot has crossed 2 million
+                            paid subscribers, generating an estimated $400 million in annual recurring revenue...</p>
+                    </div>
+                </a>
+
+                <!-- Story 8 -->
+                <a href="story.html?id=8" class="story-compact" data-story-id="8">
+                    <div class="feedback-buttons">
+                        <button class="thumb-btn thumb-up" onclick="handleThumb(8, 'up', event)" data-active="false"
+                            title="Relevant"><span class="thumb-icon">👍</span></button>
+                        <button class="thumb-btn thumb-down" onclick="handleThumb(8, 'down', event)" data-active="false"
+                            title="Not Relevant"><span class="thumb-icon">👎</span></button>
+                    </div>
+                    <div class="story-content-wrapper">
+                        <h3 class="headline">ServiceNow Acquires AI Workflow Startup for $1.2B</h3>
+                        <div class="story-meta">
+                            <span class="byline">Reuters | 7:00 AM</span>
+                        </div>
+                        <p class="story-preview">Enterprise software giant ServiceNow announced the acquisition of
+                            Flowmatic, an AI-powered workflow automation startup, for $1.2 billion in cash and stock...
+                        </p>
+                    </div>
+                </a>
+
+                <!-- Story 9 -->
+                <a href="story.html?id=9" class="story-compact" data-story-id="9">
+                    <div class="feedback-buttons">
+                        <button class="thumb-btn thumb-up" onclick="handleThumb(9, 'up', event)" data-active="false"
+                            title="Relevant"><span class="thumb-icon">👍</span></button>
+                        <button class="thumb-btn thumb-down" onclick="handleThumb(9, 'down', event)" data-active="false"
+                            title="Not Relevant"><span class="thumb-icon">👎</span></button>
+                    </div>
+                    <div class="story-content-wrapper">
+                        <h3 class="headline">Snowflake Stock Jumps 12% on Strong Q4 Earnings</h3>
+                        <div class="story-meta">
+                            <span class="byline">CNBC | 4:30 PM (Yesterday)</span>
+                        </div>
+                        <p class="story-preview">Cloud data platform Snowflake reported Q4 revenue of $900 million,
+                            beating analyst estimates by 8%, with product revenue growing 38% year-over-year...</p>
+                    </div>
+                </a>
+
+                <!-- Story 10 -->
+                <a href="story.html?id=10" class="story-compact" data-story-id="10">
+                    <div class="feedback-buttons">
+                        <button class="thumb-btn thumb-up" onclick="handleThumb(10, 'up', event)" data-active="false"
+                            title="Relevant"><span class="thumb-icon">👍</span></button>
+                        <button class="thumb-btn thumb-down" onclick="handleThumb(10, 'down', event)"
+                            data-active="false" title="Not Relevant"><span class="thumb-icon">👎</span></button>
+                    </div>
+                    <div class="story-content-wrapper">
+                        <h3 class="headline">European SaaS Startup Celonis Eyes US Expansion</h3>
+                        <div class="story-meta">
+                            <span class="byline">Financial Times | 5:00 AM</span>
+                        </div>
+                        <p class="story-preview">German process mining company Celonis announced plans to double its US
+                            workforce to 2,000 employees as it targets American enterprise customers...</p>
+                    </div>
+                </a>
+
+                <!-- Story 11 -->
+                <a href="story.html?id=11" class="story-compact" data-story-id="11">
+                    <div class="feedback-buttons">
+                        <button class="thumb-btn thumb-up" onclick="handleThumb(11, 'up', event)" data-active="false"
+                            title="Relevant"><span class="thumb-icon">👍</span></button>
+                        <button class="thumb-btn thumb-down" onclick="handleThumb(11, 'down', event)"
+                            data-active="false" title="Not Relevant"><span class="thumb-icon">👎</span></button>
+                    </div>
+                    <div class="story-content-wrapper">
+                        <h3 class="headline">Salesforce Announces $10B AI Investment Plan</h3>
+                        <div class="story-meta">
+                            <span class="byline">Bloomberg | 9:00 AM</span>
+                        </div>
+                        <p class="story-preview">Salesforce unveiled a $10 billion investment plan focused on AI
+                            infrastructure and acquisitions over the next three years as the CRM giant faces increasing
+                            competition...</p>
+                    </div>
+                </a>
+
+                <!-- Story 12 -->
+                <a href="story.html?id=12" class="story-compact" data-story-id="12">
+                    <div class="feedback-buttons">
+                        <button class="thumb-btn thumb-up" onclick="handleThumb(12, 'up', event)" data-active="false"
+                            title="Relevant"><span class="thumb-icon">👍</span></button>
+                        <button class="thumb-btn thumb-down" onclick="handleThumb(12, 'down', event)"
+                            data-active="false" title="Not Relevant"><span class="thumb-icon">👎</span></button>
+                    </div>
+                    <div class="story-content-wrapper">
+                        <h3 class="headline">Fintech Unicorn Plaid Targets 2026 IPO</h3>
+                        <div class="story-meta">
+                            <span class="byline">The Information | 8:45 AM</span>
+                        </div>
+                        <p class="story-preview">Banking API platform Plaid is preparing for an IPO in mid-2026,
+                            according to sources familiar with the matter. The company, last valued at $13.4 billion...
+                        </p>
+                    </div>
+                </a>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>NewsWatch delivers curated software economy news daily. Your feedback helps us improve.</p>
+            <p class="copyright">© 2025 NewsWatch. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

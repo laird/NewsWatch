@@ -1,0 +1,47 @@
+{
+  "name": "newswatch",
+  "version": "1.0.0",
+  "description": "NewsWatch - Automated newsletter for PE investors",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "feedback": "node backend/feedback-server.js",
+    "dev": "nodemon backend/server.js",
+    "generate": "node backend/generate-site.js",
+    "db:setup": "psql $DATABASE_URL -f backend/database/schema.sql",
+    "db:seed": "node backend/database/seed.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laird/NewsWatch.git"
+  },
+  "keywords": [
+    "newsletter",
+    "automation",
+    "private-equity",
+    "news",
+    "ai"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/laird/NewsWatch/issues"
+  },
+  "homepage": "https://github.com/laird/NewsWatch#readme",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "node-cron": "^3.0.3",
+    "openai": "^6.9.1",
+    "pg": "^8.13.1",
+    "rss-parser": "^3.13.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

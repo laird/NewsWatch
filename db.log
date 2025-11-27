@@ -1,0 +1,17 @@
+2025-11-26 15:59:07.754 EST [13151] LOG:  starting PostgreSQL 18.1 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 15.2.1 20251112, 64-bit
+2025-11-26 15:59:07.755 EST [13151] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-26 15:59:07.755 EST [13151] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-26 15:59:07.756 EST [13151] FATAL:  could not create lock file "/run/postgresql/.s.PGSQL.5432.lock": No such file or directory
+2025-11-26 15:59:07.758 EST [13151] LOG:  database system is shut down
+2025-11-26 15:59:24.139 EST [13229] LOG:  starting PostgreSQL 18.1 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 15.2.1 20251112, 64-bit
+2025-11-26 15:59:24.140 EST [13229] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-26 15:59:24.140 EST [13229] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-26 15:59:24.141 EST [13229] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2025-11-26 15:59:24.143 EST [13235] LOG:  database system was shut down at 2025-11-26 15:59:02 EST
+2025-11-26 15:59:24.146 EST [13229] LOG:  database system is ready to accept connections
+2025-11-26 16:04:24.228 EST [13233] LOG:  checkpoint starting: time
+2025-11-26 16:06:06.193 EST [13233] LOG:  checkpoint complete: wrote 1017 buffers (6.2%), wrote 3 SLRU buffers; 1 WAL file(s) added, 0 removed, 0 recycled; write=101.849 s, sync=0.068 s, total=101.966 s; sync files=338, longest=0.036 s, average=0.001 s; distance=4806 kB, estimate=4806 kB; lsn=0/1C15C28, redo lsn=0/1C15B98
+2025-11-26 16:14:24.391 EST [13233] LOG:  checkpoint starting: time
+2025-11-26 16:14:28.874 EST [13233] LOG:  checkpoint complete: wrote 44 buffers (0.3%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=4.414 s, sync=0.031 s, total=4.484 s; sync files=35, longest=0.011 s, average=0.001 s; distance=202 kB, estimate=4346 kB; lsn=0/1C48648, redo lsn=0/1C485F0
+2025-11-26 16:19:24.974 EST [13233] LOG:  checkpoint starting: time
+2025-11-26 16:19:28.454 EST [13233] LOG:  checkpoint complete: wrote 34 buffers (0.2%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=3.460 s, sync=0.017 s, total=3.481 s; sync files=18, longest=0.007 s, average=0.001 s; distance=227 kB, estimate=3934 kB; lsn=0/1C81430, redo lsn=0/1C813D8
