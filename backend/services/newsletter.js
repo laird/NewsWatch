@@ -3,14 +3,34 @@ const fs = require('fs').promises;
 const path = require('path');
 
 /**
+ * Convert markdown to HTML for email rendering
+ * Handles common markdown patterns: bold, italic, code, line breaks
+ */
+function convertMarkdownToHTML(text) {
+  if (!text) return text;
+
+  return text
+    // Bold: **text** or __text__ -> <strong>text</strong>
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/__(.+?)__/g, '<strong>$1</strong>')
+    // Italic: *text* or _text_ -> <em>text</em>
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/_(.+?)_/g, '<em>$1</em>')
+    // Inline code: `text` -> <code>text</code>
+    .replace(/`(.+?)`/g, '<code style="background-color: #f4f4f4; padding: 2px 4px; border-radius: 3px; font-family: monospace;">$1</code>')
+    // Line breaks: \n -> <br>
+    .replace(/\n/g, '<br>');
+}
+
+/**
  * Generate and send newsletter
  */
 async function generateAndSendNewsletter() {
-    console.log('\n📰 Starting newsletter generation...');
+  console.log('\n📰 Starting newsletter generation...');
 
-    try {
-        // 1. Fetch top stories from last 24 hours
-        const storiesResult = await db.query(`
+  try {
+    // 1. Fetch top stories from last 24 hours
+    const storiesResult = await db.query(`
       SELECT id, headline, source, author, url, summary, published_at,
              pe_impact_score, pe_analysis, relevance_score
       FROM stories
@@ -19,90 +39,90 @@ async function generateAndSendNewsletter() {
       LIMIT 12
     `);
 
-        const stories = storiesResult.rows;
-        console.log(`✓ Found ${stories.length} stories for newsletter`);
+    const stories = storiesResult.rows;
+    console.log(`✓ Found ${stories.length} stories for newsletter`);
 
-        if (stories.length === 0) {
-            console.log('⚠️  No stories found for newsletter');
-            return {
-                recipientCount: 0,
-                storyCount: 0,
-                sentAt: new Date()
-            };
-        }
+    if (stories.length === 0) {
+      console.log('⚠️  No stories found for newsletter');
+      return {
+        recipientCount: 0,
+        storyCount: 0,
+        sentAt: new Date()
+      };
+    }
 
-        // 2. Generate newsletter HTML
-        const html = await generateNewsletterHTML(stories);
+    // 2. Generate newsletter HTML
+    const html = await generateNewsletterHTML(stories);
 
-        // 3. Get active subscribers
-        const subscribersResult = await db.query(
-            'SELECT email, name FROM subscribers WHERE is_active = true'
-        );
+    // 3. Get active subscribers
+    const subscribersResult = await db.query(
+      'SELECT email, name FROM subscribers WHERE is_active = true'
+    );
 
-        const subscribers = subscribersResult.rows;
-        console.log(`✓ Found ${subscribers.length} active subscribers`);
+    const subscribers = subscribersResult.rows;
+    console.log(`✓ Found ${subscribers.length} active subscribers`);
 
-        // 4. Send emails
-        const subject = `NewsWatch Daily Brief - ${new Date().toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        })}`;
+    // 4. Send emails
+    const subject = `NewsWatch Daily Brief - ${new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })}`;
 
-        if (subscribers.length > 0) {
-            await sendBulkEmail({
-                to: subscribers.map(s => s.email),
-                subject,
-                html
-            });
-            console.log(`✓ Newsletter sent to ${subscribers.length} subscribers`);
-        } else {
-            console.log('⚠️  No active subscribers, skipping email send');
-            console.log('📄 Newsletter HTML generated (would be sent to subscribers)');
-        }
+    if (subscribers.length > 0) {
+      await sendBulkEmail({
+        to: subscribers.map(s => s.email),
+        subject,
+        html
+      });
+      console.log(`✓ Newsletter sent to ${subscribers.length} subscribers`);
+    } else {
+      console.log('⚠️  No active subscribers, skipping email send');
+      console.log('📄 Newsletter HTML generated (would be sent to subscribers)');
+    }
 
-        // 5. Record newsletter send
-        await db.query(`
+    // 5. Record newsletter send
+    await db.query(`
       INSERT INTO newsletters (date, subject, sent_at, recipient_count, story_ids)
       VALUES ($1, $2, NOW(), $3, $4)
     `, [
-            new Date(),
-            subject,
-            subscribers.length,
-            stories.map(s => s.id)
-        ]);
+      new Date(),
+      subject,
+      subscribers.length,
+      stories.map(s => s.id)
+    ]);
 
-        console.log('✅ Newsletter generation complete\n');
+    console.log('✅ Newsletter generation complete\n');
 
-        return {
-            recipientCount: subscribers.length,
-            storyCount: stories.length,
-            sentAt: new Date()
-        };
+    return {
+      recipientCount: subscribers.length,
+      storyCount: stories.length,
+      sentAt: new Date()
+    };
 
-    } catch (error) {
-        console.error('❌ Newsletter generation failed:', error);
-        throw error;
-    }
+  } catch (error) {
+    console.error('❌ Newsletter generation failed:', error);
+    throw error;
+  }
 }
 
 /**
  * Generate newsletter HTML from stories
  */
 async function generateNewsletterHTML(stories) {
-    const date = new Date().toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+  const date = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
-    const storiesHTML = stories.map((story, index) => {
-        const peScore = story.pe_impact_score || 0;
-        const peAnalysis = story.pe_analysis || {};
+  const storiesHTML = stories.map((story, index) => {
+    const peScore = story.pe_impact_score || 0;
+    const peAnalysis = story.pe_analysis || {};
 
-        return `
+    return `
       <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #e0e0e0;">
         <h3 style="margin: 0 0 10px 0; font-size: 18px; line-height: 1.3;">
           <a href="${story.url || '#'}" style="color: #1a1a1a; text-decoration: none;">
@@ -124,15 +144,15 @@ async function generateNewsletterHTML(stories) {
           <div style="background-color: #f0f4ff; border-left: 4px solid #667eea; padding: 12px; margin-top: 10px; font-size: 13px;">
             <strong style="color: #667eea;">PE Investor Insights:</strong>
             <ul style="margin: 8px 0 0 0; padding-left: 20px;">
-              ${peAnalysis.key_insights.slice(0, 2).map(insight => `<li style="margin-bottom: 4px;">${insight}</li>`).join('')}
+              ${peAnalysis.key_insights.slice(0, 2).map(insight => `<li style="margin-bottom: 4px;">${convertMarkdownToHTML(insight)}</li>`).join('')}
             </ul>
           </div>
         ` : ''}
       </div>
     `;
-    }).join('');
+  }).join('');
 
-    return `
+  return `
     <!DOCTYPE html>
     <html>
     <head>
@@ -179,38 +199,38 @@ async function generateNewsletterHTML(stories) {
  * Uses email service if configured, otherwise logs to console
  */
 async function sendBulkEmail({ to, subject, html }) {
-    if (process.env.SENDGRID_API_KEY) {
-        // Use SendGrid
-        const sgMail = require('@sendgrid/mail');
-        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  if (process.env.SENDGRID_API_KEY) {
+    // Use SendGrid
+    const sgMail = require('@sendgrid/mail');
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-        const msg = {
-            to,
-            from: process.env.EMAIL_FROM || 'newsletter@newswatch.local',
-            subject,
-            html
-        };
+    const msg = {
+      to,
+      from: process.env.EMAIL_FROM || 'newsletter@newswatch.local',
+      subject,
+      html
+    };
 
-        await sgMail.sendMultiple(msg);
-        console.log(`✓ Sent via SendGrid to ${to.length} recipients`);
+    await sgMail.sendMultiple(msg);
+    console.log(`✓ Sent via SendGrid to ${to.length} recipients`);
 
-    } else {
-        // Development mode - log to console and save to file
-        console.log('\n📧 EMAIL PREVIEW (No email service configured)');
-        console.log(`To: ${to.join(', ')}`);
-        console.log(`Subject: ${subject}`);
-        console.log(`HTML Length: ${html.length} characters`);
+  } else {
+    // Development mode - log to console and save to file
+    console.log('\n📧 EMAIL PREVIEW (No email service configured)');
+    console.log(`To: ${to.join(', ')}`);
+    console.log(`Subject: ${subject}`);
+    console.log(`HTML Length: ${html.length} characters`);
 
-        // Save to file for preview
-        const outputPath = path.join(__dirname, '../../newsletter-preview.html');
-        await fs.writeFile(outputPath, html);
-        console.log(`✓ Newsletter saved to: ${outputPath}`);
-        console.log('  Open this file in a browser to preview\n');
-    }
+    // Save to file for preview
+    const outputPath = path.join(__dirname, '../../newsletter-preview.html');
+    await fs.writeFile(outputPath, html);
+    console.log(`✓ Newsletter saved to: ${outputPath}`);
+    console.log('  Open this file in a browser to preview\n');
+  }
 }
 
 module.exports = {
-    generateAndSendNewsletter,
-    generateNewsletterHTML,
-    sendBulkEmail
+  generateAndSendNewsletter,
+  generateNewsletterHTML,
+  sendBulkEmail
 };
