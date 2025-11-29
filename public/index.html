@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -43,70 +42,25 @@
         <footer class="footer">
             <div class="separator-line-single"></div>
             <p>&copy; 2024 NewsWatch. All rights reserved.</p>
-            <!DOCTYPE html>
-            <html lang="en">
+        </footer>
+    </div>
 
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>NewsWatch - Daily Software Economy Brief</title>
-                <link rel="preconnect" href="https://fonts.googleapis.com">
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-                <link
-                    href="https://fonts.googleapis.com/css2?family=Chomsky&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@400;700;900&family=UnifrakturMaguntia&display=swap"
-                    rel="stylesheet">
-                <link rel="stylesheet" href="styles.css">
-            </head>
+    <script>
+        // Set date
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
 
-            <body>
-                <div class="newspaper">
-                    <header class="masthead">
-                        <div class="ears">
-                            <div class="ear-left">
-                                VOL. CLXXII... No. 42<br>
-                                NEW YORK, SATURDAY
-                            </div>
-                            <div class="title-wrapper">
-                                <h1 class="paper-title">NewsWatch</h1>
-                                <div class="paper-subtitle">Daily Software Economy Brief</div>
-                            </div>
-                            <div class="ear-right">
-                                PRICE FIVE CENTS<br>
-                                <span id="current-date"></span>
-                            </div>
-                        </div>
-                    </header>
+        // Fetch stories
+        fetch('http://localhost:3000/api/stories')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('stories-container');
+                const stories = data.stories || [];
 
-                    <main class="content">
-                        <div id="stories-container" class="story-grid">
-                            <div
-                                style="padding: 40px; text-align: center; color: #111; font-family: 'Times New Roman', serif; grid-column: 1/-1;">
-                                Loading the latest edition...</div>
-                        </div>
-                    </main>
-
-                    <footer class="footer">
-                        <div class="separator-line-single"></div>
-                        <p>&copy; 2024 NewsWatch. All rights reserved.</p>
-                    </footer>
-                </div>
-
-                <script>
-                    // Set date
-                    document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
-                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-                    });
-
-                    // Fetch stories
-                    fetch('http://localhost:3000/api/stories')
-                        .then(response => response.json())
-                        .then(data => {
-                            const container = document.getElementById('stories-container');
-                            const stories = data.stories || [];
-
-                            if (stories.length === 0) {
-                                container.innerHTML = '<div style="padding: 40px; text-align: center; color: #111; font-family: \'Times New Roman\', serif; grid-column: 1/-1;">No stories found. Run ingestion to populate.</div>';
-                                return;
+                if (stories.length === 0) {
+                    container.innerHTML = '<div style="padding: 40px; text-align: center; color: #111; font-family: \'Times New Roman\', serif; grid-column: 1/-1;">No stories found. Run ingestion to populate.</div>';
+                    return;
                         <h2 class="headline">
                             <a href="story.html?id=${storyId}">${story.headline}</a>
                         </h2>
@@ -121,7 +75,7 @@
                             <a href="story.html?id=${storyId}" class="read-more">[Read Full Story]</a>
                         </div>
                     </article >
-                                    `;
+                        `;
                             }).join('');
                         })
                         .catch(err => {
@@ -174,7 +128,7 @@
                             };
                         }
                     }
-                </script>
-            </body>
+    </script>
+</body>
 
-            </html>
+</html>
