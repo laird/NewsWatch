@@ -11,6 +11,7 @@ db_data/
 # Logs
 *.log
 npm-debug.log*
+db.log
 
 # OS generated files
 .DS_Store

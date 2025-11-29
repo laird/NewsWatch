@@ -1,6 +1,7 @@
 const Parser = require('rss-parser');
 const { stories, sourceQuality } = require('../database/firestore');
 const { analyzePEImpact } = require('./peAnalysis');
+const { processStory } = require('./storyDeduplication');
 
 const parser = new Parser({
     timeout: 10000,
@@ -26,14 +27,68 @@ const NEWS_SOURCES = [
         url: 'https://www.theinformation.com/feed',
         category: 'tech'
     },
-    // Add more sources as needed
+    {
+        name: 'VentureBeat',
+        url: 'https://venturebeat.com/feed/',
+        category: 'tech'
+    },
+    {
+        name: 'Reuters Technology',
+        url: 'https://www.reuters agency.com/feed/?best-topics=tech&post_type=best',
+        category: 'tech'
+    },
+    {
+        name: 'PE Hub',
+        url: 'https://www.pehub.com/feed/',
+        category: 'pe'
+    },
+    {
+        name: 'SaaStr',
+        url: 'https://www.saastr.com/feed/',
+        category: 'saas'
+    },
+    {
+        name: 'Bloomberg Technology',
+        url: 'https://feeds.bloomberg.com/technology/news.rss',
+        category: 'tech'
+    },
+    {
+        name: 'WSJ Technology',
+        url: 'https://feeds.content.dowjones.io/public/rss/RSSMarketsMain',
+        category: 'business'
+    },
+    {
+        name: 'Axios',
+        url: 'https://api.axios.com/feed/',
+        category: 'tech'
+    },
+    {
+        name: 'The Verge',
+        url: 'https://www.theverge.com/rss/index.xml',
+        category: 'tech'
+    },
+    {
+        name: 'Ars Technica',
+        url: 'https://feeds.arstechnica.com/arstechnica/index',
+        category: 'tech'
+    },
+    {
+        name: 'MIT Technology Review',
+        url: 'https://www.technologyreview.com/feed/',
+        category: 'tech'
+    },
+    {
+        name: 'Crunchbase News',
+        url: 'https://news.crunchbase.com/feed/',
+        category: 'startup'
+    }
 ];
 
 /**
  * Ingest news from all configured sources
  */
 async function ingestNews() {
-    console.log('\n📡 Starting news ingestion...');
+    console.log('\\n📡 Starting news ingestion...');
     let totalIngested = 0;
     let totalAnalyzed = 0;
 
@@ -60,40 +115,38 @@ async function ingestNews() {
 
             for (const item of feed.items) {
                 try {
-                    // Check if story already exists
-                    const existing = await stories.getByUrl(item.link);
-
-                    if (existing) {
-                        continue; // Skip duplicates
-                    }
-
                     // Extract content
                     const content = item.contentSnippet || item.content || item.summary || '';
-                    const summary = content.substring(0, 300) + (content.length > 300 ? '...' : '');
+                    const summary = content.substring(0, 800) + (content.length > 800 ? '...' : '');
 
-                    // Store story
-                    const story = await stories.create({
+                    // Process story (will deduplicate if similar story exists)
+                    const story = await processStory({
                         headline: item.title,
                         url: item.link,
-                        content,
-                        summary,
+                        content: content,
+                        summary: summary,
                         source: source.name,
                         published_at: item.pubDate ? new Date(item.pubDate) : new Date()
                     });
 
-                    sourceIngested++;
-                    totalIngested++;
+                    // If processStory returned a UUID string, it was a merge
+                    // If it returned an object, it's a new story
+                    const isNewStory = typeof story === 'object';
 
-                    // Analyze for PE impact (async, don't wait)
-                    // Higher quality sources get priority for analysis if we were rate limited
-                    analyzePEImpact(story)
-                        .then(() => {
-                            totalAnalyzed++;
-                            console.log(`    ✓ Analyzed: ${story.headline.substring(0, 60)}...`);
-                        })
-                        .catch(err => {
-                            console.error(`    ✗ Analysis failed for story ${story.id}:`, err.message);
-                        });
+                    if (isNewStory) {
+                        sourceIngested++;
+                        totalIngested++;
+
+                        // Analyze for PE impact (async, don't wait)
+                        analyzePEImpact(story)
+                            .then(() => {
+                                totalAnalyzed++;
+                                console.log(`    ✓ Analyzed: ${story.headline.substring(0, 60)}...`);
+                            })
+                            .catch(err => {
+                                console.error(`    ✗ Analysis failed for story ${story.id}:`, err.message);
+                            });
+                    }
 
                 } catch (itemError) {
                     console.error(`    Error processing item from ${source.name}:`, itemError.message);
@@ -109,7 +162,7 @@ async function ingestNews() {
         }
     }
 
-    console.log(`\n✅ News ingestion complete: ${totalIngested} stories ingested\n`);
+    console.log(`\\n✅ News ingestion complete: ${totalIngested} stories ingested\\n`);
 
     return {
         totalIngested,

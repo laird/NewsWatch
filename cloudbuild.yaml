@@ -1,0 +1,41 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/newswatch-backend:latest', '.']
+  
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/newswatch-backend:latest']
+  
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'newswatch-backend'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/newswatch-backend:latest'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--timeout'
+      - '300'
+      - '--concurrency'
+      - '80'
+      - '--max-instances'
+      - '10'
+      - '--set-env-vars'
+      - 'NODE_ENV=production,GCP_PROJECT_ID=$PROJECT_ID,AI_PROVIDER=openai,AI_MODEL=gpt-4o-2024-11-20,GMAIL_CLIENT_ID=838764974038-i1tllfugenfmo9qo4e6ck624cq9js6j3.apps.googleusercontent.com,EMAIL_FROM=laird+newswatch@popk.in,ADMIN_EMAIL=lairdapopkin@hotmail.com,NEWSLETTER_SEND_TIME=06:00,NEWSLETTER_TIMEZONE=America/New_York,SHOW_GUIDANCE_IN_NEWSLETTER=true,AUTO_SEND_ON_FEEDBACK=true,ENABLE_TEST_TRIGGER=true'
+      - '--set-secrets'
+      - 'OPENAI_API_KEY=openai-api-key:latest,GMAIL_CLIENT_SECRET=gmail-client-secret:latest,GMAIL_REFRESH_TOKEN=gmail-refresh-token:latest'
+
+images:
+  - 'gcr.io/$PROJECT_ID/newswatch-backend:latest'
+

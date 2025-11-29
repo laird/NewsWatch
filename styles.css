@@ -172,6 +172,10 @@ body {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    word-break: normal;
+    overflow-wrap: break-word;
 }
 
 /* Story Detail Page */
@@ -216,6 +220,10 @@ body {
     line-height: 1.8;
     margin-bottom: 1.5rem;
     text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    word-break: normal;
+    overflow-wrap: break-word;
 }
 
 .source-links {

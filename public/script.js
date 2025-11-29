@@ -5,11 +5,18 @@ function viewStory(storyId) {
     window.location.href = `story.html?id=${storyId}`;
 }
 
-// Handle thumbs up/down on cover page
-function handleThumb(storyId, direction, event) {
+// Configuration
+// Configuration
+const API_BASE_URL = '/api'; // Relative path works for both dev and prod
+
+/**
+ * Handle thumbs up/down click
+ */
+async function handleThumb(storyId, direction, event) {
     // Prevent navigation when clicking feedback buttons
     if (event) {
         event.stopPropagation();
+        event.preventDefault();
     }
 
     const thumbUpBtn = event.currentTarget.parentElement.querySelector('.thumb-up');
@@ -66,6 +73,45 @@ function loadFeedbackState() {
                 }
             }
         });
+    }
+}
+
+/**
+ * Trigger newsletter generation (Test Mode)
+ */
+async function triggerNewsletter() {
+    if (!confirm('⚡ Are you sure you want to trigger a newsletter send? This will email all subscribers.')) {
+        return;
+    }
+
+    try {
+        const btn = document.querySelector('button[onclick="triggerNewsletter()"]');
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '⏳ Sending...';
+        }
+
+        const response = await fetch(`${API_BASE_URL}/newsletter/send`, {
+            method: 'POST'
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert(`✅ Newsletter sent successfully!\n\nRecipients: ${data.recipientCount}\nStories: ${data.storyCount}`);
+        } else {
+            throw new Error(data.message || 'Failed to send newsletter');
+        }
+
+    } catch (error) {
+        console.error('Error triggering newsletter:', error);
+        alert(`❌ Error: ${error.message}`);
+    } finally {
+        const btn = document.querySelector('button[onclick="triggerNewsletter()"]');
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = '⚡ Send Test Newsletter';
+        }
     }
 }
 
