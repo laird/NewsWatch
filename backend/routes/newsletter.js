@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
 const { generateAndSendNewsletter } = require('../services/newsletter');
+const { generateStaticSite } = require('../generate-site');
 
 // Get latest newsletter
 router.get('/latest', async (req, res) => {
@@ -70,6 +71,18 @@ router.post('/send', async (req, res) => {
             error: 'Failed to send newsletter',
             message: error.message
         });
+    }
+});
+
+// Generate static site (manual trigger)
+router.post('/generate-site', async (req, res) => {
+    try {
+        console.log('🏗️ Manual static site generation triggered');
+        await generateStaticSite();
+        res.json({ success: true, message: 'Static site generated successfully' });
+    } catch (error) {
+        console.error('Error generating static site:', error);
+        res.status(500).json({ error: 'Failed to generate static site', message: error.message });
     }
 });
 

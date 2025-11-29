@@ -92,8 +92,7 @@ async function ingestNews() {
                     sourceIngested++;
                     totalIngested++;
 
-                    // Analyze for PE impact (async, don't wait)
-                    // Higher quality sources get priority for analysis if we were rate limited
+                    // Trigger AI analysis asynchronously (don't block ingestion)
                     analyzePEImpact(story)
                         .then(() => {
                             totalAnalyzed++;

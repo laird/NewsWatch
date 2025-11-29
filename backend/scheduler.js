@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const { generateAndSendNewsletter } = require('./services/newsletter');
 const { ingestNews } = require('./services/newsIngestion');
+const { generateStaticSite } = require('./generate-site');
 
 /**
  * Initialize all scheduled tasks
@@ -27,14 +28,18 @@ function initializeScheduler() {
 
     console.log(`  ✓ Newsletter scheduled for ${newsletterTime} daily (${process.env.NEWSLETTER_TIMEZONE || 'America/New_York'})`);
 
-    // Hourly news ingestion
+    // Hourly news ingestion and site generation
     cron.schedule('0 * * * *', async () => {
         console.log(`\n📡 Scheduled news ingestion triggered at ${new Date().toLocaleString()}`);
         try {
             await ingestNews();
-            console.log('✅ Scheduled news ingestion complete\n');
+            console.log('✅ Scheduled news ingestion complete');
+
+            // Generate static site after ingestion
+            await generateStaticSite();
+            console.log('✅ Static site regenerated\n');
         } catch (error) {
-            console.error('❌ Scheduled news ingestion failed:', error);
+            console.error('❌ Scheduled task failed:', error);
         }
     });
 

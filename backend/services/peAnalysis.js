@@ -16,9 +16,9 @@ Provide analysis in the following JSON format:
   "portfolio_relevance_score": 0-10,
   "overall_pe_impact_score": 0-10,
   "key_insights": [
-    "Insight 1",
-    "Insight 2",
-    "Insight 3"
+    "Arrow + Insight 1 (include directional arrow: ↑ ↗ → ↘ ↓)",
+    "Arrow + Insight 2 (include directional arrow: ↑ ↗ → ↘ ↓)",
+    "Arrow + Insight 3 (include directional arrow: ↑ ↗ → ↘ ↓)"
   ],
   "investment_implications": "Brief summary of what this means for PE investors",
   "sectors_affected": ["SaaS", "FinTech", etc.],
@@ -29,13 +29,19 @@ Provide analysis in the following JSON format:
   "risk_level": "low" | "medium" | "high"
 }
 
-Focus on:
-- Investment opportunities (new markets, technologies, companies)
-- M&A implications and deal dynamics
-- Valuation trends and multiples
-- Portfolio company impacts
-- Sector-specific developments
-- Regulatory or market changes affecting deals`;
+CRITICAL: Each key_insight MUST start with a directional arrow followed by specific, actionable analysis:
+- Use ↑ for strong positive M&A/investment signals
+- Use ↗ for moderate positive signals  
+- Use → for neutral/mixed signals
+- Use ↘ for moderate negative signals
+- Use ↓ for strong negative signals
+
+Focus insights on:
+- M&A implications and deal dynamics (acquisitions, consolidation, market changes)
+- Investment opportunities (new markets, technologies, companies, valuations)
+- Portfolio company impacts (competitive threats, growth opportunities, regulatory changes)
+
+Make insights specific and actionable, NOT generic. Reference actual content from the story.`;
 
 /**
  * Analyze a story for PE investor impact
