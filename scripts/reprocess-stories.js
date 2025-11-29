@@ -1,7 +1,7 @@
 // Reprocess all stories with AI analysis
 require('dotenv').config();
-const db = require('./backend/database/db');
-const { analyzePEImpact } = require('./backend/services/peAnalysis');
+const db = require('../backend/database/db');
+const { analyzePEImpact } = require('../backend/services/peAnalysis');
 
 async function reprocessAllStories() {
     console.log('🔄 Reprocessing all stories with AI analysis...\n');
