@@ -119,79 +119,159 @@ async function generateNewsletterHTML(stories) {
   });
 
   const storiesHTML = stories.map((story, index) => {
-    const peScore = story.pe_impact_score || 0;
     const peAnalysis = story.pe_analysis || {};
+    const score = peAnalysis.overall_pe_impact_score || 5;
+    const impactIcon = getImpactIcon(score);
 
     return `
-      <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #e0e0e0;">
-        <h3 style="margin: 0 0 10px 0; font-size: 18px; line-height: 1.3;">
-          <a href="${story.url || '#'}" style="color: #1a1a1a; text-decoration: none;">
-            ${story.headline}
-          </a>
-        </h3>
-        <div style="font-size: 12px; color: #999; margin-bottom: 10px; text-transform: uppercase;">
-          ${story.source || 'Unknown Source'} ${story.published_at ? '| ' + new Date(story.published_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : ''}
+      <div class="story">
+        <div class="headline">
+          <a href="${story.url}">${story.headline}</a>
         </div>
-        ${peScore >= 7 ? `
-          <div style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-bottom: 10px;">
-            📊 PE Impact: ${peScore}/10
-          </div>
-        ` : ''}
-        <p style="margin: 10px 0; font-size: 15px; line-height: 1.6; color: #333;">
-          ${story.summary || 'Click to read the full story...'}
-        </p>
+        <div class="meta">${story.source} • ${new Date(story.published_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+        
         ${peAnalysis.key_insights && peAnalysis.key_insights.length > 0 ? `
-          <div style="background-color: #f0f4ff; border-left: 4px solid #667eea; padding: 12px; margin-top: 10px; font-size: 13px;">
-            <strong style="color: #667eea;">PE Investor Insights:</strong>
-            <ul style="margin: 8px 0 0 0; padding-left: 20px;">
-              ${peAnalysis.key_insights.slice(0, 2).map(insight => `<li style="margin-bottom: 4px;">${convertMarkdownToHTML(insight)}</li>`).join('')}
-            </ul>
+          <div class="impact-row">
+            <div class="icon-wrapper" style="background-color: ${impactIcon.bgColor}; color: ${impactIcon.color};">
+              ${impactIcon.svg}
+            </div>
+            <div>
+              <span class="impact-label">M&A Impact:</span>
+              ${convertMarkdownToHTML(peAnalysis.key_insights[0])}
+            </div>
           </div>
         ` : ''}
+
+        <div class="summary">
+          ${story.summary}
+        </div>
       </div>
     `;
   }).join('');
 
-  return `
+  const html = `
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>NewsWatch Daily Brief</title>
+      <style>
+        /* Base Styles */
+        body { font-family: 'Georgia', serif; background-color: #f5f5f7; margin: 0; padding: 0; color: #1a1a1a; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+        .header { background-color: #1a1a1a; color: #ffffff; padding: 30px 20px; text-align: center; }
+        .header h1 { margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 1px; }
+        .date { color: #9ca3af; font-size: 14px; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* Story Card */
+        .story { padding: 24px 20px; border-bottom: 1px solid #e5e7eb; }
+        .headline { font-size: 22px; font-weight: 700; margin: 0 0 8px 0; line-height: 1.3; }
+        .headline a { color: #1a1a1a; text-decoration: none; }
+        .headline a:hover { color: #2563eb; }
+        .meta { font-family: Arial, sans-serif; font-size: 12px; color: #6b7280; text-transform: uppercase; margin-bottom: 16px; }
+        .summary { font-size: 16px; line-height: 1.6; color: #374151; margin-bottom: 16px; }
+        
+        /* Impact Section */
+        .impact-row {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          background-color: #f9fafb;
+          padding: 12px;
+          border-radius: 6px;
+          font-family: Arial, sans-serif;
+          font-size: 14px;
+          line-height: 1.5;
+          color: #374151;
+          margin-bottom: 16px;
+        }
+        
+        .icon-wrapper {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          flex-shrink: 0;
+          margin-top: -2px;
+        }
+        
+        .impact-label { font-weight: 700; color: #111; margin-right: 4px; }
+        
+        /* Footer */
+        .footer { background-color: #f5f5f7; padding: 30px 20px; text-align: center; font-size: 12px; color: #6b7280; font-family: Arial, sans-serif; }
+        .footer a { color: #6b7280; text-decoration: underline; }
+      </style>
     </head>
-    <body style="margin: 0; padding: 0; font-family: Georgia, 'Times New Roman', serif; background-color: #f5f5f0;">
-      <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);">
-        <!-- Masthead -->
-        <div style="border-bottom: 4px solid #1a1a1a; padding: 30px 30px 20px; text-align: center; background: linear-gradient(to bottom, #ffffff 0%, #f9f9f9 100%);">
-          <div style="font-family: Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 10px;">
-            ${date}
-          </div>
-          <h1 style="font-size: 42px; font-weight: bold; letter-spacing: -2px; margin: 10px 0; text-transform: uppercase; color: #1a1a1a;">
-            NewsWatch
-          </h1>
-          <div style="font-family: Arial, sans-serif; font-size: 12px; font-style: italic; color: #666; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 8px 0; margin-top: 10px;">
-            Daily Software Economy Brief for Private Equity Investors
-          </div>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>NewsWatch</h1>
+          <div class="date">${date}</div>
         </div>
-        
-        <!-- Stories -->
-        <div style="padding: 30px;">
-          ${storiesHTML}
-        </div>
-        
-        <!-- Footer -->
-        <div style="border-top: 3px solid #1a1a1a; padding: 20px 30px; text-align: center; background-color: #f9f9f9; font-family: Arial, sans-serif; font-size: 12px; color: #666;">
-          <p style="margin: 0 0 10px 0;">NewsWatch delivers curated software economy news daily.</p>
-          <p style="margin: 0; font-size: 11px; color: #999;">© ${new Date().getFullYear()} NewsWatch. All rights reserved.</p>
-          <p style="margin: 10px 0 0 0; font-size: 11px;">
-            <a href="#" style="color: #666; text-decoration: none;">Unsubscribe</a>
+
+        ${storiesHTML}
+
+        <div class="footer">
+          <p>Sent to ${stories.length} subscribers</p>
+          <p>
+            <a href="#">Unsubscribe</a> • <a href="#">Manage Preferences</a>
           </p>
         </div>
       </div>
     </body>
     </html>
   `;
+
+  return html;
+}
+
+/**
+ * Get impact icon and colors based on score (1-10)
+ */
+function getImpactIcon(score) {
+  // Strong Negative (1-2)
+  if (score <= 2) {
+    return {
+      bgColor: '#fee2e2', // Red 100
+      color: '#b91c1c',   // Red 700
+      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>` // Down
+    };
+  }
+  // Weak Negative (3-4)
+  else if (score <= 4) {
+    return {
+      bgColor: '#fef2f2', // Red 50
+      color: '#dc2626',   // Red 600
+      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="7" y1="7" x2="17" y2="17"></line><polyline points="17 7 17 17 7 17"></polyline></svg>` // Down-Right
+    };
+  }
+  // Neutral (5-6)
+  else if (score <= 6) {
+    return {
+      bgColor: '#f3f4f6', // Gray 100
+      color: '#6b7280',   // Gray 500
+      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>` // Right
+    };
+  }
+  // Weak Positive (7-8)
+  else if (score <= 8) {
+    return {
+      bgColor: '#f0fdf4', // Green 50
+      color: '#16a34a',   // Green 600
+      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>` // Up-Right
+    };
+  }
+  // Strong Positive (9-10)
+  else {
+    return {
+      bgColor: '#ecfdf5', // Emerald 50
+      color: '#059669',   // Emerald 600
+      svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>` // Up
+    };
+  }
 }
 
 /**
