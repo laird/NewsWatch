@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #f5f5f7;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1a1a1a;
+            margin-bottom: 40px;
+            font-family: Arial, sans-serif;
+            font-weight: 300;
+        }
+
+        .story-card {
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .headline {
+            font-size: 22px;
+            line-height: 1.3;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+
+        .headline a {
+            text-decoration: none;
+            color: #1a1a1a;
+        }
+
+        .meta {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        /* Impact Section */
+        .impact-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background-color: #f9fafb;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #374151;
+        }
+
+        .icon-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: -2px;
+            /* Align with text baseline roughly */
+        }
+
+        .icon-wrapper svg {
+            width: 16px;
+            height: 16px;
+            stroke-width: 2.5;
+        }
+
+        .impact-label {
+            font-weight: 700;
+            color: #111;
+            margin-right: 4px;
+        }
+
+        /* Sentiment Colors & Icons */
+
+        /* Strong Positive: Straight Up */
+        .positive-strong {
+            background-color: #ecfdf5;
+            color: #059669;
+            /* Emerald 600 */
+        }
+
+        /* Weak Positive: 45 Up-Right */
+        .positive-weak {
+            background-color: #f0fdf4;
+            color: #16a34a;
+            /* Green 600 */
+        }
+
+        /* Neutral: Horizontal */
+        .neutral {
+            background-color: #f3f4f6;
+            color: #6b7280;
+            /* Gray 500 */
+        }
+
+        /* Weak Negative: 45 Down-Right */
+        .negative-weak {
+            background-color: #fef2f2;
+            color: #dc2626;
+            /* Red 600 */
+        }
+
+        /* Strong Negative: Straight Down */
+        .negative-strong {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            /* Red 700 */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>M&A Impact Analysis</h1>
+
+        <!-- Example 1: Strong Positive -->
+        <div class="story-card">
+            <div class="headline">
+                <a href="#">Stripe Acquires Lemon for $850M</a>
+            </div>
+            <div class="meta">Bloomberg | 2 hours ago</div>
+
+            <div class="impact-row">
+                <div class="icon-wrapper positive-strong">
+                    <!-- Arrow Up -->
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="12" y1="19" x2="12" y2="5"></line>
+                        <polyline points="5 12 12 5 19 12"></polyline>
+                    </svg>
+                </div>
+                <div>
+                    <span class="impact-label">M&A Impact:</span>
+                    This acquisition significantly strengthens Stripe's position in the Latin American market, likely
+                    accelerating regional consolidation.
+                </div>
+            </div>
+        </div>
+
+        <!-- Example 2: Weak Positive -->
+        <div class="story-card">
+            <div class="headline">
+                <a href="#">Databricks Launches New Data Governance Tool</a>
+            </div>
+            <div class="meta">TechCrunch | 5 hours ago</div>
+
+            <div class="impact-row">
+                <div class="icon-wrapper positive-weak">
+                    <!-- Arrow Up-Right -->
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                        <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                </div>
+                <div>
+                    <span class="impact-label">M&A Impact:</span>
+                    While primarily a product update, this enhances Databricks' valuation metrics ahead of a potential
+                    IPO or strategic merger.
+                </div>
+            </div>
+        </div>
+
+        <!-- Example 3: Neutral -->
+        <div class="story-card">
+            <div class="headline">
+                <a href="#">Oracle Q3 Earnings Meet Expectations</a>
+            </div>
+            <div class="meta">Reuters | 8 hours ago</div>
+
+            <div class="impact-row">
+                <div class="icon-wrapper neutral">
+                    <!-- Arrow Right -->
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </div>
+                <div>
+                    <span class="impact-label">M&A Impact:</span>
+                    Stable earnings suggest business as usual; no immediate triggers for major M&A activity are expected
+                    in the short term.
+                </div>
+            </div>
+        </div>
+
+        <!-- Example 4: Weak Negative -->
+        <div class="story-card">
+            <div class="headline">
+                <a href="#">Regulatory Scrutiny Increases for AI Mergers</a>
+            </div>
+            <div class="meta">FT | 10 hours ago</div>
+
+            <div class="impact-row">
+                <div class="icon-wrapper negative-weak">
+                    <!-- Arrow Down-Right -->
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="7" y1="7" x2="17" y2="17"></line>
+                        <polyline points="17 7 17 17 7 17"></polyline>
+                    </svg>
+                </div>
+                <div>
+                    <span class="impact-label">M&A Impact:</span>
+                    New guidelines may delay mid-sized AI acquisitions, introducing moderate friction into the deal
+                    pipeline.
+                </div>
+            </div>
+        </div>
+
+        <!-- Example 5: Strong Negative -->
+        <div class="story-card">
+            <div class="headline">
+                <a href="#">Adobe-Figma Deal Collapses Under Pressure</a>
+            </div>
+            <div class="meta">CNBC | 12 hours ago</div>
+
+            <div class="impact-row">
+                <div class="icon-wrapper negative-strong">
+                    <!-- Arrow Down -->
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <polyline points="19 12 12 19 5 12"></polyline>
+                    </svg>
+                </div>
+                <div>
+                    <span class="impact-label">M&A Impact:</span>
+                    The deal's failure sets a chilling precedent for large-scale software consolidation, likely freezing
+                    mega-mergers for the year.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>
