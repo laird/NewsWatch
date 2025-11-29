@@ -30,6 +30,9 @@ app.use('/api/stories', storiesRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/subscribers', subscriberRoutes);
 
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, '../public')));
+
 // Health check
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });

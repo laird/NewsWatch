@@ -153,11 +153,7 @@ function generateMockAnalysis(story) {
         deal_impact_score: dealScore,
         portfolio_relevance_score: portfolioScore,
         overall_pe_impact_score: Number.parseFloat(overallScore),
-        key_insights: [
-            `${getScoreLevel(dealScore)} M&A activity relevance`,
-            `${getScoreLevel(investmentScore, 'investment')} investment opportunity signals`,
-            `${getScoreLevel(portfolioScore, 'impact')} portfolio company impact`
-        ],
+        key_insights: generateInsights(text, story.headline, dealScore, investmentScore, portfolioScore),
         investment_implications: `This ${getRelevanceLevel(overallScore)} development should be monitored for potential PE implications.`,
         sectors_affected: extractSectors(text),
         action_items: generateActionItems(investmentScore, dealScore, portfolioScore),
@@ -225,6 +221,74 @@ function extractSectors(text) {
     if (/\b(data|analytics)\b/.test(text)) sectors.push('Data & Analytics');
 
     return sectors.length > 0 ? sectors : ['Technology'];
+}
+
+/**
+ * Generate context-aware insights with directional arrows
+ */
+function generateInsights(text, headline, dealScore, investmentScore, portfolioScore) {
+    const insights = [];
+
+    // Determine arrow based on overall score
+    const getArrow = (score) => {
+        if (score >= 8) return '↑';
+        if (score >= 6) return '↗';
+        if (score >= 4) return '→';
+        if (score >= 2) return '↘';
+        return '↓';
+    };
+
+    // M&A/Deal Activity Insight
+    if (/\b(acqui|merger|m&a|acquisition|bought|deal|buyout)\b/.test(text)) {
+        if (dealScore >= 7) {
+            insights.push(`${getArrow(dealScore)} Significant M&A activity signals potential sector consolidation and increased deal flow`);
+        } else if (dealScore >= 5) {
+            insights.push(`${getArrow(dealScore)} Notable transaction activity may indicate emerging opportunities in adjacent markets`);
+        } else {
+            insights.push(`${getArrow(dealScore)} Limited direct M&A implications but worth monitoring for sector trends`);
+        }
+    } else if (/\b(ipo|public|listing|spac)\b/.test(text)) {
+        insights.push(`${getArrow(dealScore)} Public market activity could affect private valuations and create exit opportunities`);
+    } else if (/\b(valuation|funding|raised|investment)\b/.test(text)) {
+        insights.push(`${getArrow(dealScore)} Valuation trends may impact future deal pricing and investor appetite`);
+    } else {
+        insights.push(`${getArrow(dealScore)} Moderate relevance to M&A strategy; monitor for indirect market effects`);
+    }
+
+    // Investment Opportunity Insight
+    if (/\b(growth|expansion|scale|revenue|arr)\b/.test(text)) {
+        if (investmentScore >= 7) {
+            insights.push(`${getArrow(investmentScore)} Strong growth indicators suggest attractive investment targets in this space`);
+        } else {
+            insights.push(`${getArrow(investmentScore)} Some growth signals present; evaluate sector momentum before committing capital`);
+        }
+    } else if (/\b(disruption|innovation|technology|ai|platform)\b/.test(text)) {
+        insights.push(`${getArrow(investmentScore)} Technology shift creates opportunities for early-stage investments and roll-ups`);
+    } else if (/\b(decline|layoff|restructur|bankruptcy|shutdown)\b/.test(text)) {
+        insights.push(`${getArrow(investmentScore)} Market stress may create distressed asset opportunities or portfolio risks`);
+    }
+
+    // Portfolio Company Impact Insight  
+    if (/\b(saas|software|cloud)\b/.test(text)) {
+        if (portfolioScore >= 7) {
+            insights.push(`${getArrow(portfolioScore)} Direct impact on software portfolio companies; assess competitive positioning immediately`);
+        } else {
+            insights.push(`${getArrow(portfolioScore)} Tangential effect on tech portfolios; consider for next quarterly review`);
+        }
+    } else if (/\b(regulation|compliance|policy|law)\b/.test(text)) {
+        insights.push(`${getArrow(portfolioScore)} Regulatory changes may affect portfolio operations and require compliance reviews`);
+    } else if (/\b(market|sector|industry)\b/.test(text)) {
+        insights.push(`${getArrow(portfolioScore)} Broader market trends could influence portfolio company performance and valuations`);
+    }
+
+    // Ensure we always have at least one insight
+    if (insights.length === 0) {
+        const avgScore = (dealScore + investmentScore + portfolioScore) / 3;
+        insights.push(`${getArrow(avgScore)} Monitor this development for potential portfolio and deal implications`);
+    }
+
+    // Return top 3 insights (or fewer if less available)
+    return insights.slice(0, 3);
 }
 
 /**

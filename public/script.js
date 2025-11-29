@@ -5,8 +5,13 @@ function viewStory(storyId) {
     window.location.href = `story.html?id=${storyId}`;
 }
 
-// Handle thumbs up/down on cover page
-function handleThumb(storyId, direction, event) {
+// Configuration
+const API_BASE_URL = 'http://localhost:3000/api'; // Point to local feedback server
+
+/**
+ * Handle thumbs up/down click
+ */
+async function handleThumb(storyId, rating, event) {
     // Prevent navigation when clicking feedback buttons
     if (event) {
         event.stopPropagation();
