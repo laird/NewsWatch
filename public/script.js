@@ -6,7 +6,7 @@ function viewStory(storyId) {
 }
 
 // Configuration
-const API_BASE_URL = 'http://localhost:3000/api'; // Point to local feedback server
+const API_BASE_URL = '/api'; // Relative path for both local and prod
 
 /**
  * Handle thumbs up/down click

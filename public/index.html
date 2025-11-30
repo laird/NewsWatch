@@ -45,6 +45,7 @@
         </footer>
     </div>
 
+    <script src="script.js"></script>
     <script>
         // Set date
         document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
@@ -52,7 +53,7 @@
         });
 
         // Fetch stories
-        fetch('http://localhost:3000/api/stories')
+        fetch('/api/stories')
             .then(response => response.json())
             .then(data => {
                 const container = document.getElementById('stories-container');
