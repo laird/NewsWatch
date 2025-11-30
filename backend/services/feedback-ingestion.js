@@ -34,12 +34,28 @@ async function ingestEmailFeedback() {
 
             console.log(`  ✓ Saved feedback from ${reply.from} and updated guidance`);
 
-            // 5. Auto-send newsletter if enabled
+            // 5. Auto-send newsletter if enabled (only for test users)
             if (process.env.AUTO_SEND_ON_FEEDBACK === 'true') {
-                console.log('  📰 Auto-sending updated newsletter...');
-                const { generateAndSendNewsletter } = require('./newsletter');
-                await generateAndSendNewsletter();
-                console.log('  ✓ Updated newsletter sent');
+                // Extract email from "Name <email>" format if necessary
+                const emailMatch = reply.from.match(/<(.+)>/) || [null, reply.from];
+                const email = emailMatch[1] || reply.from;
+
+                // Check if user is a test user
+                const { queryDocs } = require('../database/db-firestore');
+                const users = await queryDocs('subscribers', [
+                    { field: 'email', op: '==', value: email }
+                ]);
+
+                const isTestUser = users.length > 0 && users[0].is_test_user;
+
+                if (isTestUser) {
+                    console.log(`  📰 Auto-sending updated newsletter to test user ${email}...`);
+                    const { generateAndSendNewsletter } = require('./newsletter');
+                    await generateAndSendNewsletter();
+                    console.log('  ✓ Updated newsletter sent');
+                } else {
+                    console.log(`  ℹ️  Skipping auto-send for non-test user ${email}`);
+                }
             }
         }
 

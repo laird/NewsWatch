@@ -16,3 +16,11 @@ db.log
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Generated newsletters
+newsletter-*.html
+
+# Agent artifacts
+.claude-flow/
+.swarm/
+CLAUDE.md

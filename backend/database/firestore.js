@@ -4,12 +4,22 @@ require('dotenv').config();
 
 // Initialize Firestore
 // In production on GCP, credentials are auto-detected
-// For local development, set GOOGLE_APPLICATION_CREDENTIALS env var
-const db = new Firestore({
-    projectId: process.env.GCP_PROJECT_ID,
-    // For local development with emulator:
-    // host: process.env.FIRESTORE_EMULATOR_HOST || undefined
-});
+// For local development, set FIRESTORE_EMULATOR_HOST env var or it will auto-detect
+const firestoreConfig = {
+    projectId: process.env.GCP_PROJECT_ID || 'newswatch-local',
+};
+
+// For local development with emulator
+if (process.env.FIRESTORE_EMULATOR_HOST || process.env.NODE_ENV === 'development') {
+    // Emulator will be auto-detected if FIRESTORE_EMULATOR_HOST is set
+    // Default to localhost:8080 if in development mode
+    if (!process.env.FIRESTORE_EMULATOR_HOST) {
+        process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
+    }
+    console.log(`🔧 Using Firestore Emulator at ${process.env.FIRESTORE_EMULATOR_HOST}`);
+}
+
+const db = new Firestore(firestoreConfig);
 
 // Collection references
 const collections = {

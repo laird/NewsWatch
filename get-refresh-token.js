@@ -19,12 +19,33 @@ const SCOPES = [
 ];
 
 async function getRefreshToken() {
-    const clientId = process.env.GMAIL_CLIENT_ID;
-    const clientSecret = process.env.GMAIL_CLIENT_SECRET;
+    let clientId = process.env.GMAIL_CLIENT_ID;
+    let clientSecret = process.env.GMAIL_CLIENT_SECRET;
+
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
 
     if (!clientId || !clientSecret) {
-        console.error('❌ Error: GMAIL_CLIENT_ID and GMAIL_CLIENT_SECRET must be set in backend/.env');
-        console.log('Please follow the gmail_setup_guide.md to get these credentials.');
+        console.log('⚠️  GMAIL_CLIENT_ID or GMAIL_CLIENT_SECRET not found in backend/.env');
+        console.log('Please enter them manually (you can get these from Google Cloud Console):\n');
+
+        if (!clientId) {
+            clientId = await new Promise(resolve => {
+                rl.question('Enter Client ID: ', answer => resolve(answer.trim()));
+            });
+        }
+
+        if (!clientSecret) {
+            clientSecret = await new Promise(resolve => {
+                rl.question('Enter Client Secret: ', answer => resolve(answer.trim()));
+            });
+        }
+    }
+
+    if (!clientId || !clientSecret) {
+        console.error('❌ Error: Client ID and Client Secret are required.');
         process.exit(1);
     }
 
@@ -44,10 +65,6 @@ async function getRefreshToken() {
     console.log('Opening browser to authorize access...');
 
     // Create a temporary server to handle the callback
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
 
     const server = http.createServer(async (req, res) => {
         try {

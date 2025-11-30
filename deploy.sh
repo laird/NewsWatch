@@ -76,7 +76,7 @@ start_local() {
     
     # Start backend server
     print_msg "Starting backend server..."
-    npm start &
+    npm run dev &
     SERVER_PID=$!
     
     print_msg "Local environment running!"

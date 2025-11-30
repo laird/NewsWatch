@@ -106,6 +106,58 @@ async function generateNewsletterHTML(stories, options = {}) {
     day: 'numeric'
   });
 
+  // Helper function to format dates (handles Firestore Timestamps)
+  const formatDate = (dateValue, options = {}) => {
+    if (!dateValue) return '';
+
+    let dateObj;
+    if (dateValue.toDate && typeof dateValue.toDate === 'function') {
+      // Firestore Timestamp
+      dateObj = dateValue.toDate();
+    } else if (dateValue instanceof Date) {
+      dateObj = dateValue;
+    } else if (typeof dateValue === 'string' || typeof dateValue === 'number') {
+      dateObj = new Date(dateValue);
+    } else {
+      return '';
+    }
+
+    return dateObj.toLocaleTimeString('en-US', options);
+  };
+
+  // Get current AI guidance if requested
+  let guidanceHTML = '';
+  if (includeGuidance) {
+    const guidanceService = require('./guidance-service');
+    let currentGuidance = await guidanceService.getCurrentGuidance();
+
+    // Fallback to default guidance if none exists
+    if (!currentGuidance) {
+      currentGuidance = `Prioritize valuation and analysis of enterprise SaaS (Software-as-a-Service) businesses with ARR > $10M, applying standard private equity analysis best practices (e.g., unit economics, retention/cohort analysis, revenue quality, growth sustainability, margin structure, and cash flow conversion).
+
+Ignore consumer apps.
+
+Maintain active coverage of:
+- Crypto infrastructure businesses (e.g., exchanges, custody, compliance, developer tooling, infrastructure providers), but ignore analysis of coins/tokens themselves unless their characteristics have a direct, material impact on the underlying infrastructure businesses.
+- Healthcare rollup strategies and platforms, with attention to acquisition economics, integration risk, payer mix, regulatory exposure, and scalability of the rollup model.`;
+    }
+
+    if (currentGuidance) {
+      guidanceHTML = `
+        <!-- AI Guidance Section -->
+        <div style="border-top: 3px solid #667eea; padding: 20px 30px; background-color: #f0f4ff; font-family: Arial, sans-serif; font-size: 13px; color: #333; margin-top: 20px;">
+          <h3 style="margin: 0 0 15px 0; font-size: 16px; color: #667eea;">🤖 Current AI Instructions</h3>
+          <div style="background-color: white; padding: 15px; border-radius: 8px; border-left: 4px solid #667eea;">
+            <p style="margin: 0; line-height: 1.6; white-space: pre-wrap;">${currentGuidance}</p>
+          </div>
+          <p style="margin: 15px 0 0 0; font-size: 11px; color: #666;">
+            <em>Based on your feedback, here is what I'm currently focusing on.</em>
+          </p>
+        </div>
+      `;
+    }
+  }
+
   const storiesHTML = stories.map((story, index) => {
     const peScore = story.pe_impact_score || 0;
     const peAnalysis = story.pe_analysis || {};
@@ -137,7 +189,7 @@ async function generateNewsletterHTML(stories, options = {}) {
           </a>
         </h3>
         <div style="font-size: 12px; color: #999; margin-bottom: 10px; text-transform: uppercase;">
-          ${story.source || 'Unknown Source'} ${story.published_at ? '| ' + new Date(story.published_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : ''}
+          ${story.source || 'Unknown Source'} ${story.published_at ? '| ' + formatDate(story.published_at, { hour: 'numeric', minute: '2-digit' }) : ''}
         </div>
         <div style="display: inline-block; background: ${bgGradient}; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-bottom: 10px;">
           ${arrow} PE Impact: ${peScore}/10
@@ -188,11 +240,16 @@ async function generateNewsletterHTML(stories, options = {}) {
         <!-- Footer -->
         <div style="border-top: 3px solid #1a1a1a; padding: 20px 30px; text-align: center; background-color: #f9f9f9; font-family: Arial, sans-serif; font-size: 12px; color: #666;">
           <p style="margin: 0 0 10px 0;">NewsWatch delivers curated software economy news daily.</p>
+          <p style="margin: 0 0 10px 0; font-size: 13px; color: #333;">
+            <strong>📧 Send Feedback:</strong> <em>Reply to this email with your thoughts to help improve the analysis!</em>
+          </p>
           <p style="margin: 0; font-size: 11px; color: #999;">© ${new Date().getFullYear()} NewsWatch. All rights reserved.</p>
           <p style="margin: 10px 0 0 0; font-size: 11px;">
             <a href="#" style="color: #666; text-decoration: none;">Unsubscribe</a>
           </p>
         </div>
+        
+        ${guidanceHTML}
       </div>
     </body>
     </html>
@@ -219,20 +276,60 @@ async function sendBulkEmail({ to, subject, html }) {
     await sgMail.sendMultiple(msg);
     console.log(`✓ Sent via SendGrid to ${to.length} recipients`);
 
-  } else if (process.env.GMAIL_REFRESH_TOKEN) {
+  } else if (process.env.GMAIL_CLIENT_ID && process.env.GMAIL_CLIENT_SECRET && process.env.GMAIL_REFRESH_TOKEN) {
     // Use Gmail API
-    const gmailClient = require('./gmail-client');
+    const { google } = require('googleapis');
+    const OAuth2 = google.auth.OAuth2;
 
-    // Send to each recipient individually via Gmail
+    const oauth2Client = new OAuth2(
+      process.env.GMAIL_CLIENT_ID,
+      process.env.GMAIL_CLIENT_SECRET,
+      "http://localhost:8081/oauth2callback"
+    );
+
+    oauth2Client.setCredentials({
+      refresh_token: process.env.GMAIL_REFRESH_TOKEN
+    });
+
+    const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+
+    // Gmail API requires emails to be sent individually
+    const fromEmail = process.env.EMAIL_FROM || process.env.ADMIN_EMAIL || 'laird@popk.in';
+
     for (const recipient of to) {
+      // Create email in RFC 2822 format
+      const email = [
+        `From: NewsWatch <${fromEmail}>`,
+        `To: ${recipient}`,
+        `Subject: ${subject}`,
+        'MIME-Version: 1.0',
+        'Content-Type: text/html; charset=utf-8',
+        '',
+        html
+      ].join('\n');
+
+      // Encode email in base64url format
+      const encodedEmail = Buffer.from(email)
+        .toString('base64')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+
       try {
-        await gmailClient.sendEmail({ to: recipient, subject, html });
-        console.log(`✓ Sent via Gmail to ${recipient}`);
+        await gmail.users.messages.send({
+          userId: 'me',
+          requestBody: {
+            raw: encodedEmail
+          }
+        });
+        console.log(`✓ Sent to ${recipient}`);
       } catch (error) {
         console.error(`✗ Failed to send to ${recipient}:`, error.message);
+        throw error;
       }
     }
-    console.log(`✓ Sent via Gmail API to ${to.length} recipients`);
+
+    console.log(`✅ Sent via Gmail API to ${to.length} recipients`);
 
   } else {
     // Development mode - log to console and save to file
@@ -242,6 +339,8 @@ async function sendBulkEmail({ to, subject, html }) {
     console.log(`HTML Length: ${html.length} characters`);
 
     // Save to file for preview
+    const path = require('path');
+    const fs = require('fs').promises;
     const outputPath = path.join(__dirname, '../../newsletter-preview.html');
     await fs.writeFile(outputPath, html);
     console.log(`✓ Newsletter saved to: ${outputPath}`);
