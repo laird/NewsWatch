@@ -109,7 +109,25 @@ async function generateNewsletterHTML(stories, options = {}) {
   const storiesHTML = stories.map((story, index) => {
     const peScore = story.pe_impact_score || 0;
     const peAnalysis = story.pe_analysis || {};
-    const arrow = peScore >= 7 ? '↑' : '↓';
+
+    // Determine arrow and color based on PE impact score
+    let arrow, bgGradient;
+    if (peScore >= 8) {
+      arrow = '↗'; // Up 45 degrees (high impact)
+      bgGradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    } else if (peScore >= 6) {
+      arrow = '↑'; // Straight up (moderate-high impact)
+      bgGradient = 'linear-gradient(135deg, #4c9aff 0%, #5b7fc7 100%)';
+    } else if (peScore >= 4) {
+      arrow = '→'; // Level/right (neutral impact)
+      bgGradient = 'linear-gradient(135deg, #999 0%, #777 100%)';
+    } else if (peScore >= 2) {
+      arrow = '↓'; // Straight down (low impact)
+      bgGradient = 'linear-gradient(135deg, #888 0%, #666 100%)';
+    } else {
+      arrow = '↘'; // Down 45 degrees (very low impact)
+      bgGradient = 'linear-gradient(135deg, #777 0%, #555 100%)';
+    }
 
     return `
       <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #e0e0e0;">
@@ -121,7 +139,7 @@ async function generateNewsletterHTML(stories, options = {}) {
         <div style="font-size: 12px; color: #999; margin-bottom: 10px; text-transform: uppercase;">
           ${story.source || 'Unknown Source'} ${story.published_at ? '| ' + new Date(story.published_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : ''}
         </div>
-        <div style="display: inline-block; background: linear-gradient(135deg, ${peScore >= 7 ? '#667eea' : '#999'} 0%, ${peScore >= 7 ? '#764ba2' : '#666'} 100%); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-bottom: 10px;">
+        <div style="display: inline-block; background: ${bgGradient}; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-bottom: 10px;">
           ${arrow} PE Impact: ${peScore}/10
         </div>
         <p style="margin: 10px 0; font-size: 15px; line-height: 1.6; color: #333;">
@@ -183,7 +201,7 @@ async function generateNewsletterHTML(stories, options = {}) {
 
 /**
  * Send bulk email
- * Uses email service if configured, otherwise logs to console
+ * Uses SendGrid if configured, Gmail if available, otherwise logs to console
  */
 async function sendBulkEmail({ to, subject, html }) {
   if (process.env.SENDGRID_API_KEY) {
@@ -200,6 +218,21 @@ async function sendBulkEmail({ to, subject, html }) {
 
     await sgMail.sendMultiple(msg);
     console.log(`✓ Sent via SendGrid to ${to.length} recipients`);
+
+  } else if (process.env.GMAIL_REFRESH_TOKEN) {
+    // Use Gmail API
+    const gmailClient = require('./gmail-client');
+
+    // Send to each recipient individually via Gmail
+    for (const recipient of to) {
+      try {
+        await gmailClient.sendEmail({ to: recipient, subject, html });
+        console.log(`✓ Sent via Gmail to ${recipient}`);
+      } catch (error) {
+        console.error(`✗ Failed to send to ${recipient}:`, error.message);
+      }
+    }
+    console.log(`✓ Sent via Gmail API to ${to.length} recipients`);
 
   } else {
     // Development mode - log to console and save to file
