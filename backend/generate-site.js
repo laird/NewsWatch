@@ -61,10 +61,22 @@ async function generateStaticSite() {
     console.log('\n✅ Static site generation complete!');
 }
 
-function generateIndexHtml(storyList) {
-    const date = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+// Helper to safely format dates from Firestore Timestamps or strings
+const formatDate = (dateObj, options = {}) => {
+    if (!dateObj) return '';
+    let date;
+    // Handle Firestore Timestamp
+    if (dateObj && typeof dateObj.toDate === 'function') {
+        date = dateObj.toDate();
+    } else {
+        date = new Date(dateObj);
+    }
 
-    const storiesHtml = storyList.map(story => `
+    if (isNaN(date.getTime())) return '';
+    return date.toLocaleString('en-US', options);
+};
+
+const storiesHtml = storyList.map(story => `
     <a href="story/${story.id}.html" class="story-compact" data-story-id="${story.id}">
         <div class="feedback-buttons">
             <button class="thumb-btn thumb-up" onclick="handleThumb('${story.id}', 'up', event)" title="Relevant"><span class="thumb-icon">👍</span></button>
@@ -73,14 +85,14 @@ function generateIndexHtml(storyList) {
         <div class="story-content-wrapper">
             <h3 class="headline">${story.headline}</h3>
             <div class="story-meta">
-                <span class="byline">${story.source || 'Unknown'} | ${story.published_at ? new Date(story.published_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : ''}</span>
+                <span class="byline">${story.source || 'Unknown'} | ${formatDate(story.published_at, { hour: 'numeric', minute: '2-digit' })}</span>
             </div>
             <p class="story-preview">${story.summary || ''}</p>
         </div>
     </a>
   `).join('');
 
-    return `<!DOCTYPE html>
+return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -117,6 +129,19 @@ function generateIndexHtml(storyList) {
 }
 
 function generateStoryHtml(story) {
+    // Helper to safely format dates (duplicated for scope, or could be shared)
+    const formatDate = (dateObj, options = {}) => {
+        if (!dateObj) return '';
+        let date;
+        if (dateObj && typeof dateObj.toDate === 'function') {
+            date = dateObj.toDate();
+        } else {
+            date = new Date(dateObj);
+        }
+        if (isNaN(date.getTime())) return '';
+        return date.toLocaleString('en-US', options);
+    };
+
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -138,7 +163,7 @@ function generateStoryHtml(story) {
                 <div class="story-meta-large">
                     <span class="source">${story.source}</span>
                     <span class="separator">|</span>
-                    <span class="time">${story.published_at ? new Date(story.published_at).toLocaleString() : ''}</span>
+                    <span class="time">${formatDate(story.published_at)}</span>
                 </div>
 
                 ${story.pe_impact_score ? `
