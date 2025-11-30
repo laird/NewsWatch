@@ -79,7 +79,11 @@ function generateIndexHtml(storyList) {
         return date.toLocaleString('en-US', options);
     };
 
-    const storiesHtml = storyList.map(story => `
+    const storiesHtml = storyList.map(story => {
+        const peScore = story.pe_impact_score || 0;
+        const peAnalysis = story.pe_analysis || {};
+
+        return `
     <a href="story/${story.id}.html" class="story-compact" data-story-id="${story.id}">
         <div class="feedback-buttons">
             <button class="thumb-btn thumb-up" onclick="handleThumb('${story.id}', 'up', event)" title="Relevant"><span class="thumb-icon">👍</span></button>
@@ -89,11 +93,21 @@ function generateIndexHtml(storyList) {
             <h3 class="headline">${story.headline}</h3>
             <div class="story-meta">
                 <span class="byline">${story.source || 'Unknown'} | ${formatDate(story.published_at, { hour: 'numeric', minute: '2-digit' })}</span>
+                ${peScore >= 7 ? `<span class="pe-badge">📊 PE Impact: ${peScore}/10</span>` : ''}
             </div>
             <p class="story-preview">${story.summary || ''}</p>
+            ${peAnalysis.key_insights && peAnalysis.key_insights.length > 0 ? `
+            <div class="pe-insights">
+                <strong>PE Investor Insights:</strong>
+                <ul>
+                    ${peAnalysis.key_insights.slice(0, 2).map(insight => `<li>${insight}</li>`).join('')}
+                </ul>
+            </div>
+            ` : ''}
         </div>
     </a>
-  `).join('');
+  `;
+    }).join('');
 
     return `<!DOCTYPE html>
 <html lang="en">
