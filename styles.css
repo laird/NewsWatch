@@ -194,40 +194,41 @@ body {
             display: none;
         }
     }
+}
 
-    /* Compact Story Card (for Index) */
-    .story-compact {
-        display: block;
-        text-decoration: none;
-        color: inherit;
-        margin-bottom: 20px;
-        break-inside: avoid;
-        border-bottom: 1px solid #ccc;
-        padding-bottom: 15px;
-    }
+/* Compact Story Card (for Index) */
+.story-compact {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    margin-bottom: 20px;
+    break-inside: avoid;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 15px;
+}
 
-    .story-compact:hover .headline {
-        text-decoration: underline;
-    }
+.story-compact:hover .headline {
+    text-decoration: underline;
+}
 
-    .story-compact .headline {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.2rem;
-        margin-bottom: 5px;
-        color: #111;
-    }
+.story-compact .headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+    color: #111;
+}
 
-    .story-compact .byline {
-        font-family: 'Times New Roman', Times, serif;
-        font-size: 0.8rem;
-        color: #666;
-        font-style: italic;
-    }
+.story-compact .byline {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+}
 
-    .story-compact .story-preview {
-        font-family: 'Times New Roman', Times, serif;
-        font-size: 0.95rem;
-        line-height: 1.2;
-        color: #333;
-        margin-top: 5px;
-    }
+.story-compact .story-preview {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    color: #333;
+    margin-top: 5px;
+}
