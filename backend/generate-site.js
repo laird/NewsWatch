@@ -1,5 +1,5 @@
 const { Storage } = require('@google-cloud/storage');
-const { stories } = require('./database/firestore');
+const { stories, db } = require('./database/firestore');
 const { ingestNews } = require('./services/newsIngestion');
 
 const storage = new Storage();
@@ -20,8 +20,19 @@ async function uploadToGCS(filename, content, contentType = 'text/html') {
 async function generateStaticSite() {
     console.log('🏗️  Starting static site generation (GCS)...');
 
-    // 1. Ingest latest news first
-    await ingestNews();
+    // 1. Check if we need to ingest news (skip if run within last hour)
+    const metadataRef = db.collection('system_metadata').doc('ingestion');
+    const metadataDoc = await metadataRef.get();
+    const lastIngestion = metadataDoc.exists ? metadataDoc.data().last_run : null;
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+
+    if (!lastIngestion || lastIngestion.toDate() < oneHourAgo) {
+        console.log('🔄 Ingesting latest news...');
+        await ingestNews();
+        await metadataRef.set({ last_run: new Date() });
+    } else {
+        console.log('⏭️  Skipping ingestion (last run was less than 1 hour ago)');
+    }
 
     // 2. Fetch top stories
     const storyList = await stories.getTopStories({ limit: 12 });
