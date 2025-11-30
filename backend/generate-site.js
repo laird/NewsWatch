@@ -1,8 +1,24 @@
-const { stories, db } = require('./database/firestore');
+const { Storage } = require('@google-cloud/storage');
+const { stories } = require('./database/firestore');
 const { ingestNews } = require('./services/newsIngestion');
 
+const storage = new Storage();
+const BUCKET_NAME = 'newswatch-479605-public';
+const bucket = storage.bucket(BUCKET_NAME);
+
+async function uploadToGCS(filename, content, contentType = 'text/html') {
+    const file = bucket.file(filename);
+    await file.save(content, {
+        metadata: {
+            contentType,
+            cacheControl: 'public, max-age=3600',
+        },
+    });
+    console.log(`✓ Uploaded gs://${BUCKET_NAME}/${filename}`);
+}
+
 async function generateStaticSite() {
-    console.log('🏗️  Starting static site generation...');
+    console.log('🏗️  Starting static site generation (GCS)...');
 
     // 1. Ingest latest news first
     await ingestNews();
@@ -12,39 +28,24 @@ async function generateStaticSite() {
 
     // 3. Generate Index Page (Cover)
     const indexHtml = generateIndexHtml(storyList);
-
-    // Store in Firestore
-    await db.collection('static_site').doc('index').set({
-        html: indexHtml,
-        updated_at: new Date()
-    });
-    console.log('✓ Generated and stored index.html');
+    await uploadToGCS('index.html', indexHtml);
 
     // 4. Generate Story Detail Pages
-    const batch = db.batch();
-    let batchCount = 0;
-
     for (const story of storyList) {
         const storyHtml = generateStoryHtml(story);
-        const ref = db.collection('static_site').doc(`story_${story.id}`);
-        batch.set(ref, {
-            html: storyHtml,
-            updated_at: new Date()
-        });
-        batchCount++;
-
-        // Commit batch if limit reached (500 writes)
-        if (batchCount >= 400) {
-            await batch.commit();
-            batchCount = 0;
-        }
+        await uploadToGCS(`story/${story.id}.html`, storyHtml);
     }
+    console.log(`✓ Generated and uploaded ${storyList.length} story pages`);
 
-    if (batchCount > 0) {
-        await batch.commit();
-    }
+    // 5. Upload Assets (CSS/JS) - Read from local source
+    const fs = require('fs').promises;
+    const path = require('path');
 
-    console.log(`✓ Generated and stored ${storyList.length} story pages`);
+    const cssContent = await fs.readFile(path.join(__dirname, '../styles.css'));
+    await uploadToGCS('styles.css', cssContent, 'text/css');
+
+    const jsContent = await fs.readFile(path.join(__dirname, '../script.js'));
+    await uploadToGCS('script.js', jsContent, 'application/javascript');
 
     console.log('\n✅ Static site generation complete!');
 }

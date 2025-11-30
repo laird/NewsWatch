@@ -32,38 +32,17 @@ app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/subscribers', subscriberRoutes);
 app.use('/api/reanalyze', require('./routes/reanalyze'));
 
-// Serve static content from Firestore
-const { db } = require('./database/firestore');
+// Redirect to GCS static site
+const GCS_BASE_URL = 'https://storage.googleapis.com/newswatch-479605-public';
 
-// Serve index page
-app.get('/', async (req, res) => {
-    try {
-        const doc = await db.collection('static_site').doc('index').get();
-        if (doc.exists) {
-            res.send(doc.data().html);
-        } else {
-            // Fallback to loading message or trigger generation
-            res.send('<html><body><h1>Site is generating... please refresh in a minute.</h1></body></html>');
-        }
-    } catch (error) {
-        console.error('Error serving index:', error);
-        res.status(500).send('Internal Server Error');
-    }
+// Serve index page - Redirect to GCS
+app.get('/', (req, res) => {
+    res.redirect(`${GCS_BASE_URL}/index.html`);
 });
 
-// Serve story pages
-app.get('/story/:id.html', async (req, res) => {
-    try {
-        const doc = await db.collection('static_site').doc(`story_${req.params.id}`).get();
-        if (doc.exists) {
-            res.send(doc.data().html);
-        } else {
-            res.status(404).send('Story not found');
-        }
-    } catch (error) {
-        console.error('Error serving story:', error);
-        res.status(500).send('Internal Server Error');
-    }
+// Serve story pages - Redirect to GCS
+app.get('/story/:id.html', (req, res) => {
+    res.redirect(`${GCS_BASE_URL}/story/${req.params.id}.html`);
 });
 
 // API route to trigger generation (for Cloud Scheduler)
@@ -72,14 +51,19 @@ app.post('/api/generate-site', async (req, res) => {
         const { generateStaticSite } = require('./generate-site');
         // Run asynchronously to avoid timeout
         generateStaticSite().catch(err => console.error('Generation failed:', err));
-        res.json({ status: 'started', message: 'Site generation triggered' });
+        res.json({ status: 'started', message: 'Site generation triggered (GCS)' });
     } catch (error) {
         console.error('Error triggering generation:', error);
         res.status(500).json({ error: 'Failed to trigger generation' });
     }
 });
 
-// Serve other static files (CSS, JS, images) from public directory
+// Serve other static files (CSS, JS, images) - Redirect to GCS
+// We keep local serving for API-related assets if needed, but for the site we use GCS
+app.get('/styles.css', (req, res) => res.redirect(`${GCS_BASE_URL}/styles.css`));
+app.get('/script.js', (req, res) => res.redirect(`${GCS_BASE_URL}/script.js`));
+
+// Keep express.static for fallback/local dev
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Health check
