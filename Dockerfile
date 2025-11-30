@@ -12,6 +12,7 @@ RUN npm ci --omit=dev
 
 # Copy application code
 COPY backend ./backend
+COPY public ./public
 COPY *.js ./
 COPY styles.css ./
 
