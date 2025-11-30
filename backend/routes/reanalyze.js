@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../database/db');
+const { stories } = require('../database/firestore');
 const { analyzePEImpact } = require('../services/peAnalysis');
 
 // Reanalyze all stories (useful for testing new prompts or switching AI providers)
@@ -9,22 +9,18 @@ router.post('/reanalyze', async (req, res) => {
         const limit = parseInt(req.query.limit) || 100; // Default to 100 to avoid overwhelming the AI
 
         // Get stories to reanalyze
-        const result = await db.query(
-            'SELECT * FROM stories ORDER BY ingested_at DESC LIMIT $1',
-            [limit]
-        );
+        const storyList = await stories.getAll({ limit });
 
-        const stories = result.rows;
-        console.log(`\n🔄 Reanalyzing ${stories.length} stories...`);
+        console.log(`\n🔄 Reanalyzing ${storyList.length} stories...`);
 
         let successCount = 0;
         let errorCount = 0;
         const errors = [];
 
         // Process each story synchronously
-        for (let i = 0; i < stories.length; i++) {
-            const story = stories[i];
-            console.log(`[${i + 1}/${stories.length}] ${story.headline.substring(0, 60)}...`);
+        for (let i = 0; i < storyList.length; i++) {
+            const story = storyList[i];
+            console.log(`[${i + 1}/${storyList.length}] ${story.headline.substring(0, 60)}...`);
 
             try {
                 await analyzePEImpact(story);
@@ -41,7 +37,7 @@ router.post('/reanalyze', async (req, res) => {
 
         res.json({
             success: true,
-            processed: stories.length,
+            processed: storyList.length,
             successful: successCount,
             errors: errorCount,
             errorDetails: errors
