@@ -23,4 +23,4 @@ ENV NODE_ENV=production
 ENV PORT=8080
 
 # Start the application
-CMD ["sh", "-c", "node backend/generate-site.js && node backend/server.js"]
+CMD ["node", "backend/server.js"]
