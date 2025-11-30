@@ -61,22 +61,25 @@ async function generateStaticSite() {
     console.log('\n✅ Static site generation complete!');
 }
 
-// Helper to safely format dates from Firestore Timestamps or strings
-const formatDate = (dateObj, options = {}) => {
-    if (!dateObj) return '';
-    let date;
-    // Handle Firestore Timestamp
-    if (dateObj && typeof dateObj.toDate === 'function') {
-        date = dateObj.toDate();
-    } else {
-        date = new Date(dateObj);
-    }
+function generateIndexHtml(storyList) {
+    const date = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-    if (isNaN(date.getTime())) return '';
-    return date.toLocaleString('en-US', options);
-};
+    // Helper to safely format dates from Firestore Timestamps or strings
+    const formatDate = (dateObj, options = {}) => {
+        if (!dateObj) return '';
+        let date;
+        // Handle Firestore Timestamp
+        if (dateObj && typeof dateObj.toDate === 'function') {
+            date = dateObj.toDate();
+        } else {
+            date = new Date(dateObj);
+        }
 
-const storiesHtml = storyList.map(story => `
+        if (isNaN(date.getTime())) return '';
+        return date.toLocaleString('en-US', options);
+    };
+
+    const storiesHtml = storyList.map(story => `
     <a href="story/${story.id}.html" class="story-compact" data-story-id="${story.id}">
         <div class="feedback-buttons">
             <button class="thumb-btn thumb-up" onclick="handleThumb('${story.id}', 'up', event)" title="Relevant"><span class="thumb-icon">👍</span></button>
@@ -92,7 +95,7 @@ const storiesHtml = storyList.map(story => `
     </a>
   `).join('');
 
-return `<!DOCTYPE html>
+    return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
