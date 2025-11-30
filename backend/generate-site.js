@@ -1,9 +1,5 @@
-const fs = require('fs').promises;
-const path = require('path');
-const { stories } = require('./database/firestore');
+const { stories, db } = require('./database/firestore');
 const { ingestNews } = require('./services/newsIngestion');
-
-const OUTPUT_DIR = path.join(__dirname, '../public');
 
 async function generateStaticSite() {
     console.log('🏗️  Starting static site generation...');
@@ -11,29 +7,44 @@ async function generateStaticSite() {
     // 1. Ingest latest news first
     await ingestNews();
 
-    // 2. Ensure output directory exists
-    await fs.mkdir(OUTPUT_DIR, { recursive: true });
-    await fs.mkdir(path.join(OUTPUT_DIR, 'story'), { recursive: true });
-
-    // 3. Fetch top stories
+    // 2. Fetch top stories
     const storyList = await stories.getTopStories({ limit: 12 });
 
-    // 4. Generate Index Page (Cover)
+    // 3. Generate Index Page (Cover)
     const indexHtml = generateIndexHtml(storyList);
-    await fs.writeFile(path.join(OUTPUT_DIR, 'index.html'), indexHtml);
-    console.log('✓ Generated index.html');
 
-    // 5. Generate Story Detail Pages
+    // Store in Firestore
+    await db.collection('static_site').doc('index').set({
+        html: indexHtml,
+        updated_at: new Date()
+    });
+    console.log('✓ Generated and stored index.html');
+
+    // 4. Generate Story Detail Pages
+    const batch = db.batch();
+    let batchCount = 0;
+
     for (const story of storyList) {
         const storyHtml = generateStoryHtml(story);
-        await fs.writeFile(path.join(OUTPUT_DIR, 'story', `${story.id}.html`), storyHtml);
-    }
-    console.log(`✓ Generated ${storyList.length} story pages`);
+        const ref = db.collection('static_site').doc(`story_${story.id}`);
+        batch.set(ref, {
+            html: storyHtml,
+            updated_at: new Date()
+        });
+        batchCount++;
 
-    // 6. Copy CSS and JS
-    await fs.copyFile(path.join(__dirname, '../styles.css'), path.join(OUTPUT_DIR, 'styles.css'));
-    await fs.copyFile(path.join(__dirname, '../script.js'), path.join(OUTPUT_DIR, 'script.js'));
-    console.log('✓ Copied assets');
+        // Commit batch if limit reached (500 writes)
+        if (batchCount >= 400) {
+            await batch.commit();
+            batchCount = 0;
+        }
+    }
+
+    if (batchCount > 0) {
+        await batch.commit();
+    }
+
+    console.log(`✓ Generated and stored ${storyList.length} story pages`);
 
     console.log('\n✅ Static site generation complete!');
 }
