@@ -55,9 +55,9 @@ app.use((req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-    console.log(`\n🚀 NewsWatch API server running on http://localhost:${PORT}`);
-    console.log(`📊 Health check: http://localhost:${PORT}/health`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`\n🚀 NewsWatch API server running on http://0.0.0.0:${PORT}`);
+    console.log(`📊 Health check: http://0.0.0.0:${PORT}/health`);
     console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}\n`);
 
     // Initialize scheduler
