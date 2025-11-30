@@ -244,6 +244,10 @@ body {
     margin-left: 8px;
 }
 
+.story-compact .pe-badge.low {
+    background: linear-gradient(135deg, #999 0%, #666 100%);
+}
+
 .story-compact .pe-insights {
     background-color: #f0f4ff;
     border-left: 3px solid #667eea;

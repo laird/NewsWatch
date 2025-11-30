@@ -6,90 +6,112 @@ const path = require('path');
  * Generate and send newsletter
  */
 async function generateAndSendNewsletter() {
-    console.log('\n📰 Starting newsletter generation...');
+  console.log('\n📰 Starting newsletter generation...');
 
-    try {
-        // 1. Fetch top stories from last 24 hours
-        const storyList = await stories.getTopForNewsletter({ hours: 24, limit: 12 });
+  try {
+    // 1. Fetch top stories from last 24 hours
+    const storyList = await stories.getTopForNewsletter({ hours: 24, limit: 12 });
 
-        console.log(`✓ Found ${storyList.length} stories for newsletter`);
+    console.log(`✓ Found ${storyList.length} stories for newsletter`);
 
-        if (storyList.length === 0) {
-            console.log('⚠️  No stories found for newsletter');
-            return {
-                recipientCount: 0,
-                storyCount: 0,
-                sentAt: new Date()
-            };
-        }
-
-        // 2. Generate newsletter HTML
-        const html = await generateNewsletterHTML(storyList);
-
-        // 3. Get active subscribers
-        const subscriberList = await subscribers.getActive();
-
-        console.log(`✓ Found ${subscriberList.length} active subscribers`);
-
-        // 4. Send emails
-        const subject = `NewsWatch Daily Brief - ${new Date().toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        })}`;
-
-        if (subscriberList.length > 0) {
-            await sendBulkEmail({
-                to: subscriberList.map(s => s.email),
-                subject,
-                html
-            });
-            console.log(`✓ Newsletter sent to ${subscriberList.length} subscribers`);
-        } else {
-            console.log('⚠️  No active subscribers, skipping email send');
-            console.log('📄 Newsletter HTML generated (would be sent to subscribers)');
-        }
-
-        // 5. Record newsletter send
-        await newsletters.create({
-            date: new Date(),
-            subject,
-            sent_at: new Date(),
-            recipient_count: subscriberList.length,
-            story_ids: storyList.map(s => s.id)
-        });
-
-        console.log('✅ Newsletter generation complete\n');
-
-        return {
-            recipientCount: subscriberList.length,
-            storyCount: storyList.length,
-            sentAt: new Date()
-        };
-
-    } catch (error) {
-        console.error('❌ Newsletter generation failed:', error);
-        throw error;
+    if (storyList.length === 0) {
+      console.log('⚠️  No stories found for newsletter');
+      return {
+        recipientCount: 0,
+        storyCount: 0,
+        sentAt: new Date()
+      };
     }
+
+    // 2. Get active subscribers
+    const subscriberList = await subscribers.getActive();
+    console.log(`✓ Found ${subscriberList.length} active subscribers`);
+
+    // 3. Split into test and regular users
+    const testUsers = subscriberList.filter(s => s.is_test_user);
+    const regularUsers = subscriberList.filter(s => !s.is_test_user);
+
+    console.log(`  - Test users: ${testUsers.length}`);
+    console.log(`  - Regular users: ${regularUsers.length}`);
+
+    // 4. Generate and send newsletters
+    const subject = `NewsWatch Daily Brief - ${new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })}`;
+
+    // Send to test users (with guidance)
+    if (testUsers.length > 0) {
+      const htmlWithGuidance = await generateNewsletterHTML(storyList, { includeGuidance: true });
+      await sendBulkEmail({
+        to: testUsers.map(s => s.email),
+        subject,
+        html: htmlWithGuidance
+      });
+      console.log(`✓ Sent newsletter (with guidance) to ${testUsers.length} test users`);
+    }
+
+    // Send to regular users (without guidance)
+    if (regularUsers.length > 0) {
+      const htmlWithoutGuidance = await generateNewsletterHTML(storyList, { includeGuidance: false });
+      await sendBulkEmail({
+        to: regularUsers.map(s => s.email),
+        subject,
+        html: htmlWithoutGuidance
+      });
+      console.log(`✓ Sent newsletter (no guidance) to ${regularUsers.length} regular users`);
+    }
+
+    if (subscriberList.length === 0) {
+      console.log('⚠️  No active subscribers, skipping email send');
+      // Generate preview with guidance for logging/debugging
+      const html = await generateNewsletterHTML(storyList, { includeGuidance: true });
+      console.log('📄 Newsletter HTML generated (would be sent to subscribers)');
+    }
+
+    // 5. Record newsletter send
+    await newsletters.create({
+      date: new Date(),
+      subject,
+      sent_at: new Date(),
+      recipient_count: subscriberList.length,
+      story_ids: storyList.map(s => s.id)
+    });
+
+    console.log('✅ Newsletter generation complete\n');
+
+    return {
+      recipientCount: subscriberList.length,
+      storyCount: storyList.length,
+      sentAt: new Date()
+    };
+
+  } catch (error) {
+    console.error('❌ Newsletter generation failed:', error);
+    throw error;
+  }
 }
 
 /**
  * Generate newsletter HTML from stories
  */
-async function generateNewsletterHTML(storyList) {
-    const date = new Date().toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+async function generateNewsletterHTML(stories, options = {}) {
+  const { includeGuidance = false } = options;
+  const date = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
-    const storiesHTML = storyList.map((story, index) => {
-        const peScore = story.pe_impact_score || 0;
-        const peAnalysis = story.pe_analysis || {};
+  const storiesHTML = stories.map((story, index) => {
+    const peScore = story.pe_impact_score || 0;
+    const peAnalysis = story.pe_analysis || {};
+    const arrow = peScore >= 7 ? '↑' : '↓';
 
-        return `
+    return `
       <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #e0e0e0;">
         <h3 style="margin: 0 0 10px 0; font-size: 18px; line-height: 1.3;">
           <a href="${story.url || '#'}" style="color: #1a1a1a; text-decoration: none;">
@@ -99,11 +121,9 @@ async function generateNewsletterHTML(storyList) {
         <div style="font-size: 12px; color: #999; margin-bottom: 10px; text-transform: uppercase;">
           ${story.source || 'Unknown Source'} ${story.published_at ? '| ' + new Date(story.published_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : ''}
         </div>
-        ${peScore >= 7 ? `
-          <div style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-bottom: 10px;">
-            📊 PE Impact: ${peScore}/10
-          </div>
-        ` : ''}
+        <div style="display: inline-block; background: linear-gradient(135deg, ${peScore >= 7 ? '#667eea' : '#999'} 0%, ${peScore >= 7 ? '#764ba2' : '#666'} 100%); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-bottom: 10px;">
+          ${arrow} PE Impact: ${peScore}/10
+        </div>
         <p style="margin: 10px 0; font-size: 15px; line-height: 1.6; color: #333;">
           ${story.summary || 'Click to read the full story...'}
         </p>
@@ -117,9 +137,9 @@ async function generateNewsletterHTML(storyList) {
         ` : ''}
       </div>
     `;
-    }).join('');
+  }).join('');
 
-    return `
+  return `
     <!DOCTYPE html>
     <html>
     <head>
@@ -166,38 +186,38 @@ async function generateNewsletterHTML(storyList) {
  * Uses email service if configured, otherwise logs to console
  */
 async function sendBulkEmail({ to, subject, html }) {
-    if (process.env.SENDGRID_API_KEY) {
-        // Use SendGrid
-        const sgMail = require('@sendgrid/mail');
-        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  if (process.env.SENDGRID_API_KEY) {
+    // Use SendGrid
+    const sgMail = require('@sendgrid/mail');
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-        const msg = {
-            to,
-            from: process.env.EMAIL_FROM || 'newsletter@newswatch.local',
-            subject,
-            html
-        };
+    const msg = {
+      to,
+      from: process.env.EMAIL_FROM || 'newsletter@newswatch.local',
+      subject,
+      html
+    };
 
-        await sgMail.sendMultiple(msg);
-        console.log(`✓ Sent via SendGrid to ${to.length} recipients`);
+    await sgMail.sendMultiple(msg);
+    console.log(`✓ Sent via SendGrid to ${to.length} recipients`);
 
-    } else {
-        // Development mode - log to console and save to file
-        console.log('\n📧 EMAIL PREVIEW (No email service configured)');
-        console.log(`To: ${to.join(', ')}`);
-        console.log(`Subject: ${subject}`);
-        console.log(`HTML Length: ${html.length} characters`);
+  } else {
+    // Development mode - log to console and save to file
+    console.log('\n📧 EMAIL PREVIEW (No email service configured)');
+    console.log(`To: ${to.join(', ')}`);
+    console.log(`Subject: ${subject}`);
+    console.log(`HTML Length: ${html.length} characters`);
 
-        // Save to file for preview
-        const outputPath = path.join(__dirname, '../../newsletter-preview.html');
-        await fs.writeFile(outputPath, html);
-        console.log(`✓ Newsletter saved to: ${outputPath}`);
-        console.log('  Open this file in a browser to preview\n');
-    }
+    // Save to file for preview
+    const outputPath = path.join(__dirname, '../../newsletter-preview.html');
+    await fs.writeFile(outputPath, html);
+    console.log(`✓ Newsletter saved to: ${outputPath}`);
+    console.log('  Open this file in a browser to preview\n');
+  }
 }
 
 module.exports = {
-    generateAndSendNewsletter,
-    generateNewsletterHTML,
-    sendBulkEmail
+  generateAndSendNewsletter,
+  generateNewsletterHTML,
+  sendBulkEmail
 };

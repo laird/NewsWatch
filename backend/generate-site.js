@@ -82,6 +82,7 @@ function generateIndexHtml(storyList) {
     const storiesHtml = storyList.map(story => {
         const peScore = story.pe_impact_score || 0;
         const peAnalysis = story.pe_analysis || {};
+        const arrow = peScore >= 7 ? '↑' : '↓';
 
         return `
     <a href="story/${story.id}.html" class="story-compact" data-story-id="${story.id}">
@@ -93,7 +94,7 @@ function generateIndexHtml(storyList) {
             <h3 class="headline">${story.headline}</h3>
             <div class="story-meta">
                 <span class="byline">${story.source || 'Unknown'} | ${formatDate(story.published_at, { hour: 'numeric', minute: '2-digit' })}</span>
-                ${peScore >= 7 ? `<span class="pe-badge">📊 PE Impact: ${peScore}/10</span>` : ''}
+                <span class="pe-badge ${peScore >= 7 ? 'high' : 'low'}">${arrow} PE Impact: ${peScore}/10</span>
             </div>
             <p class="story-preview">${story.summary || ''}</p>
             ${peAnalysis.key_insights && peAnalysis.key_insights.length > 0 ? `
