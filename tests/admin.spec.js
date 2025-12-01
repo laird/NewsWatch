@@ -109,8 +109,8 @@ test.describe('Admin Page E2E Tests', () => {
             // But since tests run in parallel or order isn't guaranteed, we can't strictly depend on previous test.
             // However, we can check if the list is not showing "No archives found" or "Loading..."
 
-            // Wait for loading to finish
-            await expect(page.locator('#archive-list li')).not.toHaveText('Loading archives...', { timeout: 10000 });
+            // Wait for loading to finish - check first item only
+            await expect(page.locator('#archive-list li').first()).not.toHaveText('Loading archives...', { timeout: 10000 });
 
             // If we have archives, check the first one
             if (await items.count() > 0) {

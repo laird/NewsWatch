@@ -15,7 +15,7 @@
           - text: Initial guidance [TEST EDIT]
         - generic [ref=e12]: 28 characters
       - button "💾 Save Guidance" [ref=e13] [cursor=pointer]
-      - generic [ref=e14]: "Last updated: 12/1/2025, 4:49:38 AM"
+      - generic [ref=e14]: "Last updated: 12/1/2025, 7:47:40 AM"
     - generic [ref=e15]:
       - heading "📧 Newsletter Testing" [level=2] [ref=e16]
       - paragraph [ref=e17]: Generate and send a test newsletter to all test users with the current guidance included.
@@ -47,5 +47,9 @@
         - listitem [ref=e39]:
           - generic [ref=e40]: Invalid Date Invalid Date 2 recipients • 12 stories
           - link "View →" [ref=e41] [cursor=pointer]:
+            - /url: "#"
+        - listitem [ref=e42]:
+          - generic [ref=e43]: Invalid Date Invalid Date 2 recipients • 12 stories
+          - link "View →" [ref=e44] [cursor=pointer]:
             - /url: "#"
 ```
