@@ -7,7 +7,7 @@
     - paragraph [ref=e5]: Admin Panel
   - generic [ref=e6]:
     - heading "🔐 Authentication Required" [level=2] [ref=e7]
-    - textbox "Enter admin password" [ref=e9]: admin123
+    - textbox "Enter admin password" [ref=e9]: wrong_password
     - button "Unlock Admin Panel" [active] [ref=e10] [cursor=pointer]
     - generic [ref=e12]: ❌ Set ADMIN_PASSWORD environment variable
 ```
