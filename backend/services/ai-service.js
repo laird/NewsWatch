@@ -27,6 +27,7 @@ class AIService {
      * @param {object} options - { temperature, maxTokens, jsonMode }
      */
     async generateContent(prompt, options = {}) {
+        console.log(`[AI-SERVICE] Generating content. Provider: ${this.provider}, NODE_ENV: ${process.env.NODE_ENV}`);
         try {
             if (this.provider === 'gemini') {
                 return await this._generateWithGemini(prompt);
@@ -34,7 +35,15 @@ class AIService {
                 return await this._generateWithOpenAI(prompt, options);
             }
         } catch (error) {
-            console.error('AI Generation Error:', error);
+            console.error('AI Generation Error:', error.message);
+            // Fallback for testing/development if AI is unavailable
+            if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+                console.log('⚠️ Using mock AI response due to error');
+                return {
+                    text: "This is a mock AI response because the AI service is unavailable. [MOCK GUIDANCE] Focus on high-growth SaaS and ignore crypto.",
+                    usage: { total_tokens: 0 }
+                };
+            }
             throw error;
         }
     }

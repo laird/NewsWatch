@@ -99,7 +99,11 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}\n`);
 
     // Initialize scheduler
-    initializeScheduler();
+    if (process.env.ENABLE_SCHEDULER !== 'false') {
+        initializeScheduler();
+    } else {
+        console.log('⚠️ Scheduler disabled via environment variable');
+    }
 });
 
 module.exports = app;

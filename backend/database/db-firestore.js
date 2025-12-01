@@ -96,14 +96,21 @@ async function addDoc(collectionName, data) {
  * Set a document with a specific ID (creates or overwrites)
  */
 async function setDoc(collectionName, docId, data, options = {}) {
-    const docRef = db.collection(collectionName).doc(docId);
-    await docRef.set(data, options);
+    console.log(`[FIRESTORE] setDoc called for ${collectionName}/${docId}`);
+    try {
+        const docRef = db.collection(collectionName).doc(docId);
+        await docRef.set(data, options);
 
-    const doc = await docRef.get();
-    return {
-        id: doc.id,
-        ...doc.data()
-    };
+        const doc = await docRef.get();
+        console.log(`[FIRESTORE] setDoc success for ${collectionName}/${docId}`);
+        return {
+            id: doc.id,
+            ...doc.data()
+        };
+    } catch (error) {
+        console.error(`[FIRESTORE] setDoc failed for ${collectionName}/${docId}:`, error);
+        throw error;
+    }
 }
 
 /**
