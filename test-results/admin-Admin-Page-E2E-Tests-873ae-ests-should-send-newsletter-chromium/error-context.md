@@ -1,0 +1,51 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - heading "NewsWatch" [level=1] [ref=e4]
+    - paragraph [ref=e5]: Admin Panel
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - heading "🤖 AI Guidance Editor" [level=2] [ref=e8]
+      - generic [ref=e9]:
+        - generic [ref=e10]: "Current AI Instructions:"
+        - textbox "Current AI Instructions:" [ref=e11]:
+          - /placeholder: Loading guidance...
+          - text: Initial guidance [TEST EDIT]
+        - generic [ref=e12]: 28 characters
+      - button "💾 Save Guidance" [ref=e13] [cursor=pointer]
+      - generic [ref=e14]: "Last updated: 12/1/2025, 4:49:38 AM"
+    - generic [ref=e15]:
+      - heading "📧 Newsletter Testing" [level=2] [ref=e16]
+      - paragraph [ref=e17]: Generate and send a test newsletter to all test users with the current guidance included.
+      - button "⚡ Generate & Send Test Newsletter" [ref=e18] [cursor=pointer]
+      - generic [ref=e20]: ❌ No test users found
+    - generic [ref=e21]:
+      - heading "📚 Recent Newsletter Archives" [level=2] [ref=e22]
+      - list [ref=e23]:
+        - listitem [ref=e24]:
+          - generic [ref=e25]: Invalid Date Invalid Date 2 recipients • 12 stories
+          - link "View →" [ref=e26] [cursor=pointer]:
+            - /url: "#"
+        - listitem [ref=e27]:
+          - generic [ref=e28]: Invalid Date Invalid Date 2 recipients • 12 stories
+          - link "View →" [ref=e29] [cursor=pointer]:
+            - /url: "#"
+        - listitem [ref=e30]:
+          - generic [ref=e31]: Invalid Date Invalid Date 2 recipients • 12 stories
+          - link "View →" [ref=e32] [cursor=pointer]:
+            - /url: "#"
+        - listitem [ref=e33]:
+          - generic [ref=e34]: Invalid Date Invalid Date 2 recipients • 12 stories
+          - link "View →" [ref=e35] [cursor=pointer]:
+            - /url: "#"
+        - listitem [ref=e36]:
+          - generic [ref=e37]: Invalid Date Invalid Date 2 recipients • 12 stories
+          - link "View →" [ref=e38] [cursor=pointer]:
+            - /url: "#"
+        - listitem [ref=e39]:
+          - generic [ref=e40]: Invalid Date Invalid Date 2 recipients • 12 stories
+          - link "View →" [ref=e41] [cursor=pointer]:
+            - /url: "#"
+```

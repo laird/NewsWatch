@@ -10,6 +10,7 @@ const newsletterRoutes = require('./routes/newsletter');
 const subscriberRoutes = require('./routes/subscribers');
 const adminRoutes = require('./routes/admin');
 const { initializeScheduler } = require('./scheduler');
+const { seedTestUsers } = require('./database/seed-test-users');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -93,10 +94,17 @@ app.use((req, res) => {
 });
 
 // Start server
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', async () => {
     console.log(`\n🚀 NewsWatch API server running on http://0.0.0.0:${PORT}`);
     console.log(`📊 Health check: http://0.0.0.0:${PORT}/health`);
     console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}\n`);
+
+    // Seed test users
+    try {
+        await seedTestUsers();
+    } catch (error) {
+        console.error('⚠️ Failed to seed test users:', error.message);
+    }
 
     // Initialize scheduler
     if (process.env.ENABLE_SCHEDULER !== 'false') {
