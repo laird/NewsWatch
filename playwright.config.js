@@ -39,5 +39,13 @@ module.exports = defineConfig({
         url: 'http://localhost:3000',
         reuseExistingServer: !process.env.CI,
         timeout: 120 * 1000,
+        env: {
+            ...process.env,
+            NODE_ENV: 'test',
+            ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'admin123',
+            OPENAI_API_KEY: process.env.OPENAI_API_KEY || 'sk-test-dummy-key',
+            FIRESTORE_EMULATOR_HOST: process.env.FIRESTORE_EMULATOR_HOST || 'localhost:8080',
+            GCP_PROJECT_ID: process.env.GCP_PROJECT_ID || 'newswatch-test',
+        },
     },
 });
