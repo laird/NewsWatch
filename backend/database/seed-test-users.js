@@ -1,4 +1,4 @@
-const { subscribers } = require('./firestore');
+const { subscribers, collections } = require('./firestore');
 
 /**
  * Ensure test users exist in the database
@@ -30,9 +30,9 @@ async function seedTestUsers() {
                 await subscribers.create(userData);
                 console.log(`  ✓ Created test user: ${userData.email}`);
             } else {
-                // Update to ensure is_test_user flag is set
+                // Update to ensure is_test_user flag is set using Firestore collection directly
                 if (!existingUser.is_test_user) {
-                    await subscribers.update(existingUser.id, {
+                    await collections.subscribers.doc(existingUser.id).update({
                         is_test_user: true,
                         subscribed: true
                     });

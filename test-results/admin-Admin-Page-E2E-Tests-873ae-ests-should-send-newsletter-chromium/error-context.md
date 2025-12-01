@@ -15,7 +15,7 @@
           - text: Initial guidance [TEST EDIT]
         - generic [ref=e12]: 28 characters
       - button "💾 Save Guidance" [ref=e13] [cursor=pointer]
-      - generic [ref=e14]: "Last updated: 12/1/2025, 6:12:29 AM"
+      - generic [ref=e14]: "Last updated: 12/1/2025, 7:47:40 AM"
     - generic [ref=e15]:
       - heading "📧 Newsletter Testing" [level=2] [ref=e16]
       - paragraph [ref=e17]: Generate and send a test newsletter to all test users with the current guidance included.
