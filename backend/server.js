@@ -8,6 +8,7 @@ const feedbackRoutes = require('./routes/feedback');
 const storiesRoutes = require('./routes/stories');
 const newsletterRoutes = require('./routes/newsletter');
 const subscriberRoutes = require('./routes/subscribers');
+const adminRoutes = require('./routes/admin');
 const { initializeScheduler } = require('./scheduler');
 
 const app = express();
@@ -30,6 +31,7 @@ app.use('/api/feedback', feedbackRoutes);
 app.use('/api/stories', storiesRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/subscribers', subscriberRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/reanalyze', require('./routes/reanalyze'));
 
 // Redirect to GCS static site
@@ -43,6 +45,11 @@ app.get('/', (req, res) => {
 // Serve story pages - Redirect to GCS
 app.get('/story/:id.html', (req, res) => {
     res.redirect(`${GCS_BASE_URL}/story/${req.params.id}.html`);
+});
+
+// Serve admin page (local only, not on GCS)
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/admin.html'));
 });
 
 // API route to trigger generation (for Cloud Scheduler)

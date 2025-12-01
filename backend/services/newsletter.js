@@ -348,8 +348,169 @@ async function sendBulkEmail({ to, subject, html }) {
   }
 }
 
+/**
+ * Generate and send newsletter to test users only
+ * Used by admin panel for testing
+ */
+async function generateAndSendTestNewsletter() {
+  console.log('\n📧 Starting TEST newsletter generation...');
+
+  try {
+    // 1. Fetch top stories from last 24 hours
+    const storyList = await stories.getTopForNewsletter({ hours: 24, limit: 12 });
+
+    console.log(`✓ Found ${storyList.length} stories for newsletter`);
+
+    if (storyList.length === 0) {
+      throw new Error('No stories found for newsletter');
+    }
+
+    // 2. Get test subscribers only
+    const subscriberList = await subscribers.getActive();
+    const testUsers = subscriberList.filter(s => s.is_test_user);
+
+    console.log(`✓ Found ${testUsers.length} test users`);
+
+    if (testUsers.length === 0) {
+      throw new Error('No test users found');
+    }
+
+    // 3. Generate newsletter with guidance
+    const html = await generateNewsletterHTML(storyList, { includeGuidance: true });
+
+    // 4. Save to archive
+    const archiveResult = await saveNewsletterToArchive(html, {
+      isTest: true,
+      recipientCount: testUsers.length,
+      storyCount: storyList.length
+    });
+
+    // 5. Send to test users
+    const subject = `NewsWatch Daily Brief - ${new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })} [TEST]`;
+
+    await sendBulkEmail({
+      to: testUsers.map(s => s.email),
+      subject,
+      html
+    });
+
+    console.log(`✓ Sent test newsletter to ${testUsers.length} test users`);
+
+    // 6. Record newsletter send
+    await newsletters.create({
+      date: new Date(),
+      subject,
+      sent_at: new Date(),
+      recipient_count: testUsers.length,
+      story_ids: storyList.map(s => s.id),
+      is_test: true,
+      archive_url: archiveResult.publicUrl
+    });
+
+    console.log('✅ Test newsletter generation complete\n');
+
+    return {
+      recipientCount: testUsers.length,
+      storyCount: storyList.length,
+      archiveUrl: archiveResult.publicUrl,
+      archivePath: archiveResult.filePath
+    };
+
+  } catch (error) {
+    console.error('❌ Test newsletter generation failed:', error);
+    throw error;
+  }
+}
+
+/**
+ * Save newsletter to archive
+ * Saves to public/editions/ and uploads to GCS
+ */
+async function saveNewsletterToArchive(html, metadata = {}) {
+  const now = new Date();
+  const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+  const timeStr = now.toTimeString().slice(0, 8).replace(/:/g, ''); // HHmmss
+  const filename = `${dateStr}-${timeStr}.html`;
+
+  // Local path
+  const editionsDir = path.join(__dirname, '../../public/editions');
+  const filePath = path.join(editionsDir, filename);
+
+  try {
+    // Ensure editions directory exists
+    await fs.mkdir(editionsDir, { recursive: true });
+
+    // Save HTML file
+    await fs.writeFile(filePath, html, 'utf8');
+    console.log(`✓ Saved newsletter to ${filePath}`);
+
+    // Upload to GCS if configured
+    let publicUrl = `/editions/${filename}`; // Local fallback URL
+
+    if (process.env.GCP_PROJECT_ID && process.env.NODE_ENV === 'production') {
+      const { Storage } = require('@google-cloud/storage');
+      const storage = new Storage();
+      const bucketName = `newswatch-${process.env.GCP_PROJECT_ID}-public`;
+      const bucket = storage.bucket(bucketName);
+
+      const destination = `editions/${filename}`;
+      await bucket.upload(filePath, {
+        destination,
+        metadata: {
+          contentType: 'text/html',
+          cacheControl: 'public, max-age=3600',
+        },
+      });
+
+      publicUrl = `https://storage.googleapis.com/${bucketName}/${destination}`;
+      console.log(`✓ Uploaded to GCS: ${publicUrl}`);
+    }
+
+    // Update index.json
+    const indexPath = path.join(editionsDir, 'index.json');
+    let index = [];
+    try {
+      const indexContent = await fs.readFile(indexPath, 'utf8');
+      index = JSON.parse(indexContent);
+    } catch (err) {
+      // File doesn't exist yet, start fresh
+      console.log('Creating new index.json');
+    }
+
+    index.unshift({
+      filename,
+      date: now.toISOString(),
+      url: publicUrl,
+      ...metadata
+    });
+
+    // Keep only last 100 entries
+    index = index.slice(0, 100);
+
+    await fs.writeFile(indexPath, JSON.stringify(index, null, 2), 'utf8');
+    console.log('✓ Updated index.json');
+
+    return {
+      filePath,
+      publicUrl,
+      filename
+    };
+
+  } catch (error) {
+    console.error('❌ Failed to save newsletter to archive:', error);
+    throw error;
+  }
+}
+
 module.exports = {
   generateAndSendNewsletter,
+  generateAndSendTestNewsletter,
   generateNewsletterHTML,
-  sendBulkEmail
+  sendBulkEmail,
+  saveNewsletterToArchive
 };

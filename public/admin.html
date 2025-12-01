@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsWatch Admin Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Roboto:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+
+        .auth-section {
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input[type="password"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Roboto', sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input[type="password"]:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            min-height: 300px;
+            font-family: 'Roboto Mono', monospace;
+            line-height: 1.6;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(22, 163, 74, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .status-message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .status-success {
+            background: #ecfdf5;
+            border: 1px solid #16a34a;
+            color: #16a34a;
+        }
+
+        .status-error {
+            background: #fef2f2;
+            border: 1px solid #dc2626;
+            color: #dc2626;
+        }
+
+        .status-info {
+            background: #f0f4ff;
+            border: 1px solid #667eea;
+            color: #667eea;
+        }
+
+        .meta-info {
+            font-size: 13px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .archive-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .archive-item {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .archive-item:last-child {
+            border-bottom: none;
+        }
+
+        .archive-date {
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .archive-meta {
+            font-size: 12px;
+            color: #666;
+            margin-left: 10px;
+        }
+
+        .archive-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .archive-link:hover {
+            text-decoration: underline;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .badge-test {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .char-counter {
+            font-size: 12px;
+            color: #666;
+            text-align: right;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>NewsWatch</h1>
+            <p>Admin Panel</p>
+        </div>
+
+        <!-- Authentication Section -->
+        <div id="auth-card" class="card auth-section">
+            <h2>🔐 Authentication Required</h2>
+            <div class="form-group">
+                <input type="password" id="auth-password" placeholder="Enter admin password"
+                    onkeypress="handleAuthKeypress(event)">
+            </div>
+            <button class="btn btn-primary" onclick="authenticate()">Unlock Admin Panel</button>
+            <div id="auth-status"></div>
+        </div>
+
+        <!-- Main Admin Panel (hidden until authenticated) -->
+        <div id="admin-panel" class="hidden">
+
+            <!-- Guidance Editor -->
+            <div class="card">
+                <h2>🤖 AI Guidance Editor</h2>
+                <div class="form-group">
+                    <label for="guidance-text">Current AI Instructions:</label>
+                    <textarea id="guidance-text" placeholder="Loading guidance..."></textarea>
+                    <div class="char-counter">
+                        <span id="char-count">0</span> characters
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="saveGuidance()">💾 Save Guidance</button>
+                <div id="guidance-status"></div>
+                <div class="meta-info" id="guidance-meta"></div>
+            </div>
+
+            <!-- Newsletter Testing -->
+            <div class="card">
+                <h2>📧 Newsletter Testing</h2>
+                <p style="margin-bottom: 20px; color: #666;">
+                    Generate and send a test newsletter to all test users with the current guidance included.
+                </p>
+                <button class="btn btn-success" id="trigger-btn" onclick="triggerNewsletter()">
+                    ⚡ Generate & Send Test Newsletter
+                </button>
+                <div id="newsletter-status"></div>
+            </div>
+
+            <!-- Recent Archives -->
+            <div class="card">
+                <h2>📚 Recent Newsletter Archives</h2>
+                <ul class="archive-list" id="archive-list">
+                    <li style="text-align: center; color: #999;">Loading archives...</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let adminPassword = '';
+
+        function handleAuthKeypress(event) {
+            if (event.key === 'Enter') {
+                authenticate();
+            }
+        }
+
+        async function authenticate() {
+            const password = document.getElementById('auth-password').value;
+            const statusDiv = document.getElementById('auth-status');
+
+            if (!password) {
+                showStatus(statusDiv, 'Please enter a password', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+
+                const data = await response.json();
+
+                if (data.authenticated) {
+                    adminPassword = password;
+                    document.getElementById('auth-card').classList.add('hidden');
+                    document.getElementById('admin-panel').classList.remove('hidden');
+                    loadGuidance();
+                    loadArchives();
+                } else {
+                    showStatus(statusDiv, '❌ ' + data.message, 'error');
+                }
+            } catch (error) {
+                showStatus(statusDiv, '❌ Authentication failed: ' + error.message, 'error');
+            }
+        }
+
+        async function loadGuidance() {
+            const textArea = document.getElementById('guidance-text');
+            const statusDiv = document.getElementById('guidance-status');
+
+            try {
+                const response = await fetch(`/api/admin/guidance?auth=${encodeURIComponent(adminPassword)}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                textArea.value = data.guidance || '';
+                updateCharCount();
+
+                if (data.lastUpdated) {
+                    // Handle Firestore Timestamp object
+                    let lastUpdated;
+                    if (data.lastUpdated._seconds) {
+                        lastUpdated = new Date(data.lastUpdated._seconds * 1000);
+                    } else if (data.lastUpdated.toDate) {
+                        lastUpdated = data.lastUpdated.toDate();
+                    } else {
+                        lastUpdated = new Date(data.lastUpdated);
+                    }
+                    document.getElementById('guidance-meta').textContent =
+                        'Last updated: ' + lastUpdated.toLocaleString();
+                } else {
+                    document.getElementById('guidance-meta').textContent =
+                        'No guidance set yet';
+                }
+
+                // Clear any previous errors
+                statusDiv.innerHTML = '';
+            } catch (error) {
+                console.error('Load guidance error:', error);
+                showStatus(statusDiv,
+                    '❌ Failed to load guidance: ' + error.message, 'error');
+                textArea.value = '';
+                textArea.placeholder = 'Failed to load guidance. Check console for details.';
+            }
+        }
+
+        async function saveGuidance() {
+            const guidance = document.getElementById('guidance-text').value;
+            const statusDiv = document.getElementById('guidance-status');
+
+            if (!guidance.trim()) {
+                showStatus(statusDiv, '⚠️ Guidance cannot be empty', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/guidance', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: adminPassword, guidance })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showStatus(statusDiv, '✅ ' + data.message, 'success');
+                    setTimeout(() => loadGuidance(), 500);
+                } else {
+                    showStatus(statusDiv, '❌ ' + data.message, 'error');
+                }
+            } catch (error) {
+                showStatus(statusDiv, '❌ Failed to save: ' + error.message, 'error');
+            }
+        }
+
+        async function triggerNewsletter() {
+            const statusDiv = document.getElementById('newsletter-status');
+            const btn = document.getElementById('trigger-btn');
+
+            btn.disabled = true;
+            showStatus(statusDiv, '⏳ Generating newsletter... This may take a minute.', 'info');
+
+            try {
+                const response = await fetch('/api/admin/trigger-newsletter', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: adminPassword })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const message = `✅ Newsletter sent to ${data.recipientCount} test users with ${data.storyCount} stories. 
+                        <a href="${data.archiveUrl}" target="_blank" class="archive-link">View Archive</a>`;
+                    showStatus(statusDiv, message, 'success');
+                    setTimeout(() => loadArchives(), 1000);
+                } else {
+                    showStatus(statusDiv, '❌ ' + data.message, 'error');
+                }
+            } catch (error) {
+                showStatus(statusDiv, '❌ Failed to generate: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function loadArchives() {
+            try {
+                const response = await fetch(`/api/admin/newsletter-archives?auth=${encodeURIComponent(adminPassword)}&limit=10`);
+                const data = await response.json();
+
+                const listEl = document.getElementById('archive-list');
+
+                if (data.archives && data.archives.length > 0) {
+                    listEl.innerHTML = data.archives.map(archive => {
+                        const date = new Date(archive.date);
+                        const testBadge = archive.isTest ? '<span class="badge badge-test">TEST</span>' : '';
+                        return `
+                            <li class="archive-item">
+                                <div>
+                                    <span class="archive-date">${date.toLocaleDateString()} ${date.toLocaleTimeString()}</span>
+                                    ${testBadge}
+                                    <span class="archive-meta">${archive.recipientCount} recipients • ${archive.storyCount} stories</span>
+                                </div>
+                                <a href="${archive.archiveUrl || '#'}" target="_blank" class="archive-link">View →</a>
+                            </li>
+                        `;
+                    }).join('');
+                } else {
+                    listEl.innerHTML = '<li style="text-align: center; color: #999;">No archives found</li>';
+                }
+            } catch (error) {
+                document.getElementById('archive-list').innerHTML =
+                    '<li style="text-align: center; color: #dc2626;">Failed to load archives</li>';
+            }
+        }
+
+        function updateCharCount() {
+            const text = document.getElementById('guidance-text').value;
+            document.getElementById('char-count').textContent = text.length;
+        }
+
+        function showStatus(element, message, type) {
+            element.innerHTML = `<div class="status-message status-${type}">${message}</div>`;
+        }
+
+        // Update char count on input
+        document.addEventListener('DOMContentLoaded', () => {
+            const textarea = document.getElementById('guidance-text');
+            if (textarea) {
+                textarea.addEventListener('input', updateCharCount);
+            }
+        });
+    </script>
+</body>
+
+</html>
