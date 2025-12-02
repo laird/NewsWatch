@@ -447,7 +447,15 @@
 
                 if (data.archives && data.archives.length > 0) {
                     listEl.innerHTML = data.archives.map(archive => {
-                        const date = new Date(archive.date);
+                        // Handle Firestore Timestamp object
+                        let date;
+                        if (archive.date._seconds) {
+                            date = new Date(archive.date._seconds * 1000);
+                        } else if (archive.date.toDate) {
+                            date = archive.date.toDate();
+                        } else {
+                            date = new Date(archive.date);
+                        }
                         const testBadge = archive.isTest ? '<span class="badge badge-test">TEST</span>' : '';
                         return `
                             <li class="archive-item">
