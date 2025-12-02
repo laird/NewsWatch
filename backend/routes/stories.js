@@ -90,4 +90,61 @@ router.post('/:id/analyze', async (req, res) => {
     }
 });
 
+// Vote on a  story (thumbs up/down)
+router.post('/:id/vote', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { vote } = req.body; // 'up' or 'down'
+
+        if (!vote || (vote !== 'up' && vote !== 'down')) {
+            return res.status(400).json({ error: 'Invalid vote. Must be "up" or "down"' });
+        }
+
+        // Check if story exists
+        const story = await stories.getById(id);
+        if (!story) {
+            return res.status(404).json({ error: 'Story not found' });
+        }
+
+        // Increment vote count
+        await stories.incrementVote(id, vote);
+
+        res.json({
+            success: true,
+            vote,
+            message: `Vote recorded: thumbs ${vote}`
+        });
+
+    } catch (error) {
+        console.error('Error recording vote:', error);
+        res.status(500).json({ error: 'Failed to record vote' });
+    }
+});
+
+// Track story click
+router.post('/:id/click', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Check if story exists
+        const story = await stories.getById(id);
+        if (!story) {
+            return res.status(404).json({ error: 'Story not found' });
+        }
+
+        // Increment click count
+        await stories.incrementClicks(id);
+
+        res.json({
+            success: true,
+            message: 'Click recorded'
+        });
+
+    } catch (error) {
+        console.error('Error recording click:', error);
+        res.status(500).json({ error: 'Failed to record click' });
+    }
+});
+
 module.exports = router;
+

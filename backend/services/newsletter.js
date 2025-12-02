@@ -98,7 +98,9 @@ async function generateAndSendNewsletter() {
  * Generate newsletter HTML from stories
  */
 async function generateNewsletterHTML(stories, options = {}) {
-  const { includeGuidance = false } = options;
+  const { includeGuidance = false, tokenCost = 0 } = options;
+  const tokenTracker = require('../utils/token-tracker');
+
   const date = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
@@ -145,66 +147,89 @@ Maintain active coverage of:
     if (currentGuidance) {
       guidanceHTML = `
         <!-- AI Guidance Section -->
-        <div style="border-top: 3px solid #667eea; padding: 20px 30px; background-color: #f0f4ff; font-family: Arial, sans-serif; font-size: 13px; color: #333; margin-top: 20px;">
-          <h3 style="margin: 0 0 15px 0; font-size: 16px; color: #667eea;">🤖 Current AI Instructions</h3>
-          <div style="background-color: white; padding: 15px; border-radius: 8px; border-left: 4px solid #667eea;">
-            <p style="margin: 0; line-height: 1.6; white-space: pre-wrap;">${currentGuidance}</p>
+        <div style="border: 3px solid #1a1a1a; padding: 20px; background-color: #fffef0; font-family: Georgia, serif; margin-top: 30px;">
+          <h3 style="margin: 0 0 15px 0; font-size: 16px; color: #1a1a1a; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #1a1a1a; padding-bottom: 8px;">📰 Editor's Guidance</h3>
+          <div style="background-color: white; padding: 15px; border: 1px solid #ddd;">
+            <p style="margin: 0; line-height: 1.8; white-space: pre-wrap; font-size: 13px; color: #333;">${currentGuidance}</p>
           </div>
-          <p style="margin: 15px 0 0 0; font-size: 11px; color: #666;">
-            <em>Based on your feedback, here is what I'm currently focusing on.</em>
+          <p style="margin: 15px 0 0 0; font-size: 11px; color: #666; font-style: italic; font-family: Arial, sans-serif;">
+            Based on your feedback, this is what we're currently focusing on.
           </p>
         </div>
       `;
     }
   }
 
+  // Format token cost for banner
+  const costDisplay = tokenTracker.formatTokenCost(tokenCost || tokenTracker.getTokenCount());
+
   const storiesHTML = stories.map((story, index) => {
     const peScore = story.pe_impact_score || 0;
     const peAnalysis = story.pe_analysis || {};
+    const thumbsUpCount = story.thumbs_up_count || 0;
+    const thumbsDownCount = story.thumbs_down_count || 0;
 
     // Determine arrow and color based on PE impact score
     let arrow, bgGradient;
     if (peScore >= 8) {
-      arrow = '↗'; // Up 45 degrees (high impact)
+      arrow = '↗';
       bgGradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
     } else if (peScore >= 6) {
-      arrow = '↑'; // Straight up (moderate-high impact)
+      arrow = '↑';
       bgGradient = 'linear-gradient(135deg, #4c9aff 0%, #5b7fc7 100%)';
     } else if (peScore >= 4) {
-      arrow = '→'; // Level/right (neutral impact)
+      arrow = '→';
       bgGradient = 'linear-gradient(135deg, #999 0%, #777 100%)';
     } else if (peScore >= 2) {
-      arrow = '↓'; // Straight down (low impact)
+      arrow = '↓';
       bgGradient = 'linear-gradient(135deg, #888 0%, #666 100%)';
     } else {
-      arrow = '↘'; // Down 45 degrees (very low impact)
+      arrow = '↘';
       bgGradient = 'linear-gradient(135deg, #777 0%, #555 100%)';
     }
 
+    // Format insights as italicized text
+    const insightsHTML = peAnalysis.key_insights && peAnalysis.key_insights.length > 0 ? `
+      <div style="margin: 10px 0; font-style: italic; font-size: 13px; color: #444; line-height: 1.6;">
+        ${peAnalysis.key_insights.slice(0, 2).map(insight => `• ${insight}`).join('<br>')}
+      </div>
+    ` : '';
+
+    // Make source clickable
+    const sourceHTML = story.url ?
+      `<a href="${story.url}" style="color: #666; text-decoration: none; text-transform: uppercase;">${story.source || 'Unknown Source'}</a>` :
+      `${story.source || 'Unknown Source'}`;
+
     return `
-      <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #e0e0e0;">
-        <h3 style="margin: 0 0 10px 0; font-size: 18px; line-height: 1.3;">
+      <div class="story-item" style="break-inside: avoid; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid #ddd;">
+        <h3 style="margin: 0 0 8px 0; font-size: 16px; line-height: 1.3; font-weight: bold;">
           <a href="${story.url || '#'}" style="color: #1a1a1a; text-decoration: none;">
             ${story.headline}
           </a>
         </h3>
-        <div style="font-size: 12px; color: #999; margin-bottom: 10px; text-transform: uppercase;">
-          ${story.source || 'Unknown Source'} ${story.published_at ? '| ' + formatDate(story.published_at, { hour: 'numeric', minute: '2-digit' }) : ''}
+        
+        <!-- Thumbs up/down -->
+        <div style="margin: 8px 0; font-size: 18px;">
+          <span style="cursor: pointer; margin-right: 12px;" title="More like this">👍 ${thumbsUpCount > 0 ? `<small style="font-size: 11px; color: #666;">${thumbsUpCount}</small>` : ''}</span>
+          <span style="cursor: pointer;" title="Less like this">👎 ${thumbsDownCount > 0 ? `<small style="font-size: 11px; color: #666;">${thumbsDownCount}</small>` : ''}</span>
         </div>
-        <div style="display: inline-block; background: ${bgGradient}; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-bottom: 10px;">
+        
+        <!-- Source and date -->
+        <div style="font-size: 11px; color: #666; margin-bottom: 8px; font-family: Arial, sans-serif;">
+          ${sourceHTML} ${story.published_at ? '| ' + formatDate(story.published_at, { hour: 'numeric', minute: '2-digit' }) : ''}
+        </div>
+        
+        <!-- PE Impact badge -->
+        <div style="display: inline-block; background: ${bgGradient}; color: white; padding: 3px 10px; font-size: 11px; font-weight: 600; margin-bottom: 8px; font-family: Arial, sans-serif;">
           ${arrow} PE Impact: ${peScore}/10
         </div>
-        <p style="margin: 10px 0; font-size: 15px; line-height: 1.6; color: #333;">
+        
+        ${insightsHTML}
+        
+        <!-- Teaser/Summary -->
+        <p style="margin: 8px 0 0 0; font-size: 14px; line-height: 1.6; color: #333;">
           ${story.summary || 'Click to read the full story...'}
         </p>
-        ${peAnalysis.key_insights && peAnalysis.key_insights.length > 0 ? `
-          <div style="background-color: #f0f4ff; border-left: 4px solid #667eea; padding: 12px; margin-top: 10px; font-size: 13px;">
-            <strong style="color: #667eea;">PE Investor Insights:</strong>
-            <ul style="margin: 8px 0 0 0; padding-left: 20px;">
-              ${peAnalysis.key_insights.slice(0, 2).map(insight => `<li style="margin-bottom: 4px;">${insight}</li>`).join('')}
-            </ul>
-          </div>
-        ` : ''}
       </div>
     `;
   }).join('');
@@ -216,37 +241,75 @@ Maintain active coverage of:
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>NewsWatch Daily Brief</title>
+      <style>
+        /* Responsive column layout */
+        @media (min-width: 1400px) {
+          .stories-grid { column-count: 6; }
+        }
+        @media (min-width: 1100px) and (max-width: 1399px) {
+          .stories-grid { column-count: 5; }
+        }
+        @media (min-width: 900px) and (max-width: 1099px) {
+          .stories-grid { column-count: 4; }
+        }
+        @media (min-width: 700px) and (max-width: 899px) {
+          .stories-grid { column-count: 3; }
+        }
+        @media (min-width: 500px) and (max-width: 699px) {
+          .stories-grid { column-count: 2; }
+        }
+        @media (max-width: 499px) {
+          .stories-grid { column-count: 1; }
+        }
+        .stories-grid {
+          column-gap: 20px;
+          column-rule: 1px solid #ddd;
+        }
+      </style>
     </head>
     <body style="margin: 0; padding: 0; font-family: Georgia, 'Times New Roman', serif; background-color: #f5f5f0;">
-      <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);">
-        <!-- Masthead -->
-        <div style="border-bottom: 4px solid #1a1a1a; padding: 30px 30px 20px; text-align: center; background: linear-gradient(to bottom, #ffffff 0%, #f9f9f9 100%);">
-          <div style="font-family: Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 10px;">
-            ${date}
+      <div style="max-width: 1200px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);">
+        
+        <!-- Banner / Masthead -->
+        <div style="border-bottom: 4px solid #1a1a1a; padding: 20px 30px; background: #ffffff;">
+          <!-- Top line: Date | Title | Cost -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; flex-wrap: wrap;">
+            <div style="font-family: Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #666; min-width: 150px;">
+              ${date}
+            </div>
+            <div style="flex: 1; text-align: center; min-width: 200px;">
+              <h1 style="font-size: 48px; font-weight: bold; letter-spacing: -2px; margin: 0; text-transform: uppercase; color: #1a1a1a;">
+                NEWSWATCH
+              </h1>
+            </div>
+            <div style="font-family: Arial, sans-serif; font-size: 11px; text-align: right; color: #666; min-width: 150px;">
+              PRICE: ${costDisplay}
+            </div>
           </div>
-          <h1 style="font-size: 42px; font-weight: bold; letter-spacing: -2px; margin: 10px 0; text-transform: uppercase; color: #1a1a1a;">
-            NewsWatch
-          </h1>
-          <div style="font-family: Arial, sans-serif; font-size: 12px; font-style: italic; color: #666; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 8px 0; margin-top: 10px;">
+          
+          <!-- Subtitle -->
+          <div style="font-family: Arial, sans-serif; font-size: 12px; font-style: italic; color: #666; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 8px 0; text-align: center;">
             Daily Software Economy Brief for Private Equity Investors
           </div>
         </div>
 
-        <!-- Stories -->
-        <div style="padding: 30px;">
+        <!-- Stories in newspaper columns -->
+        <div class="stories-grid" style="padding: 30px;">
           ${storiesHTML}
         </div>
 
         <!-- Footer -->
-        <div style="border-top: 3px solid #1a1a1a; padding: 20px 30px; text-align: center; background-color: #f9f9f9; font-family: Arial, sans-serif; font-size: 12px; color: #666;">
-          <p style="margin: 0 0 10px 0;">NewsWatch delivers curated software economy news daily.</p>
-          <p style="margin: 0 0 10px 0; font-size: 13px; color: #333;">
-            <strong>📧 Send Feedback:</strong> <em>Reply to this email with your thoughts to help improve the analysis!</em>
+        <div style="border-top: 3px solid #1a1a1a; padding: 20px 30px; background-color: #f9f9f9; font-family: Arial, sans-serif; font-size: 12px; color: #666;">
+          <p style="margin: 0 0 10px 0; text-align: center;">NewsWatch delivers curated software economy news daily.</p>
+          <p style="margin: 0 0 10px 0; font-size: 13px; color: #333; text-align: center;">
+            <strong>📧 Share Your Thoughts:</strong> <em>Reply to this email with suggestions on sources, story coverage, or anything else you'd like to see!</em>
           </p>
-          <p style="margin: 0; font-size: 11px; color: #999;">© ${new Date().getFullYear()} NewsWatch. All rights reserved.</p>
-          <p style="margin: 10px 0 0 0; font-size: 11px;">
-            <a href="#" style="color: #666; text-decoration: none;">Unsubscribe</a>
-          </p>
+          <div style="text-align: center; margin-top: 15px; font-size: 11px; color: #999;">
+            <p style="margin: 5px 0;">© ${new Date().getFullYear()} NewsWatch. All rights reserved.</p>
+            <p style="margin: 5px 0;">
+              <a href="#" style="color: #666; text-decoration: none;">Unsubscribe</a>
+            </p>
+          </div>
         </div>
         
         ${guidanceHTML}

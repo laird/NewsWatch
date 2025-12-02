@@ -127,6 +127,23 @@ const stories = {
     async update(id, data) {
         await collections.stories.doc(id).update(data);
         return { id, ...data };
+    },
+
+    async incrementVote(id, voteType) {
+        const field = voteType === 'up' ? 'thumbs_up_count' : 'thumbs_down_count';
+        const story = await this.getById(id);
+        const currentValue = story?.[field] || 0;
+        await collections.stories.doc(id).update({
+            [field]: currentValue + 1
+        });
+    },
+
+    async incrementClicks(id) {
+        const story = await this.getById(id);
+        const currentClicks = story?.click_count || 0;
+        await collections.stories.doc(id).update({
+            click_count: currentClicks + 1
+        });
     }
 };
 
