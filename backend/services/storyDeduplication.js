@@ -1,5 +1,25 @@
-const { queryDocs, getDoc, addDoc, updateDoc, serverTimestamp, timestampFromDate } = require('../database/db-firestore');
+const { queryDocs, getDoc, addDoc, updateDoc, serverTimestamp, timestampFromDate, runTransaction } = require('../database/db-firestore');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+
+/**
+ * Normalize URL for comparison
+ * Removes query parameters, fragments, trailing slashes, and www prefix
+ */
+function normalizeUrl(url) {
+    if (!url) return '';
+    try {
+        const u = new URL(url);
+        // Remove www. prefix
+        let hostname = u.hostname.replace(/^www\./, '');
+        // Remove trailing slash from pathname
+        let pathname = u.pathname.replace(/\/$/, '');
+        // Return origin + pathname (no query params or fragments)
+        return `${u.protocol}//${hostname}${pathname}`.toLowerCase();
+    } catch (e) {
+        // If URL parsing fails, return lowercase version
+        return url.toLowerCase().replace(/\/$/, '');
+    }
+}
 
 /**
  * Calculate similarity between two strings (simple word overlap approach)
@@ -129,6 +149,24 @@ async function findSimilarStory(newStory) {
             console.log(`  🔗 Exact URL match found for: ${newStory.headline.substring(0, 60)}...`);
             return exactMatches[0];
         }
+
+        // Second check: normalized URL match (catches variations like with/without www, trailing slashes)
+        const normalizedNewUrl = normalizeUrl(newStory.url);
+        if (normalizedNewUrl) {
+            // Get all recent stories and check normalized URLs in memory
+            // (Firestore doesn't support field transformations in queries)
+            const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
+            const recentStories = await queryDocs('stories', [
+                { field: 'ingested_at', op: '>', value: timestampFromDate(twoDaysAgo) }
+            ]);
+
+            for (const existing of recentStories) {
+                if (existing.url && normalizeUrl(existing.url) === normalizedNewUrl) {
+                    console.log(`  🔗 Normalized URL match found: ${newStory.url} matches ${existing.url}`);
+                    return existing;
+                }
+            }
+        }
     }
 
     // Get recent stories (last 48 hours) to check for duplicates
@@ -200,16 +238,7 @@ async function mergeStories(existingStory, newStory) {
     };
 
     // Check if this source is already in the list (by URL or Name)
-    // Normalize URL: remove query params and trailing slashes for comparison
-    const normalizeUrl = (url) => {
-        try {
-            const u = new URL(url);
-            return u.origin + u.pathname.replace(/\/$/, '');
-        } catch (e) {
-            return url;
-        }
-    };
-
+    // Use centralized URL normalization
     const newUrlNormalized = normalizeUrl(newSource.url);
 
     const sourceExists = sources.some(s => {
@@ -218,10 +247,6 @@ async function mergeStories(existingStory, newStory) {
 
         // Check normalized URL match
         if (normalizeUrl(s.url) === newUrlNormalized) return true;
-
-        // Check name match (if URL is missing or different but name is same, it might be same source)
-        // But be careful, "Hacker News" might have different links. 
-        // So maybe only dedupe if URL is same.
 
         return false;
     });
@@ -313,5 +338,6 @@ module.exports = {
     findSimilarStory,
     mergeStories,
     processStory,
-    calculateSimilarity
+    calculateSimilarity,
+    normalizeUrl
 };
