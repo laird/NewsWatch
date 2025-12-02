@@ -54,26 +54,33 @@ function snapshotToArray(snapshot) {
 // Stories collection helpers
 const stories = {
     async getAll({ limit = 20, offset = 0, minPEScore = 0 } = {}) {
+        // Fetch more to account for potential duplicates
+        const fetchLimit = limit + 10;
+
         let query = collections.stories
             .where('pe_impact_score', '>=', minPEScore)
             .orderBy('pe_impact_score', 'desc')
             .orderBy('ingested_at', 'desc')
-            .limit(limit);
+            .limit(fetchLimit);
 
         if (offset > 0) {
-            // Firestore doesn't support offset directly, need to use cursor
-            // For simplicity, we'll fetch offset + limit and slice
             query = collections.stories
                 .where('pe_impact_score', '>=', minPEScore)
                 .orderBy('pe_impact_score', 'desc')
                 .orderBy('ingested_at', 'desc')
-                .limit(offset + limit);
+                .limit(offset + fetchLimit);
             const snapshot = await query.get();
-            return snapshotToArray(snapshot).slice(offset);
+            const allResults = snapshotToArray(snapshot);
+            // Filter duplicates
+            const activeResults = allResults.filter(s => !s.is_duplicate);
+            return activeResults.slice(offset, offset + limit);
         }
 
         const snapshot = await query.get();
-        return snapshotToArray(snapshot);
+        const allResults = snapshotToArray(snapshot);
+        // Filter duplicates
+        const activeResults = allResults.filter(s => !s.is_duplicate);
+        return activeResults.slice(0, limit);
     },
 
     async getById(id) {
@@ -99,17 +106,29 @@ const stories = {
 
         // Sort by pe_impact_score in memory (Firestore limitation on multiple orderBy with inequality)
         let results = snapshotToArray(snapshot);
+
+        // Filter out duplicates
+        results = results.filter(s => !s.is_duplicate);
+
         results.sort((a, b) => (b.pe_impact_score || 0) - (a.pe_impact_score || 0));
         return results.slice(0, limit);
     },
 
     async getTopStories({ limit = 12 } = {}) {
+        // Fetch extra to account for duplicates
+        const fetchLimit = limit * 2;
+
         const snapshot = await collections.stories
             .orderBy('pe_impact_score', 'desc')
             .orderBy('ingested_at', 'desc')
-            .limit(limit)
+            .limit(fetchLimit)
             .get();
-        return snapshotToArray(snapshot);
+
+        const results = snapshotToArray(snapshot);
+        // Filter out duplicates
+        const activeResults = results.filter(s => !s.is_duplicate);
+
+        return activeResults.slice(0, limit);
     },
 
     async create(data) {
