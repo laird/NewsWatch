@@ -339,7 +339,7 @@
             const statusDiv = document.getElementById('guidance-status');
 
             try {
-                const response = await fetch(`/api/admin/guidance?auth=${encodeURIComponent(adminPassword)}`);
+                const response = await fetch(`/api/admin/guidance?auth=${encodeURIComponent(adminPassword)}&_=${Date.now()}`);
 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);

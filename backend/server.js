@@ -35,17 +35,67 @@ app.use('/api/subscribers', subscriberRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/reanalyze', require('./routes/reanalyze'));
 
-// Redirect to GCS static site
+// Redirect to GCS static site (production) or serve local (dev)
 const GCS_BASE_URL = 'https://storage.googleapis.com/newswatch-479605-public';
+const IS_DEV = process.env.NODE_ENV !== 'production';
 
-// Serve index page - Redirect to GCS
+// Helper to serve file from GCS
+async function serveFromGCS(res, filename, contentType) {
+    try {
+        const { Storage } = require('@google-cloud/storage');
+        const storage = new Storage();
+        const bucketName = `${process.env.GCP_PROJECT_ID}-public`;
+        const bucket = storage.bucket(bucketName);
+        const file = bucket.file(filename);
+
+        const [exists] = await file.exists();
+        if (!exists) {
+            return res.status(404).send('Not found');
+        }
+
+        if (contentType) {
+            res.setHeader('Content-Type', contentType);
+        }
+
+        // Pipe the file stream to the response
+        file.createReadStream()
+            .on('error', (err) => {
+                console.error(`Error streaming ${filename} from GCS:`, err);
+                res.status(500).end();
+            })
+            .pipe(res);
+
+    } catch (error) {
+        console.error(`Error serving ${filename} from GCS:`, error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+// Serve index page
 app.get('/', (req, res) => {
-    res.redirect(`${GCS_BASE_URL}/index.html`);
+    if (IS_DEV) {
+        res.sendFile(path.join(__dirname, '../public/index.html'));
+    } else {
+        serveFromGCS(res, 'index.html', 'text/html');
+    }
 });
 
-// Serve story pages - Redirect to GCS
+// Serve archive page
+app.get('/archive.html', (req, res) => {
+    if (IS_DEV) {
+        res.sendFile(path.join(__dirname, '../public/archive.html'));
+    } else {
+        serveFromGCS(res, 'archive.html', 'text/html');
+    }
+});
+
+// Serve story pages
 app.get('/story/:id.html', (req, res) => {
-    res.redirect(`${GCS_BASE_URL}/story/${req.params.id}.html`);
+    if (IS_DEV) {
+        res.sendFile(path.join(__dirname, `../public/story/${req.params.id}.html`));
+    } else {
+        serveFromGCS(res, `story/${req.params.id}.html`, 'text/html');
+    }
 });
 
 // Serve admin page (local only, not on GCS)
@@ -66,10 +116,11 @@ app.post('/api/generate-site', async (req, res) => {
     }
 });
 
-// Serve other static files (CSS, JS, images) - Redirect to GCS
-// We keep local serving for API-related assets if needed, but for the site we use GCS
-app.get('/styles.css', (req, res) => res.redirect(`${GCS_BASE_URL}/styles.css`));
-app.get('/script.js', (req, res) => res.redirect(`${GCS_BASE_URL}/script.js`));
+// In production, proxy CSS/JS from GCS. In dev, express.static serves from public/
+if (!IS_DEV) {
+    app.get('/styles.css', (req, res) => serveFromGCS(res, 'styles.css', 'text/css'));
+    app.get('/script.js', (req, res) => serveFromGCS(res, 'script.js', 'application/javascript'));
+}
 
 // Keep express.static for fallback/local dev
 app.use(express.static(path.join(__dirname, '../public')));

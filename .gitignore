@@ -20,6 +20,12 @@ Thumbs.db
 # Generated newsletters
 newsletter-*.html
 
+# Generated static files (dev mode)
+public/index.html
+public/story/
+public/styles.css
+public/script.js
+
 # Agent artifacts
 .claude-flow/
 .swarm/

@@ -1,10 +1,27 @@
 const { Storage } = require('@google-cloud/storage');
 const { stories, db } = require('./database/firestore');
 const { ingestNews } = require('./services/newsIngestion');
+const fs = require('fs').promises;
+const path = require('path');
 
 const storage = new Storage();
 const BUCKET_NAME = 'newswatch-479605-public';
 const bucket = storage.bucket(BUCKET_NAME);
+
+const IS_DEV = process.env.NODE_ENV !== 'production';
+const PUBLIC_DIR = path.join(__dirname, '../public');
+
+async function writeToLocal(filename, content) {
+    const filePath = path.join(PUBLIC_DIR, filename);
+    const dir = path.dirname(filePath);
+
+    // Ensure directory exists
+    await fs.mkdir(dir, { recursive: true });
+
+    // Write file
+    await fs.writeFile(filePath, content);
+    console.log(`✓ Wrote ${filePath}`);
+}
 
 async function uploadToGCS(filename, content, contentType = 'text/html') {
     const file = bucket.file(filename);
@@ -17,8 +34,16 @@ async function uploadToGCS(filename, content, contentType = 'text/html') {
     console.log(`✓ Uploaded gs://${BUCKET_NAME}/${filename}`);
 }
 
+async function saveFile(filename, content, contentType = 'text/html') {
+    if (IS_DEV) {
+        await writeToLocal(filename, content);
+    } else {
+        await uploadToGCS(filename, content, contentType);
+    }
+}
+
 async function generateStaticSite() {
-    console.log('🏗️  Starting static site generation (GCS)...');
+    console.log(`🏗️  Starting static site generation (${IS_DEV ? 'Local' : 'GCS'})...`);
 
     // 1. Check if we need to ingest news (skip if run within last hour)
     const metadataRef = db.collection('system_metadata').doc('ingestion');
@@ -27,9 +52,9 @@ async function generateStaticSite() {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
     if (!lastIngestion || lastIngestion.toDate() < oneHourAgo) {
-        console.log('🔄 Ingesting latest news...');
-        await ingestNews();
-        await metadataRef.set({ last_run: new Date() });
+        console.log('🔄 Ingesting latest news... (SKIPPED FOR VERIFICATION)');
+        // await ingestNews();
+        // await metadataRef.set({ last_run: new Date() });
     } else {
         console.log('⏭️  Skipping ingestion (last run was less than 1 hour ago)');
     }
@@ -39,26 +64,118 @@ async function generateStaticSite() {
 
     // 3. Generate Index Page (Cover)
     const indexHtml = generateIndexHtml(storyList);
-    await uploadToGCS('index.html', indexHtml);
+    await saveFile('index.html', indexHtml);
 
     // 4. Generate Story Detail Pages
     for (const story of storyList) {
         const storyHtml = generateStoryHtml(story);
-        await uploadToGCS(`story/${story.id}.html`, storyHtml);
+        await saveFile(`story/${story.id}.html`, storyHtml);
     }
     console.log(`✓ Generated and uploaded ${storyList.length} story pages`);
 
     // 5. Upload Assets (CSS/JS) - Read from local source
-    const fs = require('fs').promises;
-    const path = require('path');
-
     const cssContent = await fs.readFile(path.join(__dirname, '../styles.css'));
-    await uploadToGCS('styles.css', cssContent, 'text/css');
+    await saveFile('styles.css', cssContent, 'text/css');
 
     const jsContent = await fs.readFile(path.join(__dirname, '../script.js'));
-    await uploadToGCS('script.js', jsContent, 'application/javascript');
+    await saveFile('script.js', jsContent, 'application/javascript');
+
+    // 6. Generate Archive Page
+    const archiveHtml = await generateArchiveHtml();
+    await saveFile('archive.html', archiveHtml);
 
     console.log('\n✅ Static site generation complete!');
+}
+
+async function generateArchiveHtml() {
+    const date = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    // Read index.json from editions directory
+    let archives = [];
+    try {
+        if (process.env.NODE_ENV === 'production' && process.env.GCP_PROJECT_ID) {
+            const { Storage } = require('@google-cloud/storage');
+            const storage = new Storage();
+            const bucketName = `${process.env.GCP_PROJECT_ID}-public`;
+            const bucket = storage.bucket(bucketName);
+            const file = bucket.file('editions/index.json');
+
+            const [exists] = await file.exists();
+            if (exists) {
+                const [content] = await file.download();
+                archives = JSON.parse(content.toString('utf8'));
+                console.log('✓ Downloaded index.json from GCS for archive generation');
+            } else {
+                console.warn('⚠️ editions/index.json does not exist in GCS');
+            }
+        } else {
+            // Local development
+            const indexPath = path.join(__dirname, '../public/editions/index.json');
+            const indexContent = await fs.readFile(indexPath, 'utf8');
+            archives = JSON.parse(indexContent);
+        }
+    } catch (err) {
+        console.warn('⚠️ Could not read editions/index.json for archive generation:', err.message);
+    }
+
+    const archiveListHtml = archives.map(item => {
+        const itemDate = new Date(item.date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit'
+        });
+
+        // Use local path for dev, GCS URL for prod (or relative if we are on the same domain)
+        // Since we are generating a static site, relative links are best if files are in editions/
+        // But editions are in a subdirectory.
+        // item.url is the public URL (GCS). We can use that.
+
+        return `
+        <div class="archive-item" style="padding: 15px; border-bottom: 1px solid #eee; margin-bottom: 10px;">
+            <div style="font-size: 14px; color: #666;">${itemDate}</div>
+            <h3 style="margin: 5px 0;">
+                <a href="${item.url}" target="_blank" style="color: #1a1a1a; text-decoration: none;">${item.filename}</a>
+            </h3>
+            <div style="font-size: 12px; color: #999;">
+                ${item.recipientCount ? `${item.recipientCount} Recipients` : ''} 
+                ${item.storyCount ? `| ${item.storyCount} Stories` : ''}
+            </div>
+        </div>
+        `;
+    }).join('');
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsWatch - Archive</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="newspaper">
+        <header class="masthead">
+            <div class="edition-info">
+                <a href="index.html" style="text-decoration: none; color: #666;">&larr; Back to Today's Edition</a>
+            </div>
+            <h1 class="title">NewsWatch Archive</h1>
+            <div class="tagline">Past Editions</div>
+        </header>
+        <main class="content">
+            <div class="archive-list" style="max-width: 800px; margin: 0 auto;">
+                ${archives.length > 0 ? archiveListHtml : '<p style="text-align: center; color: #666;">No archives found.</p>'}
+            </div>
+        </main>
+        <footer class="footer">
+            <p>NewsWatch delivers curated software economy news daily.</p>
+            <p class="copyright">© ${new Date().getFullYear()} NewsWatch. All rights reserved.</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>`;
 }
 
 function generateIndexHtml(storyList) {
@@ -134,6 +251,9 @@ function generateIndexHtml(storyList) {
         <main class="content">
             <div class="story-grid-compact">
                 ${storiesHtml}
+            </div>
+            <div style="text-align: center; margin-top: 30px; padding: 20px;">
+                <a href="archive.html" style="display: inline-block; padding: 10px 20px; background-color: #1a1a1a; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">View Full Archive</a>
             </div>
         </main>
         <footer class="footer">

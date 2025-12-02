@@ -14,7 +14,7 @@ RUN npm ci --omit=dev
 COPY backend ./backend
 COPY public ./public
 # Remove index.html to prevent express.static from serving it (we use GCS redirect)
-RUN rm public/index.html
+RUN rm -f public/index.html
 COPY *.js ./
 COPY styles.css ./
 

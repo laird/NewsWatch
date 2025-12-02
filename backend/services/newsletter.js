@@ -518,7 +518,7 @@ async function saveNewsletterToArchive(html, metadata = {}) {
     if (process.env.GCP_PROJECT_ID && process.env.NODE_ENV === 'production') {
       const { Storage } = require('@google-cloud/storage');
       const storage = new Storage();
-      const bucketName = `newswatch-${process.env.GCP_PROJECT_ID}-public`;
+      const bucketName = `${process.env.GCP_PROJECT_ID}-public`;
       const bucket = storage.bucket(bucketName);
 
       const destination = `editions/${filename}`;
@@ -557,6 +557,23 @@ async function saveNewsletterToArchive(html, metadata = {}) {
 
     await fs.writeFile(indexPath, JSON.stringify(index, null, 2), 'utf8');
     console.log('✓ Updated index.json');
+
+    // Upload index.json to GCS
+    if (process.env.GCP_PROJECT_ID && process.env.NODE_ENV === 'production') {
+      const { Storage } = require('@google-cloud/storage');
+      const storage = new Storage();
+      const bucketName = `${process.env.GCP_PROJECT_ID}-public`;
+      const bucket = storage.bucket(bucketName);
+
+      await bucket.upload(indexPath, {
+        destination: 'editions/index.json',
+        metadata: {
+          contentType: 'application/json',
+          cacheControl: 'public, max-age=3600',
+        },
+      });
+      console.log('✓ Uploaded index.json to GCS');
+    }
 
     return {
       filePath,
