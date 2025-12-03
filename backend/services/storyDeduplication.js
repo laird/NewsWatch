@@ -79,6 +79,38 @@ function calculateOverlap(str1, str2) {
 
     return intersection.size / minSize;
 }
+/**
+ * Helper to deduplicate sources
+ * 1. Deduplicates by normalized URL
+ * 2. Deduplicates by Source Name if they are from the same domain (e.g. multiple Hacker News links)
+ */
+function dedupeSources(sources) {
+    const seenUrls = new Set();
+    const seenSources = new Set();
+
+    return sources.filter(src => {
+        const normUrl = normalizeUrl(src.url);
+
+        // 1. Check URL duplication
+        if (seenUrls.has(normUrl)) return false;
+        seenUrls.add(normUrl);
+
+        // 2. Check Source Name duplication (only if from same domain/platform)
+        // This handles the "29 Hacker News links" issue where they might have different IDs but are effectively the same source
+        // We only keep the FIRST occurrence of a source name
+        // But we should be careful: what if "TechCrunch" has two different articles?
+        // The user said: "these are all one source... Filter them down to just the first report."
+        // So for now, let's be aggressive: One link per Source Name.
+        if (src.name) {
+            const normalizedName = src.name.toLowerCase().trim();
+            if (seenSources.has(normalizedName)) return false;
+            seenSources.add(normalizedName);
+        }
+
+        return true;
+    });
+}
+
 
 /**
  * Generate a combined summary from multiple sources using AI
@@ -311,6 +343,8 @@ async function mergeStories(existingStory, newStory) {
 
     if (!sourceExists) {
         sources.push(newSource);
+        // Ensure sources are unique by normalized URL
+        sources = dedupeSources(sources);
         console.log(`  📰 Merging story from ${newStory.source} into existing story (${sources.length} sources total)`);
     } else {
         console.log(`  ⚠️  Source ${newStory.source} already exists for this story, skipping merge`);
@@ -349,6 +383,10 @@ async function mergeStories(existingStory, newStory) {
         updateData.summary = newStory.summary;
     }
 
+    // Update last_source_at to the new source's published_at (or now if missing)
+    const newSourceDate = newStory.published_at ? new Date(newStory.published_at) : new Date();
+    updateData.last_source_at = timestampFromDate(newSourceDate);
+
     // Update the existing story
     await updateDoc('stories', existingStory.id, updateData);
 
@@ -370,11 +408,14 @@ async function processStory(newStory) {
 
     // No duplicate found, insert as new story
     // Initialize sources array with the first source
-    const sources = [{
+    // Initialize sources array with the first source and deduplicate (in case of duplicate URLs)
+    let sources = [{
         name: newStory.source,
         url: newStory.url,
         published_at: newStory.published_at
     }];
+    sources = dedupeSources(sources);
+
 
     const storyData = {
         headline: newStory.headline,
@@ -385,7 +426,8 @@ async function processStory(newStory) {
         sources: sources,
         published_at: timestampFromDate(new Date(newStory.published_at)),
         ingested_at: serverTimestamp(),
-        created_at: serverTimestamp()
+        created_at: serverTimestamp(),
+        last_source_at: timestampFromDate(new Date(newStory.published_at || Date.now()))
     };
 
     const story = await addDoc('stories', storyData);
@@ -418,13 +460,8 @@ async function mergeExistingStories(winner, loser) {
         published_at: loser.published_at
     }];
 
-    for (const src of loserSources) {
-        const srcUrlNormalized = normalizeUrl(src.url);
-        const exists = sources.some(s => normalizeUrl(s.url) === srcUrlNormalized);
-        if (!exists) {
-            sources.push(src);
-        }
-    }
+    // Add loser's sources and deduplicate
+    sources = dedupeSources(sources.concat(loserSources));
 
     // 2. Update winner
     const sourceMultiplier = 1 + (sources.length - 1) * 0.15;
@@ -446,6 +483,14 @@ async function mergeExistingStories(winner, loser) {
     }
     if ((loser.summary || '').length > (winner.summary || '').length) {
         updateData.summary = loser.summary;
+    }
+
+    // Update last_source_at to the latest of the two
+    const winnerTime = winner.last_source_at ? winner.last_source_at.toDate().getTime() : (winner.published_at ? winner.published_at.toDate().getTime() : 0);
+    const loserTime = loser.last_source_at ? loser.last_source_at.toDate().getTime() : (loser.published_at ? loser.published_at.toDate().getTime() : 0);
+
+    if (loserTime > winnerTime) {
+        updateData.last_source_at = loser.last_source_at || loser.published_at;
     }
 
     await updateDoc('stories', winner.id, updateData);
