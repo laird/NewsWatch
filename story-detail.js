@@ -78,7 +78,7 @@ function loadStory() {
             <div class="source-links">
                 <h4>Sources & Related Reading</h4>
                 <ul>
-                    ${story.sources.map(s => `<li><a href="${s.url}" target="_blank" rel="noopener">${s.title}</a></li>`).join('')}
+                    ${story.sources.map(s => `<li><a href="${s.url}" target="_blank" rel="noopener">${s.name || s.title}</a></li>`).join('')}
                 </ul>
             </div>
         `;

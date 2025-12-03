@@ -195,10 +195,34 @@ Maintain active coverage of:
       </div>
     ` : '';
 
-    // Make source clickable
-    const sourceHTML = story.url ?
-      `<a href="${story.url}" style="color: #666; text-decoration: none; text-transform: uppercase;">${story.source || 'Unknown Source'}</a>` :
-      `${story.source || 'Unknown Source'}`;
+    // Display all sources if story has multiple sources
+    let sourcesHTML = '';
+    if (story.sources && Array.isArray(story.sources) && story.sources.length > 0) {
+      // Story has been merged from multiple sources
+      const sourcesList = story.sources.map(src => {
+        const srcName = src.name || 'Unknown Source';
+        const srcUrl = src.url || '#';
+        const srcDate = src.published_at ? formatDate(src.published_at, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
+        return `<a href="${srcUrl}" style="color: #666; text-decoration: none;">${srcName}</a>${srcDate ? ` (${srcDate})` : ''}`;
+      }).join(' • ');
+
+      sourcesHTML = `
+        <div style="font-size: 11px; color: #666; margin-bottom: 8px; font-family: Arial, sans-serif;">
+          ${story.sources.length > 1 ? `<strong>${story.sources.length} sources:</strong> ` : ''}${sourcesList}
+        </div>
+      `;
+    } else {
+      // Single source story
+      const sourceHTML = story.url ?
+        `<a href="${story.url}" style="color: #666; text-decoration: none; text-transform: uppercase;">${story.source || 'Unknown Source'}</a>` :
+        `${story.source || 'Unknown Source'}`;
+
+      sourcesHTML = `
+        <div style="font-size: 11px; color: #666; margin-bottom: 8px; font-family: Arial, sans-serif;">
+          ${sourceHTML} ${story.published_at ? '| ' + formatDate(story.published_at, { hour: 'numeric', minute: '2-digit' }) : ''}
+        </div>
+      `;
+    }
 
     return `
       <div class="story-item" style="break-inside: avoid; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid #ddd;">
@@ -214,10 +238,7 @@ Maintain active coverage of:
           <span style="cursor: pointer;" title="Less like this">👎 ${thumbsDownCount > 0 ? `<small style="font-size: 11px; color: #666;">${thumbsDownCount}</small>` : ''}</span>
         </div>
         
-        <!-- Source and date -->
-        <div style="font-size: 11px; color: #666; margin-bottom: 8px; font-family: Arial, sans-serif;">
-          ${sourceHTML} ${story.published_at ? '| ' + formatDate(story.published_at, { hour: 'numeric', minute: '2-digit' }) : ''}
-        </div>
+        <!-- Source(s) and date -->${sourcesHTML}
         
         <!-- PE Impact badge -->
         <div style="display: inline-block; background: ${bgGradient}; color: white; padding: 3px 10px; font-size: 11px; font-weight: 600; margin-bottom: 8px; font-family: Arial, sans-serif;">
