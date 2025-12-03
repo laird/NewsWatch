@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const { generateAndSendNewsletter } = require('./services/newsletter');
 const { ingestNews } = require('./services/newsIngestion');
+const { ingestEmailFeedback } = require('./services/feedback-ingestion');
 
 /**
  * Initialize all scheduled tasks
@@ -39,6 +40,18 @@ function initializeScheduler() {
     });
 
     console.log('  ✓ News ingestion scheduled hourly');
+
+    // Hourly feedback ingestion (at minute 30)
+    cron.schedule('30 * * * *', async () => {
+        console.log(`\n📧 Scheduled feedback ingestion triggered at ${new Date().toLocaleString()}`);
+        try {
+            await ingestEmailFeedback();
+            console.log('✅ Feedback ingestion complete\n');
+        } catch (error) {
+            console.error('❌ Feedback ingestion failed:', error);
+        }
+    });
+    console.log('  ✓ Feedback ingestion scheduled hourly (minute 30)');
 
     // Optional: Run news ingestion immediately on startup
     if (process.env.INGEST_ON_STARTUP !== 'false') {

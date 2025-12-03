@@ -5,15 +5,16 @@ CREATE TABLE IF NOT EXISTS stories (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   headline TEXT NOT NULL,
   source TEXT,
+  sources JSONB DEFAULT '[]',
   author TEXT,
   url TEXT UNIQUE,
   content TEXT,
   summary TEXT,
   published_at TIMESTAMP,
   ingested_at TIMESTAMP DEFAULT NOW(),
-  pe_impact_score DECIMAL(3,2),
+  pe_impact_score DECIMAL(4,2),
   pe_analysis JSONB,
-  relevance_score DECIMAL(3,2),
+  relevance_score DECIMAL(4,2),
   created_at TIMESTAMP DEFAULT NOW()
 );
 

@@ -17,6 +17,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Request logging
 app.use((req, res, next) => {
@@ -29,6 +30,10 @@ app.use('/api/feedback', feedbackRoutes);
 app.use('/api/stories', storiesRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/subscribers', subscriberRoutes);
+app.use('/api/reanalyze', require('./routes/reanalyze'));
+
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Health check
 app.get('/health', (req, res) => {

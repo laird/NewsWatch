@@ -23,3 +23,3080 @@
 2025-11-26 21:11:47.670 EST [13233] LOG:  checkpoint complete: wrote 11 buffers (0.1%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=1.104 s, sync=0.014 s, total=1.132 s; sync files=7, longest=0.010 s, average=0.002 s; distance=60 kB, estimate=2904 kB; lsn=0/1CE50E0, redo lsn=0/1CE5088
 2025-11-26 21:21:46.870 EST [13233] LOG:  checkpoint starting: time
 2025-11-26 21:21:47.596 EST [13233] LOG:  checkpoint complete: wrote 7 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.702 s, sync=0.011 s, total=0.727 s; sync files=2, longest=0.011 s, average=0.006 s; distance=39 kB, estimate=2617 kB; lsn=0/1CEEDD8, redo lsn=0/1CEED80
+2025-11-26 21:31:46.779 EST [13233] LOG:  checkpoint starting: time
+2025-11-26 21:31:47.609 EST [13233] LOG:  checkpoint complete: wrote 8 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.803 s, sync=0.014 s, total=0.830 s; sync files=7, longest=0.011 s, average=0.002 s; distance=38 kB, estimate=2360 kB; lsn=0/1CF8770, redo lsn=0/1CF8718
+2025-11-26 22:21:43.701 EST [13233] LOG:  checkpoint starting: time
+2025-11-26 22:21:45.435 EST [13233] LOG:  checkpoint complete: wrote 17 buffers (0.1%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=1.707 s, sync=0.015 s, total=1.735 s; sync files=9, longest=0.010 s, average=0.002 s; distance=94 kB, estimate=2133 kB; lsn=0/1D10018, redo lsn=0/1D0FFA8
+2025-11-26 22:45:19.414 EST [112301] ERROR:  numeric field overflow
+2025-11-26 22:45:19.414 EST [112301] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.414 EST [112301] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.421 EST [112303] ERROR:  numeric field overflow
+2025-11-26 22:45:19.421 EST [112303] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.421 EST [112303] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.428 EST [112304] ERROR:  numeric field overflow
+2025-11-26 22:45:19.428 EST [112304] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.428 EST [112304] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.437 EST [112305] ERROR:  numeric field overflow
+2025-11-26 22:45:19.437 EST [112305] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.437 EST [112305] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.445 EST [112308] ERROR:  numeric field overflow
+2025-11-26 22:45:19.445 EST [112308] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.445 EST [112308] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.452 EST [112309] ERROR:  numeric field overflow
+2025-11-26 22:45:19.452 EST [112309] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.452 EST [112309] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.461 EST [112310] ERROR:  numeric field overflow
+2025-11-26 22:45:19.461 EST [112310] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.461 EST [112310] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.469 EST [112311] ERROR:  numeric field overflow
+2025-11-26 22:45:19.469 EST [112311] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.469 EST [112311] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.476 EST [112316] ERROR:  numeric field overflow
+2025-11-26 22:45:19.476 EST [112316] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.476 EST [112316] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.484 EST [112319] ERROR:  numeric field overflow
+2025-11-26 22:45:19.484 EST [112319] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.484 EST [112319] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.491 EST [112320] ERROR:  numeric field overflow
+2025-11-26 22:45:19.491 EST [112320] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.491 EST [112320] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.498 EST [112321] ERROR:  numeric field overflow
+2025-11-26 22:45:19.498 EST [112321] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.498 EST [112321] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.503 EST [112322] ERROR:  numeric field overflow
+2025-11-26 22:45:19.503 EST [112322] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.503 EST [112322] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.510 EST [112323] ERROR:  numeric field overflow
+2025-11-26 22:45:19.510 EST [112323] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.510 EST [112323] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.516 EST [112324] ERROR:  numeric field overflow
+2025-11-26 22:45:19.516 EST [112324] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.516 EST [112324] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.522 EST [112325] ERROR:  numeric field overflow
+2025-11-26 22:45:19.522 EST [112325] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.522 EST [112325] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.528 EST [112326] ERROR:  numeric field overflow
+2025-11-26 22:45:19.528 EST [112326] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.528 EST [112326] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.534 EST [112327] ERROR:  numeric field overflow
+2025-11-26 22:45:19.534 EST [112327] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.534 EST [112327] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.542 EST [112328] ERROR:  numeric field overflow
+2025-11-26 22:45:19.542 EST [112328] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.542 EST [112328] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.547 EST [112329] ERROR:  numeric field overflow
+2025-11-26 22:45:19.547 EST [112329] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.547 EST [112329] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.553 EST [112330] ERROR:  numeric field overflow
+2025-11-26 22:45:19.553 EST [112330] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.553 EST [112330] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.560 EST [112331] ERROR:  numeric field overflow
+2025-11-26 22:45:19.560 EST [112331] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.560 EST [112331] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.568 EST [112332] ERROR:  numeric field overflow
+2025-11-26 22:45:19.568 EST [112332] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.568 EST [112332] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.575 EST [112333] ERROR:  numeric field overflow
+2025-11-26 22:45:19.575 EST [112333] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.575 EST [112333] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.581 EST [112334] ERROR:  numeric field overflow
+2025-11-26 22:45:19.581 EST [112334] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.581 EST [112334] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.586 EST [112335] ERROR:  numeric field overflow
+2025-11-26 22:45:19.586 EST [112335] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.586 EST [112335] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:45:19.592 EST [112336] ERROR:  numeric field overflow
+2025-11-26 22:45:19.592 EST [112336] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:45:19.592 EST [112336] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:46:43.890 EST [13233] LOG:  checkpoint starting: time
+2025-11-26 22:46:52.485 EST [13233] LOG:  checkpoint complete: wrote 85 buffers (0.5%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=8.533 s, sync=0.024 s, total=8.596 s; sync files=28, longest=0.010 s, average=0.001 s; distance=561 kB, estimate=1976 kB; lsn=0/1D9C730, redo lsn=0/1D9C6A0
+2025-11-26 22:48:14.969 EST [114669] ERROR:  numeric field overflow
+2025-11-26 22:48:14.969 EST [114669] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:14.969 EST [114669] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:14.975 EST [114670] ERROR:  numeric field overflow
+2025-11-26 22:48:14.975 EST [114670] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:14.975 EST [114670] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:14.981 EST [114671] ERROR:  numeric field overflow
+2025-11-26 22:48:14.981 EST [114671] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:14.981 EST [114671] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:14.987 EST [114672] ERROR:  numeric field overflow
+2025-11-26 22:48:14.987 EST [114672] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:14.987 EST [114672] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:14.995 EST [114673] ERROR:  numeric field overflow
+2025-11-26 22:48:14.995 EST [114673] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:14.995 EST [114673] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.001 EST [114674] ERROR:  numeric field overflow
+2025-11-26 22:48:15.001 EST [114674] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.001 EST [114674] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.008 EST [114675] ERROR:  numeric field overflow
+2025-11-26 22:48:15.008 EST [114675] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.008 EST [114675] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.013 EST [114676] ERROR:  numeric field overflow
+2025-11-26 22:48:15.013 EST [114676] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.013 EST [114676] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.020 EST [114677] ERROR:  numeric field overflow
+2025-11-26 22:48:15.020 EST [114677] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.020 EST [114677] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.025 EST [114678] ERROR:  numeric field overflow
+2025-11-26 22:48:15.025 EST [114678] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.025 EST [114678] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.031 EST [114679] ERROR:  numeric field overflow
+2025-11-26 22:48:15.031 EST [114679] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.031 EST [114679] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.037 EST [114680] ERROR:  numeric field overflow
+2025-11-26 22:48:15.037 EST [114680] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.037 EST [114680] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.043 EST [114681] ERROR:  numeric field overflow
+2025-11-26 22:48:15.043 EST [114681] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.043 EST [114681] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.048 EST [114684] ERROR:  numeric field overflow
+2025-11-26 22:48:15.048 EST [114684] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.048 EST [114684] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.056 EST [114685] ERROR:  numeric field overflow
+2025-11-26 22:48:15.056 EST [114685] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.056 EST [114685] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.061 EST [114686] ERROR:  numeric field overflow
+2025-11-26 22:48:15.061 EST [114686] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.061 EST [114686] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.067 EST [114688] ERROR:  numeric field overflow
+2025-11-26 22:48:15.067 EST [114688] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.067 EST [114688] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.073 EST [114694] ERROR:  numeric field overflow
+2025-11-26 22:48:15.073 EST [114694] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.073 EST [114694] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.078 EST [114695] ERROR:  numeric field overflow
+2025-11-26 22:48:15.078 EST [114695] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.078 EST [114695] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.084 EST [114696] ERROR:  numeric field overflow
+2025-11-26 22:48:15.084 EST [114696] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.084 EST [114696] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.091 EST [114697] ERROR:  numeric field overflow
+2025-11-26 22:48:15.091 EST [114697] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.091 EST [114697] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.096 EST [114698] ERROR:  numeric field overflow
+2025-11-26 22:48:15.096 EST [114698] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.096 EST [114698] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.101 EST [114699] ERROR:  numeric field overflow
+2025-11-26 22:48:15.101 EST [114699] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.101 EST [114699] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.107 EST [114700] ERROR:  numeric field overflow
+2025-11-26 22:48:15.107 EST [114700] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.107 EST [114700] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.112 EST [114701] ERROR:  numeric field overflow
+2025-11-26 22:48:15.112 EST [114701] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.112 EST [114701] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.117 EST [114702] ERROR:  numeric field overflow
+2025-11-26 22:48:15.117 EST [114702] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.117 EST [114702] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.123 EST [114703] ERROR:  numeric field overflow
+2025-11-26 22:48:15.123 EST [114703] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.123 EST [114703] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.128 EST [114704] ERROR:  numeric field overflow
+2025-11-26 22:48:15.128 EST [114704] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.128 EST [114704] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.134 EST [114705] ERROR:  numeric field overflow
+2025-11-26 22:48:15.134 EST [114705] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 22:48:15.134 EST [114705] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 22:48:15.791 EST [114706] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 22:48:15.791 EST [114706] DETAIL:  Key (url)=(https://venturebeat.com/ai/anthropics-claude-opus-4-5-is-here-cheaper-ai-infinite-chats-and-coding) already exists.
+2025-11-26 22:48:15.791 EST [114706] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 22:48:15.798 EST [114708] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 22:48:15.798 EST [114708] DETAIL:  Key (url)=(https://venturebeat.com/security/deepseek-injects-50-more-security-bugs-when-prompted-with-chinese-political) already exists.
+2025-11-26 22:48:15.798 EST [114708] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 22:48:18.253 EST [114729] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 22:48:18.253 EST [114729] DETAIL:  Key (url)=(https://www.saastr.com/long-ceo-continue-head-products/) already exists.
+2025-11-26 22:48:18.253 EST [114729] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 22:48:18.265 EST [114730] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 22:48:18.265 EST [114730] DETAIL:  Key (url)=(https://www.saastr.com/how-much-vacation-is-normal-for-an-early-stage-startup-ceo/) already exists.
+2025-11-26 22:48:18.265 EST [114730] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 22:48:18.273 EST [114731] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 22:48:18.273 EST [114731] DETAIL:  Key (url)=(https://www.saastr.com/figma-is-at-20b-right-where-adobe-offered-to-buy-it-when-is-saying-no-worth-it-in-a-strong-ma-deal/) already exists.
+2025-11-26 22:48:18.273 EST [114731] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 22:48:18.278 EST [114732] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 22:48:18.278 EST [114732] DETAIL:  Key (url)=(https://www.saastr.com/how-can-a-saas-business-reactivate-churned-customers/) already exists.
+2025-11-26 22:48:18.278 EST [114732] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 22:48:18.284 EST [114733] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 22:48:18.284 EST [114733] DETAIL:  Key (url)=(https://www.saastr.com/ai-inbound-how-we-went-from-30-to-71-of-revenue-from-inbound-by-letting-ai-qualify-24-7/) already exists.
+2025-11-26 22:48:18.284 EST [114733] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 22:48:18.291 EST [114734] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 22:48:18.291 EST [114734] DETAIL:  Key (url)=(https://www.saastr.com/gemini-3-solves-one-of-the-biggest-headaches-with-vibe-coding-now-your-site-doesnt-have-to-look-like-it-was-vibe-coded/) already exists.
+2025-11-26 22:48:18.291 EST [114734] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 22:48:18.298 EST [114735] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 22:48:18.298 EST [114735] DETAIL:  Key (url)=(https://www.saastr.com/ai-app-of-the-week-aurasell-the-ai-native-crm-thats-actually-replacing-15-tools/) already exists.
+2025-11-26 22:48:18.298 EST [114735] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 22:51:43.585 EST [13233] LOG:  checkpoint starting: time
+2025-11-26 22:51:48.330 EST [13233] LOG:  checkpoint complete: wrote 47 buffers (0.3%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=4.713 s, sync=0.018 s, total=4.745 s; sync files=14, longest=0.011 s, average=0.002 s; distance=308 kB, estimate=1809 kB; lsn=0/1DE9928, redo lsn=0/1DE98D0
+2025-11-26 23:01:00.254 EST [124689] ERROR:  numeric field overflow
+2025-11-26 23:01:00.254 EST [124689] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.254 EST [124689] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.261 EST [124690] ERROR:  numeric field overflow
+2025-11-26 23:01:00.261 EST [124690] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.261 EST [124690] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.267 EST [124691] ERROR:  numeric field overflow
+2025-11-26 23:01:00.267 EST [124691] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.267 EST [124691] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.274 EST [124692] ERROR:  numeric field overflow
+2025-11-26 23:01:00.274 EST [124692] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.274 EST [124692] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.280 EST [124693] ERROR:  numeric field overflow
+2025-11-26 23:01:00.280 EST [124693] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.280 EST [124693] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.285 EST [124694] ERROR:  numeric field overflow
+2025-11-26 23:01:00.285 EST [124694] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.285 EST [124694] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.290 EST [124695] ERROR:  numeric field overflow
+2025-11-26 23:01:00.290 EST [124695] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.290 EST [124695] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.296 EST [124696] ERROR:  numeric field overflow
+2025-11-26 23:01:00.296 EST [124696] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.296 EST [124696] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.301 EST [124697] ERROR:  numeric field overflow
+2025-11-26 23:01:00.301 EST [124697] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.301 EST [124697] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.306 EST [124698] ERROR:  numeric field overflow
+2025-11-26 23:01:00.306 EST [124698] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.306 EST [124698] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.312 EST [124699] ERROR:  numeric field overflow
+2025-11-26 23:01:00.312 EST [124699] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.312 EST [124699] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.318 EST [124700] ERROR:  numeric field overflow
+2025-11-26 23:01:00.318 EST [124700] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.318 EST [124700] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.323 EST [124701] ERROR:  numeric field overflow
+2025-11-26 23:01:00.323 EST [124701] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.323 EST [124701] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.328 EST [124702] ERROR:  numeric field overflow
+2025-11-26 23:01:00.328 EST [124702] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.328 EST [124702] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.334 EST [124703] ERROR:  numeric field overflow
+2025-11-26 23:01:00.334 EST [124703] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.334 EST [124703] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.338 EST [124704] ERROR:  numeric field overflow
+2025-11-26 23:01:00.338 EST [124704] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.338 EST [124704] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.344 EST [124705] ERROR:  numeric field overflow
+2025-11-26 23:01:00.344 EST [124705] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.344 EST [124705] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.349 EST [124706] ERROR:  numeric field overflow
+2025-11-26 23:01:00.349 EST [124706] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.349 EST [124706] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.354 EST [124707] ERROR:  numeric field overflow
+2025-11-26 23:01:00.354 EST [124707] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.354 EST [124707] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.359 EST [124708] ERROR:  numeric field overflow
+2025-11-26 23:01:00.359 EST [124708] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.359 EST [124708] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.365 EST [124709] ERROR:  numeric field overflow
+2025-11-26 23:01:00.365 EST [124709] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.365 EST [124709] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.370 EST [124710] ERROR:  numeric field overflow
+2025-11-26 23:01:00.370 EST [124710] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.370 EST [124710] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.374 EST [124711] ERROR:  numeric field overflow
+2025-11-26 23:01:00.374 EST [124711] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.374 EST [124711] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.381 EST [124712] ERROR:  numeric field overflow
+2025-11-26 23:01:00.381 EST [124712] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.381 EST [124712] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.386 EST [124713] ERROR:  numeric field overflow
+2025-11-26 23:01:00.386 EST [124713] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.386 EST [124713] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.392 EST [124714] ERROR:  numeric field overflow
+2025-11-26 23:01:00.392 EST [124714] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.392 EST [124714] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:00.398 EST [124716] ERROR:  numeric field overflow
+2025-11-26 23:01:00.398 EST [124716] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:01:00.398 EST [124716] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:01:01.115 EST [124724] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:01:01.115 EST [124724] DETAIL:  Key (url)=(https://venturebeat.com/ai/anthropics-claude-opus-4-5-is-here-cheaper-ai-infinite-chats-and-coding) already exists.
+2025-11-26 23:01:01.115 EST [124724] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:01:01.122 EST [124725] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:01:01.122 EST [124725] DETAIL:  Key (url)=(https://venturebeat.com/security/deepseek-injects-50-more-security-bugs-when-prompted-with-chinese-political) already exists.
+2025-11-26 23:01:01.122 EST [124725] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:01:03.547 EST [124734] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:01:03.547 EST [124734] DETAIL:  Key (url)=(https://www.saastr.com/long-ceo-continue-head-products/) already exists.
+2025-11-26 23:01:03.547 EST [124734] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:01:03.556 EST [124735] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:01:03.556 EST [124735] DETAIL:  Key (url)=(https://www.saastr.com/how-much-vacation-is-normal-for-an-early-stage-startup-ceo/) already exists.
+2025-11-26 23:01:03.556 EST [124735] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:01:03.563 EST [124736] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:01:03.563 EST [124736] DETAIL:  Key (url)=(https://www.saastr.com/figma-is-at-20b-right-where-adobe-offered-to-buy-it-when-is-saying-no-worth-it-in-a-strong-ma-deal/) already exists.
+2025-11-26 23:01:03.563 EST [124736] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:01:03.569 EST [124737] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:01:03.569 EST [124737] DETAIL:  Key (url)=(https://www.saastr.com/how-can-a-saas-business-reactivate-churned-customers/) already exists.
+2025-11-26 23:01:03.569 EST [124737] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:01:03.574 EST [124738] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:01:03.574 EST [124738] DETAIL:  Key (url)=(https://www.saastr.com/ai-inbound-how-we-went-from-30-to-71-of-revenue-from-inbound-by-letting-ai-qualify-24-7/) already exists.
+2025-11-26 23:01:03.574 EST [124738] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:01:03.582 EST [124739] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:01:03.582 EST [124739] DETAIL:  Key (url)=(https://www.saastr.com/gemini-3-solves-one-of-the-biggest-headaches-with-vibe-coding-now-your-site-doesnt-have-to-look-like-it-was-vibe-coded/) already exists.
+2025-11-26 23:01:03.582 EST [124739] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:01:03.588 EST [124740] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:01:03.588 EST [124740] DETAIL:  Key (url)=(https://www.saastr.com/ai-app-of-the-week-aurasell-the-ai-native-crm-thats-actually-replacing-15-tools/) already exists.
+2025-11-26 23:01:03.588 EST [124740] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:01:04.529 EST [124741] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:01:04.529 EST [124741] DETAIL:  Key (url)=(https://www.wsj.com/finance/u-s-banks-shelve-20-billion-bailout-plan-for-argentina-add58f7e?mod=rss_markets_main) already exists.
+2025-11-26 23:01:04.529 EST [124741] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:01:04.538 EST [124756] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:01:04.538 EST [124756] DETAIL:  Key (url)=(https://www.wsj.com/tech/meta-ai-data-center-finances-d3a6b464?mod=rss_markets_main) already exists.
+2025-11-26 23:01:04.538 EST [124756] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:01:43.508 EST [13233] LOG:  checkpoint starting: time
+2025-11-26 23:02:02.975 EST [13233] LOG:  checkpoint complete: wrote 194 buffers (1.2%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=19.449 s, sync=0.014 s, total=19.468 s; sync files=18, longest=0.011 s, average=0.001 s; distance=1572 kB, estimate=1785 kB; lsn=0/1F72C58, redo lsn=0/1F72BC8
+2025-11-26 23:06:44.075 EST [13233] LOG:  checkpoint starting: time
+2025-11-26 23:06:48.312 EST [13233] LOG:  checkpoint complete: wrote 42 buffers (0.3%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=4.210 s, sync=0.015 s, total=4.237 s; sync files=8, longest=0.011 s, average=0.002 s; distance=300 kB, estimate=1637 kB; lsn=0/1FBDF20, redo lsn=0/1FBDEC8
+2025-11-26 23:07:06.300 EST [125900] ERROR:  numeric field overflow
+2025-11-26 23:07:06.300 EST [125900] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.300 EST [125900] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.308 EST [125909] ERROR:  numeric field overflow
+2025-11-26 23:07:06.308 EST [125909] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.308 EST [125909] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.314 EST [125910] ERROR:  numeric field overflow
+2025-11-26 23:07:06.314 EST [125910] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.314 EST [125910] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.322 EST [125911] ERROR:  numeric field overflow
+2025-11-26 23:07:06.322 EST [125911] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.322 EST [125911] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.330 EST [125912] ERROR:  numeric field overflow
+2025-11-26 23:07:06.330 EST [125912] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.330 EST [125912] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.337 EST [125913] ERROR:  numeric field overflow
+2025-11-26 23:07:06.337 EST [125913] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.337 EST [125913] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.345 EST [125914] ERROR:  numeric field overflow
+2025-11-26 23:07:06.345 EST [125914] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.345 EST [125914] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.351 EST [125915] ERROR:  numeric field overflow
+2025-11-26 23:07:06.351 EST [125915] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.351 EST [125915] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.358 EST [125916] ERROR:  numeric field overflow
+2025-11-26 23:07:06.358 EST [125916] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.358 EST [125916] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.366 EST [125917] ERROR:  numeric field overflow
+2025-11-26 23:07:06.366 EST [125917] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.366 EST [125917] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.374 EST [125918] ERROR:  numeric field overflow
+2025-11-26 23:07:06.374 EST [125918] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.374 EST [125918] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.381 EST [125919] ERROR:  numeric field overflow
+2025-11-26 23:07:06.381 EST [125919] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.381 EST [125919] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.387 EST [125920] ERROR:  numeric field overflow
+2025-11-26 23:07:06.387 EST [125920] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.387 EST [125920] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.394 EST [125921] ERROR:  numeric field overflow
+2025-11-26 23:07:06.394 EST [125921] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.394 EST [125921] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.400 EST [125922] ERROR:  numeric field overflow
+2025-11-26 23:07:06.400 EST [125922] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.400 EST [125922] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.408 EST [125923] ERROR:  numeric field overflow
+2025-11-26 23:07:06.408 EST [125923] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.408 EST [125923] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.415 EST [125924] ERROR:  numeric field overflow
+2025-11-26 23:07:06.415 EST [125924] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.415 EST [125924] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.422 EST [125925] ERROR:  numeric field overflow
+2025-11-26 23:07:06.422 EST [125925] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.422 EST [125925] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.429 EST [125926] ERROR:  numeric field overflow
+2025-11-26 23:07:06.429 EST [125926] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.429 EST [125926] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.435 EST [125927] ERROR:  numeric field overflow
+2025-11-26 23:07:06.435 EST [125927] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.435 EST [125927] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.443 EST [125928] ERROR:  numeric field overflow
+2025-11-26 23:07:06.443 EST [125928] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.443 EST [125928] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.450 EST [125929] ERROR:  numeric field overflow
+2025-11-26 23:07:06.450 EST [125929] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.450 EST [125929] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.457 EST [125930] ERROR:  numeric field overflow
+2025-11-26 23:07:06.457 EST [125930] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.457 EST [125930] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.464 EST [125931] ERROR:  numeric field overflow
+2025-11-26 23:07:06.464 EST [125931] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.464 EST [125931] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.470 EST [125932] ERROR:  numeric field overflow
+2025-11-26 23:07:06.470 EST [125932] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.470 EST [125932] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.477 EST [125933] ERROR:  numeric field overflow
+2025-11-26 23:07:06.477 EST [125933] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.477 EST [125933] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.483 EST [125934] ERROR:  numeric field overflow
+2025-11-26 23:07:06.483 EST [125934] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.483 EST [125934] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.490 EST [125935] ERROR:  numeric field overflow
+2025-11-26 23:07:06.490 EST [125935] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.490 EST [125935] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:06.497 EST [125936] ERROR:  numeric field overflow
+2025-11-26 23:07:06.497 EST [125936] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:07:06.497 EST [125936] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:07:07.662 EST [125945] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:07.662 EST [125945] DETAIL:  Key (url)=(https://venturebeat.com/ai/anthropics-claude-opus-4-5-is-here-cheaper-ai-infinite-chats-and-coding) already exists.
+2025-11-26 23:07:07.662 EST [125945] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:07.672 EST [125946] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:07.672 EST [125946] DETAIL:  Key (url)=(https://venturebeat.com/security/deepseek-injects-50-more-security-bugs-when-prompted-with-chinese-political) already exists.
+2025-11-26 23:07:07.672 EST [125946] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:09.809 EST [125960] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:09.809 EST [125960] DETAIL:  Key (url)=(https://www.saastr.com/long-ceo-continue-head-products/) already exists.
+2025-11-26 23:07:09.809 EST [125960] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:09.835 EST [125961] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:09.835 EST [125961] DETAIL:  Key (url)=(https://www.saastr.com/how-much-vacation-is-normal-for-an-early-stage-startup-ceo/) already exists.
+2025-11-26 23:07:09.835 EST [125961] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:09.850 EST [125962] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:09.850 EST [125962] DETAIL:  Key (url)=(https://www.saastr.com/figma-is-at-20b-right-where-adobe-offered-to-buy-it-when-is-saying-no-worth-it-in-a-strong-ma-deal/) already exists.
+2025-11-26 23:07:09.850 EST [125962] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:09.865 EST [125963] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:09.865 EST [125963] DETAIL:  Key (url)=(https://www.saastr.com/how-can-a-saas-business-reactivate-churned-customers/) already exists.
+2025-11-26 23:07:09.865 EST [125963] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:09.879 EST [125964] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:09.879 EST [125964] DETAIL:  Key (url)=(https://www.saastr.com/ai-inbound-how-we-went-from-30-to-71-of-revenue-from-inbound-by-letting-ai-qualify-24-7/) already exists.
+2025-11-26 23:07:09.879 EST [125964] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:09.891 EST [125965] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:09.891 EST [125965] DETAIL:  Key (url)=(https://www.saastr.com/gemini-3-solves-one-of-the-biggest-headaches-with-vibe-coding-now-your-site-doesnt-have-to-look-like-it-was-vibe-coded/) already exists.
+2025-11-26 23:07:09.891 EST [125965] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:09.901 EST [125966] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:09.901 EST [125966] DETAIL:  Key (url)=(https://www.saastr.com/ai-app-of-the-week-aurasell-the-ai-native-crm-thats-actually-replacing-15-tools/) already exists.
+2025-11-26 23:07:09.901 EST [125966] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:10.715 EST [125967] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:10.715 EST [125967] DETAIL:  Key (url)=(https://www.wsj.com/tech/meta-ai-data-center-finances-d3a6b464?mod=rss_markets_main) already exists.
+2025-11-26 23:07:10.715 EST [125967] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:10.722 EST [125968] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:10.722 EST [125968] DETAIL:  Key (url)=(https://www.wsj.com/health/healthcare/trump-calls-obamacare-insurers-fat-and-rich-investors-see-them-as-vulnerable-b918a8a6?mod=rss_markets_main) already exists.
+2025-11-26 23:07:10.722 EST [125968] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:10.731 EST [125969] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:10.731 EST [125969] DETAIL:  Key (url)=(https://www.wsj.com/finance/investing/the-race-to-refinance-makes-mortgages-more-expensive-for-everyone-else-43f48ff5?mod=rss_markets_main) already exists.
+2025-11-26 23:07:10.731 EST [125969] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:10.755 EST [125970] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:10.755 EST [125970] DETAIL:  Key (url)=(https://www.wsj.com/finance/banking/julius-baer-draws-line-under-credit-review-as-bank-posts-record-client-assets-a89a1536?mod=rss_markets_main) already exists.
+2025-11-26 23:07:10.755 EST [125970] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:10.764 EST [125971] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:10.764 EST [125971] DETAIL:  Key (url)=(https://www.wsj.com/finance/banking/citigroup-plans-to-reorganize-u-s-personal-banking-business-names-next-cfo-95d175b9?mod=rss_markets_main) already exists.
+2025-11-26 23:07:10.764 EST [125971] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:10.831 EST [125974] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:10.831 EST [125974] DETAIL:  Key (url)=(https://www.wsj.com/opinion/the-proxy-process-needs-an-overhaul-00052637?mod=rss_markets_main) already exists.
+2025-11-26 23:07:10.831 EST [125974] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:10.843 EST [125981] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:10.843 EST [125981] DETAIL:  Key (url)=(https://www.wsj.com/opinion/global-markets-lifted-by-nvidias-record-earnings-21ae486a?mod=rss_markets_main) already exists.
+2025-11-26 23:07:10.843 EST [125981] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:10.852 EST [125982] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:10.852 EST [125982] DETAIL:  Key (url)=(https://www.wsj.com/opinion/a-50-year-mortgage-makes-no-economic-sense-interest-rate-risk-equity-c4658f5d?mod=rss_markets_main) already exists.
+2025-11-26 23:07:10.852 EST [125982] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:10.861 EST [125983] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:10.861 EST [125983] DETAIL:  Key (url)=(https://www.wsj.com/opinion/chinas-myanmar-project-could-end-u-s-sanctions-8b5fdb6f?mod=rss_markets_main) already exists.
+2025-11-26 23:07:10.861 EST [125983] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:10.870 EST [125984] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:10.870 EST [125984] DETAIL:  Key (url)=(https://www.wsj.com/opinion/how-ai-can-empower-the-financial-industry-40a138ef?mod=rss_markets_main) already exists.
+2025-11-26 23:07:10.870 EST [125984] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:10.921 EST [125985] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:10.921 EST [125985] DETAIL:  Key (url)=(https://www.wsj.com/finance/currencies/singapore-dollar-consolidates-amid-risk-on-sentiment-186e1c41?mod=rss_markets_main) already exists.
+2025-11-26 23:07:10.921 EST [125985] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:10.931 EST [125986] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:10.931 EST [125986] DETAIL:  Key (url)=(https://www.wsj.com/finance/currencies/yuan-isnt-cheap-but-vulnerable-to-geopolitical-shocks-2d6d12dc?mod=rss_markets_main) already exists.
+2025-11-26 23:07:10.931 EST [125986] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:10.944 EST [125987] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:10.944 EST [125987] DETAIL:  Key (url)=(https://www.wsj.com/finance/u-s-banks-shelve-20-billion-bailout-plan-for-argentina-add58f7e?mod=rss_markets_main) already exists.
+2025-11-26 23:07:10.944 EST [125987] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:10.956 EST [125988] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:10.956 EST [125988] DETAIL:  Key (url)=(https://www.wsj.com/articles/threats-to-eurozone-financial-stability-remain-elevated-says-ecbs-de-guindos-ee4e440e?mod=rss_markets_main) already exists.
+2025-11-26 23:07:10.956 EST [125988] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:10.966 EST [125989] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:10.966 EST [125989] DETAIL:  Key (url)=(https://www.wsj.com/finance/regulation/national-trust-charters-fintech-cypto-b3d3e443?mod=rss_markets_main) already exists.
+2025-11-26 23:07:10.966 EST [125989] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:10.976 EST [125990] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:10.976 EST [125990] DETAIL:  Key (url)=(https://www.wsj.com/finance/regulation/proxy-advisers-iss-and-glass-lewis-are-facing-antitrust-probes-22f0ff38?mod=rss_markets_main) already exists.
+2025-11-26 23:07:10.976 EST [125990] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:10.984 EST [125991] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:10.984 EST [125991] DETAIL:  Key (url)=(https://www.wsj.com/finance/regulation/trump-executive-order-proxy-index-fund-votes-638f396e?mod=rss_markets_main) already exists.
+2025-11-26 23:07:10.984 EST [125991] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:11.009 EST [125992] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:11.009 EST [125992] DETAIL:  Key (url)=(https://www.wsj.com/articles/golf-services-business-founded-by-jack-nicklaus-files-bankruptcy-after-50-million-defamation-verdict-in-his-favor-25bc5cb6?mod=rss_markets_main) already exists.
+2025-11-26 23:07:11.009 EST [125992] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:11.020 EST [125993] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:11.020 EST [125993] DETAIL:  Key (url)=(https://www.wsj.com/finance/stocks/global-stocks-markets-dow-news-11-12-2025-3f865d22?mod=rss_markets_main) already exists.
+2025-11-26 23:07:11.020 EST [125993] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:11.032 EST [125994] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:11.032 EST [125994] DETAIL:  Key (url)=(https://www.wsj.com/finance/commodities-futures/tucker-carlson-gold-company-a9dea0eb?mod=rss_markets_main) already exists.
+2025-11-26 23:07:11.032 EST [125994] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:11.042 EST [125995] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:11.042 EST [125995] DETAIL:  Key (url)=(https://www.wsj.com/buyside/personal-finance/banking/money-market-accounts?mod=rss_markets_main) already exists.
+2025-11-26 23:07:11.042 EST [125995] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:11.050 EST [125996] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:11.050 EST [125996] DETAIL:  Key (url)=(https://www.wsj.com/buyside/personal-finance/banking/what-is-a-high-yield-savings-account?mod=rss_markets_main) already exists.
+2025-11-26 23:07:11.050 EST [125996] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:11.060 EST [125997] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:11.060 EST [125997] DETAIL:  Key (url)=(https://www.wsj.com/buyside/personal-finance/financial-tips/how-to-choose-financial-advisor?mod=rss_markets_main) already exists.
+2025-11-26 23:07:11.060 EST [125997] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:11.069 EST [125998] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:11.069 EST [125998] DETAIL:  Key (url)=(https://www.wsj.com/finance/u-s-banks-shelve-20-billion-bailout-plan-for-argentina-add58f7e?mod=rss_markets_main) already exists.
+2025-11-26 23:07:11.069 EST [125998] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:11.079 EST [125999] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:11.079 EST [125999] DETAIL:  Key (url)=(https://www.wsj.com/finance/the-golden-handcuffs-are-off-private-equity-employees-leave-for-smaller-firms-375573c6?mod=rss_markets_main) already exists.
+2025-11-26 23:07:11.079 EST [125999] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:11.087 EST [126000] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:11.087 EST [126000] DETAIL:  Key (url)=(https://www.wsj.com/tech/meta-ai-data-center-finances-d3a6b464?mod=rss_markets_main) already exists.
+2025-11-26 23:07:11.087 EST [126000] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:11.096 EST [126001] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:11.096 EST [126001] DETAIL:  Key (url)=(https://www.wsj.com/finance/investing/are-stocks-a-better-bet-than-social-security-873ab68a?mod=rss_markets_main) already exists.
+2025-11-26 23:07:11.096 EST [126001] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.177 EST [126010] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.177 EST [126010] DETAIL:  Key (url)=(https://www.axios.com/2025/11/25/don-bacon-trump-ukraine-russia-deal-mtg-resign) already exists.
+2025-11-26 23:07:12.177 EST [126010] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.184 EST [126002] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.184 EST [126002] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/trump-comey-case-charges-dismissed-judge) already exists.
+2025-11-26 23:07:12.184 EST [126002] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.193 EST [126011] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.193 EST [126011] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/emmett-till-barn-civil-rights-mississippi-lynching) already exists.
+2025-11-26 23:07:12.193 EST [126011] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.202 EST [126012] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.202 EST [126012] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/trump-ai-genesis-mission-doe-chris-wright) already exists.
+2025-11-26 23:07:12.202 EST [126012] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.212 EST [126013] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.212 EST [126013] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/trump-maduro-talks-meeting-venezuela-boat-strikes) already exists.
+2025-11-26 23:07:12.212 EST [126013] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.221 EST [126014] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.221 EST [126014] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/pew-latinos-trump-poll-pessimism-economy) already exists.
+2025-11-26 23:07:12.221 EST [126014] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.231 EST [126015] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.231 EST [126015] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/sen-mark-kelly-facing-military-investigation-after-clashing-with-trump) already exists.
+2025-11-26 23:07:12.231 EST [126015] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.242 EST [126016] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.242 EST [126016] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/trump-visit-china-april-xi) already exists.
+2025-11-26 23:07:12.242 EST [126016] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.252 EST [126017] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.252 EST [126017] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/trump-opposes-broadcast-cap-lift-fcc) already exists.
+2025-11-26 23:07:12.252 EST [126017] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.264 EST [126018] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.264 EST [126018] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/jony-ive-sam-altman-openai-plans-elegantly-simple-device) already exists.
+2025-11-26 23:07:12.264 EST [126018] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.275 EST [126019] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.275 EST [126019] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/trump-ukraine-plan-28-points-back-story) already exists.
+2025-11-26 23:07:12.275 EST [126019] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.284 EST [126020] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.284 EST [126020] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/ai-startups-need-cash-to-compete) already exists.
+2025-11-26 23:07:12.284 EST [126020] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.296 EST [126021] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.296 EST [126021] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/cancer-diagnosis-americans-gallup-one-in-ten) already exists.
+2025-11-26 23:07:12.296 EST [126021] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.307 EST [126022] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.307 EST [126022] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/thanksgiving-weather-forecast-cold-polar-vortex) already exists.
+2025-11-26 23:07:12.307 EST [126022] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.317 EST [126023] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.317 EST [126023] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/trump-health-cost-plan-aca-subsidies) already exists.
+2025-11-26 23:07:12.317 EST [126023] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.327 EST [126024] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.327 EST [126024] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/democrats-ranked-choice-voting-2028-primaries) already exists.
+2025-11-26 23:07:12.327 EST [126024] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.336 EST [126025] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.336 EST [126025] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/democrats-super-pac-war-2028) already exists.
+2025-11-26 23:07:12.336 EST [126025] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.346 EST [126026] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.346 EST [126026] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/whitmer-retreat-campaign-president-2028) already exists.
+2025-11-26 23:07:12.346 EST [126026] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.356 EST [126027] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.356 EST [126027] DETAIL:  Key (url)=(https://www.axios.com/2025/11/24/airlines-venezuela-flights-faa-military-activity-trump-maduro) already exists.
+2025-11-26 23:07:12.356 EST [126027] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.365 EST [126028] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.365 EST [126028] DETAIL:  Key (url)=(https://www.axios.com/2025/11/23/us-ukraine-progress-trump-peace-plan) already exists.
+2025-11-26 23:07:12.365 EST [126028] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.376 EST [126029] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.376 EST [126029] DETAIL:  Key (url)=(https://www.axios.com/2025/11/23/israel-strike-hezbollah-commander) already exists.
+2025-11-26 23:07:12.376 EST [126029] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.385 EST [126030] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.385 EST [126030] DETAIL:  Key (url)=(https://www.axios.com/2025/11/23/mamdani-trump-fascist-national-guard-nyc) already exists.
+2025-11-26 23:07:12.385 EST [126030] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.396 EST [126031] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.396 EST [126031] DETAIL:  Key (url)=(https://www.axios.com/2025/11/23/doj-epstein-grand-jury-records) already exists.
+2025-11-26 23:07:12.396 EST [126031] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.405 EST [126032] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.405 EST [126032] DETAIL:  Key (url)=(https://www.axios.com/2025/11/23/trump-mamdani-nyc-funding) already exists.
+2025-11-26 23:07:12.405 EST [126032] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.415 EST [126033] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.415 EST [126033] DETAIL:  Key (url)=(https://www.axios.com/2025/11/23/generative-ai-hollywood-art) already exists.
+2025-11-26 23:07:12.415 EST [126033] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.425 EST [126034] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.425 EST [126034] DETAIL:  Key (url)=(https://www.axios.com/2025/11/23/netflix-film-vietnam-war-napalm-girl-photo-credit) already exists.
+2025-11-26 23:07:12.425 EST [126034] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.434 EST [126035] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.434 EST [126035] DETAIL:  Key (url)=(https://www.axios.com/2025/11/22/pbs-lily-gladstone-film-blackfeet-buffalo-return) already exists.
+2025-11-26 23:07:12.434 EST [126035] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.444 EST [126036] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.444 EST [126036] DETAIL:  Key (url)=(https://www.axios.com/2025/11/22/marjorie-taylor-greene-resign-congress-trump) already exists.
+2025-11-26 23:07:12.444 EST [126036] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.453 EST [126037] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.453 EST [126037] DETAIL:  Key (url)=(https://www.axios.com/2025/11/22/fossil-fuels-un-climate-talks) already exists.
+2025-11-26 23:07:12.453 EST [126037] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.463 EST [126038] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.463 EST [126038] DETAIL:  Key (url)=(https://www.axios.com/2025/11/22/trump-peace-plan-geneva-ukraine-europe) already exists.
+2025-11-26 23:07:12.463 EST [126038] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.473 EST [126039] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.473 EST [126039] DETAIL:  Key (url)=(https://www.axios.com/2025/11/22/trump-zohran-mamdani-new-york-bond) already exists.
+2025-11-26 23:07:12.473 EST [126039] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.483 EST [126040] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.483 EST [126040] DETAIL:  Key (url)=(https://www.axios.com/2025/11/22/ivf-designer-babies-how-orchid-nucleus) already exists.
+2025-11-26 23:07:12.483 EST [126040] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.494 EST [126041] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.494 EST [126041] DETAIL:  Key (url)=(https://www.axios.com/2025/11/22/trump-tariffs-promises) already exists.
+2025-11-26 23:07:12.494 EST [126041] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.502 EST [126042] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.502 EST [126042] DETAIL:  Key (url)=(https://www.axios.com/2025/11/22/top-scams-holiday-shopping-2025) already exists.
+2025-11-26 23:07:12.502 EST [126042] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.512 EST [126043] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.512 EST [126043] DETAIL:  Key (url)=(https://www.axios.com/2025/11/22/ai-accents-chatgpt-jobs-health) already exists.
+2025-11-26 23:07:12.512 EST [126043] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.523 EST [126044] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.523 EST [126044] DETAIL:  Key (url)=(https://www.axios.com/2025/11/22/long-covid-symptoms-timeline-how-long) already exists.
+2025-11-26 23:07:12.523 EST [126044] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.532 EST [126045] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.532 EST [126045] DETAIL:  Key (url)=(https://www.axios.com/2025/11/22/congress-house-censure-indictment-fire-crazy-week) already exists.
+2025-11-26 23:07:12.532 EST [126045] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.541 EST [126046] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.541 EST [126046] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/trump-mamdani-nyc-mayor-meeting-quotes-white-house) already exists.
+2025-11-26 23:07:12.541 EST [126046] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.552 EST [126047] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.552 EST [126047] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/mike-huckabee-meeting-spy-israel-maga) already exists.
+2025-11-26 23:07:12.552 EST [126047] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.562 EST [126048] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.562 EST [126048] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/trump-mamdani-meeting-friday-white-house) already exists.
+2025-11-26 23:07:12.562 EST [126048] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.571 EST [126049] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.571 EST [126049] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/republicans-trump-congress-epstein-tariffs) already exists.
+2025-11-26 23:07:12.571 EST [126049] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.581 EST [126050] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.581 EST [126050] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/democrats-trump-threats-posts-military-video) already exists.
+2025-11-26 23:07:12.581 EST [126050] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.591 EST [126051] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.591 EST [126051] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/fed-interest-rate-cut-fomc) already exists.
+2025-11-26 23:07:12.591 EST [126051] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.600 EST [126052] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.600 EST [126052] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/fed-rate-cut-fomc-lisa-cook) already exists.
+2025-11-26 23:07:12.600 EST [126052] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.611 EST [126053] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.611 EST [126053] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/democrat-jason-crow-trump-threat-capitol-police) already exists.
+2025-11-26 23:07:12.611 EST [126053] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.619 EST [126054] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.619 EST [126054] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/zelensky-respond-trump-ukraine-peace-plan) already exists.
+2025-11-26 23:07:12.619 EST [126054] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.629 EST [126055] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.629 EST [126055] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/zelensky-vance-trump-peace-plan) already exists.
+2025-11-26 23:07:12.629 EST [126055] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.639 EST [126056] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.639 EST [126056] DETAIL:  Key (url)=(https://www.axios.com/2025/11/20/trump-death-threats-democrats-congress-military) already exists.
+2025-11-26 23:07:12.639 EST [126056] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.649 EST [126057] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.649 EST [126057] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/bitcoin-value-price-crypto-coin-sell-off) already exists.
+2025-11-26 23:07:12.649 EST [126057] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.659 EST [126058] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.659 EST [126058] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/trumps-offshore-plan-oil-execs-test) already exists.
+2025-11-26 23:07:12.659 EST [126058] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.669 EST [126059] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.669 EST [126059] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/irs-deploys-ai-agents) already exists.
+2025-11-26 23:07:12.669 EST [126059] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.679 EST [126060] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.679 EST [126060] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/paramount-comcast-netflix-warner-bros-discovery-bids) already exists.
+2025-11-26 23:07:12.679 EST [126060] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.689 EST [126061] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.689 EST [126061] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/911-families-lawsuit-links-saudi-officials-to-plot-despite-princes-denial) already exists.
+2025-11-26 23:07:12.689 EST [126061] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.698 EST [126062] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.698 EST [126062] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/trump-mtg-white-house-advisers) already exists.
+2025-11-26 23:07:12.698 EST [126062] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.710 EST [126063] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.710 EST [126063] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/swalwell-california-governor-race-trump-jimmy-kimmel) already exists.
+2025-11-26 23:07:12.710 EST [126063] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.718 EST [126064] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.718 EST [126064] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/crockett-white-supremacist-threats-dc-office) already exists.
+2025-11-26 23:07:12.718 EST [126064] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.728 EST [126065] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.728 EST [126065] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/ukraine-security-guarantee-nato-article-5-trump) already exists.
+2025-11-26 23:07:12.728 EST [126065] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.737 EST [126066] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.737 EST [126066] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/air-travel-workers-flights-trump-checks-shutdown) already exists.
+2025-11-26 23:07:12.737 EST [126066] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.748 EST [126067] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.748 EST [126067] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/mike-johnson-house-discharge-petitions-epstein) already exists.
+2025-11-26 23:07:12.748 EST [126067] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.758 EST [126068] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.758 EST [126068] DETAIL:  Key (url)=(https://www.axios.com/2025/11/21/crash-test-dummy-female-safety) already exists.
+2025-11-26 23:07:12.758 EST [126068] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.768 EST [126069] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.768 EST [126069] DETAIL:  Key (url)=(https://www.axios.com/2025/11/20/trump-tariffs-deficit-forecast) already exists.
+2025-11-26 23:07:12.768 EST [126069] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.777 EST [126070] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.777 EST [126070] DETAIL:  Key (url)=(https://www.axios.com/2025/11/20/trump-florida-california-alaska-offshore-oil-drilling) already exists.
+2025-11-26 23:07:12.777 EST [126070] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.788 EST [126071] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.788 EST [126071] DETAIL:  Key (url)=(https://www.axios.com/2025/11/20/trump-ukraine-peace-plan-28-points-russia) already exists.
+2025-11-26 23:07:12.788 EST [126071] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.797 EST [126072] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.797 EST [126072] DETAIL:  Key (url)=(https://www.axios.com/2025/11/20/house-censure-mills-plaskett-mike-johnson) already exists.
+2025-11-26 23:07:12.797 EST [126072] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.807 EST [126073] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.807 EST [126073] DETAIL:  Key (url)=(https://www.axios.com/2025/11/20/shein-childlike-sex-dolls-lawmakers) already exists.
+2025-11-26 23:07:12.807 EST [126073] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:12.817 EST [126074] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:12.817 EST [126074] DETAIL:  Key (url)=(https://www.axios.com/2025/11/20/dick-cheney-funeral-vice-president-in-photos) already exists.
+2025-11-26 23:07:12.817 EST [126074] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:13.964 EST [126075] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:13.964 EST [126075] DETAIL:  Key (url)=(https://arstechnica.com/ai/2025/11/anthropic-introduces-opus-4-5-cuts-api-pricing-and-enables-much-longer-claude-chats/) already exists.
+2025-11-26 23:07:13.964 EST [126075] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:13.972 EST [126076] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:13.972 EST [126076] DETAIL:  Key (url)=(https://arstechnica.com/space/2025/11/rivals-object-to-spacexs-starship-plans-in-florida-whos-interfering-with-whom/) already exists.
+2025-11-26 23:07:13.972 EST [126076] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:14.202 EST [126077] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:14.202 EST [126077] DETAIL:  Key (url)=(https://www.technologyreview.com/2025/11/24/1128051/the-state-of-ai-chatbot-companions-and-the-future-of-our-privacy/) already exists.
+2025-11-26 23:07:14.202 EST [126077] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:14.213 EST [126078] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:14.213 EST [126078] DETAIL:  Key (url)=(https://www.technologyreview.com/2025/11/24/1128322/whats-next-for-alphafold-a-conversation-with-a-google-deepmind-nobel-laureate/) already exists.
+2025-11-26 23:07:14.213 EST [126078] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:14.224 EST [126079] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:14.224 EST [126079] DETAIL:  Key (url)=(https://www.technologyreview.com/2025/11/24/1128306/the-download-how-to-fix-a-tractor-and-living-among-conspiracy-theorists/) already exists.
+2025-11-26 23:07:14.224 EST [126079] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:14.238 EST [126080] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:14.238 EST [126080] DETAIL:  Key (url)=(https://www.technologyreview.com/2025/11/21/1128232/the-download-the-secrets-of-vitamin-d-and-an-ai-party-in-africa/) already exists.
+2025-11-26 23:07:14.238 EST [126080] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:14.251 EST [126081] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:14.251 EST [126081] DETAIL:  Key (url)=(https://www.technologyreview.com/2025/11/21/1128206/vitamin-d-bodies-bone-health-immune/) already exists.
+2025-11-26 23:07:14.251 EST [126081] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:14.264 EST [126082] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:14.264 EST [126082] DETAIL:  Key (url)=(https://www.technologyreview.com/2025/11/20/1127749/roundtables-surviving-the-new-age-of-conspiracies/) already exists.
+2025-11-26 23:07:14.264 EST [126082] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:14.630 EST [126083] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:14.630 EST [126083] DETAIL:  Key (url)=(https://news.crunchbase.com/fintech/revolut-valuation-spikes-secondary-share-sale/) already exists.
+2025-11-26 23:07:14.630 EST [126083] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:14.641 EST [126084] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:14.641 EST [126084] DETAIL:  Key (url)=(https://news.crunchbase.com/ai/wave-infrastructure-phase-connell-cleve-atomico-corti/) already exists.
+2025-11-26 23:07:14.641 EST [126084] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:14.652 EST [126085] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:14.652 EST [126085] DETAIL:  Key (url)=(https://news.crunchbase.com/ai/next-generation-platform-shift-brotman-alpha/) already exists.
+2025-11-26 23:07:14.652 EST [126085] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:14.664 EST [126086] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:14.664 EST [126086] DETAIL:  Key (url)=(https://news.crunchbase.com/venture/biggest-funding-rounds-ai-fintech-lambda/) already exists.
+2025-11-26 23:07:14.664 EST [126086] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:14.672 EST [126087] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:14.672 EST [126087] DETAIL:  Key (url)=(https://news.crunchbase.com/venture/innovation-policies-australia-strategic-focus-onetti-mindthebridge/) already exists.
+2025-11-26 23:07:14.672 EST [126087] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:07:14.681 EST [126088] ERROR:  duplicate key value violates unique constraint "stories_url_key"
+2025-11-26 23:07:14.681 EST [126088] DETAIL:  Key (url)=(https://news.crunchbase.com/venture/edtech-funding-stays-low/) already exists.
+2025-11-26 23:07:14.681 EST [126088] STATEMENT:  
+	        INSERT INTO stories (headline, url, content, summary, source, sources, published_at)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7)
+	        RETURNING *
+	    
+2025-11-26 23:08:15.322 EST [126587] ERROR:  numeric field overflow
+2025-11-26 23:08:15.322 EST [126587] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:08:15.322 EST [126587] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:08:15.344 EST [126588] ERROR:  numeric field overflow
+2025-11-26 23:08:15.344 EST [126588] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:08:15.344 EST [126588] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:08:15.379 EST [126589] ERROR:  numeric field overflow
+2025-11-26 23:08:15.379 EST [126589] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:08:15.379 EST [126589] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:08:19.378 EST [126590] ERROR:  numeric field overflow
+2025-11-26 23:08:19.378 EST [126590] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:08:19.378 EST [126590] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:08:19.553 EST [126634] ERROR:  numeric field overflow
+2025-11-26 23:08:19.553 EST [126634] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:08:19.553 EST [126634] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:09:30.699 EST [128737] ERROR:  numeric field overflow
+2025-11-26 23:09:30.699 EST [128737] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:09:30.699 EST [128737] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:09:30.720 EST [128738] ERROR:  numeric field overflow
+2025-11-26 23:09:30.720 EST [128738] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:09:30.720 EST [128738] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:09:30.747 EST [128739] ERROR:  numeric field overflow
+2025-11-26 23:09:30.747 EST [128739] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:09:30.747 EST [128739] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:09:30.996 EST [128740] ERROR:  numeric field overflow
+2025-11-26 23:09:30.996 EST [128740] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:09:30.996 EST [128740] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:09:34.565 EST [128749] ERROR:  numeric field overflow
+2025-11-26 23:09:34.565 EST [128749] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:09:34.565 EST [128749] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:09:34.962 EST [128791] ERROR:  numeric field overflow
+2025-11-26 23:09:34.962 EST [128791] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:09:34.962 EST [128791] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:09:34.986 EST [128792] ERROR:  numeric field overflow
+2025-11-26 23:09:34.986 EST [128792] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:09:34.986 EST [128792] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:09:34.998 EST [128793] ERROR:  numeric field overflow
+2025-11-26 23:09:34.998 EST [128793] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:09:34.998 EST [128793] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:09:35.027 EST [128794] ERROR:  numeric field overflow
+2025-11-26 23:09:35.027 EST [128794] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:09:35.027 EST [128794] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:11:44.403 EST [13233] LOG:  checkpoint starting: time
+2025-11-26 23:12:07.827 EST [13233] LOG:  checkpoint complete: wrote 233 buffers (1.4%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=23.362 s, sync=0.021 s, total=23.424 s; sync files=19, longest=0.011 s, average=0.002 s; distance=2519 kB, estimate=2519 kB; lsn=0/2233E98, redo lsn=0/2233E08
+2025-11-26 23:12:49.998 EST [129460] ERROR:  numeric field overflow
+2025-11-26 23:12:49.998 EST [129460] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:12:49.998 EST [129460] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:14:47.661 EST [129798] ERROR:  numeric field overflow
+2025-11-26 23:14:47.661 EST [129798] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:14:47.661 EST [129798] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = CASE 
+	                WHEN LENGTH($4) > LENGTH(COALESCE(summary, '')) THEN $4 
+	                ELSE summary 
+	            END
+	        WHERE id = $5
+	    
+2025-11-26 23:15:45.949 EST [130051] ERROR:  numeric field overflow
+2025-11-26 23:15:45.949 EST [130051] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:15:45.949 EST [130051] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = COALESCE($4, CASE 
+	                WHEN LENGTH($5) > LENGTH(COALESCE(summary, '')) THEN $5 
+	                ELSE summary 
+	            END)
+	        WHERE id = $6
+	    
+2025-11-26 23:16:44.894 EST [13233] LOG:  checkpoint starting: time
+2025-11-26 23:16:46.323 EST [13233] LOG:  checkpoint complete: wrote 14 buffers (0.1%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=1.404 s, sync=0.012 s, total=1.429 s; sync files=4, longest=0.010 s, average=0.003 s; distance=66 kB, estimate=2274 kB; lsn=0/2244A70, redo lsn=0/22449E0
+2025-11-26 23:17:26.580 EST [130416] ERROR:  numeric field overflow
+2025-11-26 23:17:26.580 EST [130416] DETAIL:  A field with precision 3, scale 2 must round to an absolute value less than 10^1.
+2025-11-26 23:17:26.580 EST [130416] STATEMENT:  
+	        UPDATE stories 
+	        SET sources = $1,
+	            pe_impact_score = COALESCE($2, pe_impact_score),
+	            content = CASE 
+	                WHEN LENGTH($3) > LENGTH(COALESCE(content, '')) THEN $3 
+	                ELSE content 
+	            END,
+	            summary = COALESCE($4, CASE 
+	                WHEN LENGTH($5) > LENGTH(COALESCE(summary, '')) THEN $5 
+	                ELSE summary 
+	            END)
+	        WHERE id = $6
+	    
+2025-11-26 23:21:44.422 EST [13233] LOG:  checkpoint starting: time
+2025-11-26 23:21:44.563 EST [13233] LOG:  checkpoint complete: wrote 1 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.101 s, sync=0.001 s, total=0.142 s; sync files=1, longest=0.001 s, average=0.001 s; distance=6 kB, estimate=2047 kB; lsn=0/2246320, redo lsn=0/22462C8
+2025-11-27 09:44:06.414 EST [13229] LOG:  received smart shutdown request
+2025-11-27 09:44:06.440 EST [13229] LOG:  background worker "logical replication launcher" (PID 13238) exited with exit code 1
+2025-11-27 09:44:06.661 EST [13233] LOG:  shutting down
+2025-11-27 09:44:06.694 EST [13233] LOG:  checkpoint starting: shutdown immediate
+2025-11-27 09:44:06.910 EST [13233] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.250 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=1842 kB; lsn=0/22463D0, redo lsn=0/22463D0
+2025-11-27 09:44:07.316 EST [13229] LOG:  database system is shut down
+2025-11-27 22:28:04.297 EST [20659] LOG:  starting PostgreSQL 18.1 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 15.2.1 20251112, 64-bit
+2025-11-27 22:28:04.298 EST [20659] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-27 22:28:04.298 EST [20659] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-27 22:28:04.299 EST [20659] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2025-11-27 22:28:04.303 EST [20666] LOG:  database system was shut down at 2025-11-27 09:44:06 EST
+2025-11-27 22:28:04.307 EST [20659] LOG:  database system is ready to accept connections
+2025-11-27 22:33:04.305 EST [20664] LOG:  checkpoint starting: time
+2025-11-27 22:33:04.532 EST [20664] LOG:  checkpoint complete: wrote 2 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.202 s, sync=0.012 s, total=0.227 s; sync files=3, longest=0.011 s, average=0.004 s; distance=16 kB, estimate=16 kB; lsn=0/224A4D8, redo lsn=0/224A480
+2025-11-27 22:48:04.822 EST [20664] LOG:  checkpoint starting: time
+2025-11-27 22:48:06.789 EST [20664] LOG:  checkpoint complete: wrote 19 buffers (0.1%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=1.909 s, sync=0.019 s, total=1.967 s; sync files=15, longest=0.010 s, average=0.002 s; distance=107 kB, estimate=107 kB; lsn=0/2265430, redo lsn=0/22653D8
+2025-11-27 22:53:04.889 EST [20664] LOG:  checkpoint starting: time
+2025-11-27 22:53:23.778 EST [20664] LOG:  checkpoint complete: wrote 188 buffers (1.1%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=18.856 s, sync=0.021 s, total=18.890 s; sync files=20, longest=0.010 s, average=0.002 s; distance=1360 kB, estimate=1360 kB; lsn=0/23B94B8, redo lsn=0/23B9428
+2025-11-27 23:03:04.978 EST [20664] LOG:  checkpoint starting: time
+2025-11-27 23:03:05.329 EST [20664] LOG:  checkpoint complete: wrote 3 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.301 s, sync=0.011 s, total=0.352 s; sync files=1, longest=0.011 s, average=0.011 s; distance=16 kB, estimate=1225 kB; lsn=0/23BD698, redo lsn=0/23BD640
+2025-11-28 12:22:30.856 EST [20659] LOG:  received SIGHUP, reloading configuration files
+2025-11-28 15:15:20.536 EST [20659] LOG:  received smart shutdown request
+2025-11-28 15:15:20.647 EST [20659] LOG:  background worker "logical replication launcher" (PID 20669) exited with exit code 1
+2025-11-28 15:15:20.679 EST [20664] LOG:  shutting down
+2025-11-28 15:15:20.733 EST [20664] LOG:  checkpoint starting: shutdown immediate
+2025-11-28 15:15:20.782 EST [20664] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.010 s, sync=0.001 s, total=0.103 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=1103 kB; lsn=0/23BD748, redo lsn=0/23BD748
+2025-11-28 15:15:20.811 EST [20659] LOG:  database system is shut down

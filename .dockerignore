@@ -1,0 +1,35 @@
+node_modules
+npm-debug.log
+.env
+.env.local
+*.log
+.git
+.gitignore
+README.md
+*.md
+.vscode
+.idea
+coverage
+.nyc_output
+dist
+build
+tmp
+temp
+
+# Local development files
+firebase.json
+.firebaserc
+newsletter-preview.html
+verify-*.js
+send-newsletter-now.js
+add-subscriber.js
+analyze-all-stories.js
+ingest-feedback-now.js
+get-refresh-token.js
+
+# Test files
+test
+tests
+__tests__
+*.test.js
+*.spec.js

@@ -3,31 +3,18 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const OpenAI = require('openai');
 
 // PE Analysis Prompt Template
-const PE_ANALYSIS_PROMPT = `You are an expert private equity analyst. Analyze the following news story for its relevance and impact on PE investors.
+const PE_ANALYSIS_PROMPT = `You are a financial analyst specializing in private equity investments. Analyze this news article for its impact on PE investors.
 
-Story Headline: {headline}
-Story Content: {content}
-Source: {source}
+Title: {{HEADLINE}}
 
-Provide analysis in the following JSON format:
-{
-  "investment_opportunity_score": 0-10,
-  "deal_impact_score": 0-10,
-  "portfolio_relevance_score": 0-10,
-  "overall_pe_impact_score": 0-10,
-  "key_insights": [
-    "Insight 1",
-    "Insight 2",
-    "Insight 3"
-  ],
-  "investment_implications": "Brief summary of what this means for PE investors",
-  "sectors_affected": ["SaaS", "FinTech", etc.],
-  "action_items": [
-    "Potential action 1",
-    "Potential action 2"
-  ],
-  "risk_level": "low" | "medium" | "high"
-}
+Content: {{CONTENT}}
+
+Provide a structured analysis:
+1. Investment Opportunity Score (0-10): How relevant is this to PE investment opportunities?
+2. Deal Impact Score (0-10): Does this affect M&A or deal dynamics?
+3. Portfolio Impact Score (0-10): Does this affect existing portfolio companies?
+4. Key Sectors: List 2-3 most relevant PE sectors (e.g., SaaS, FinTech, Healthcare, etc.)
+5. Actionable Insights: 2-3 bullet points on what PE investors should do
 
 Focus on:
 - Investment opportunities (new markets, technologies, companies)
@@ -43,213 +30,226 @@ Focus on:
  */
 async function analyzePEImpact(story) {
     try {
-        const provider = process.env.AI_PROVIDER || 'auto';
+        let analysis;
 
-        if (provider === 'gemini' || (provider === 'auto' && process.env.GEMINI_API_KEY)) {
-            return await analyzeWithGemini(story);
-        } else if (provider === 'openai' || (provider === 'auto' && (process.env.OPENAI_API_KEY || process.env.OPENAI_BASE_URL))) {
-            return await analyzeWithOpenAI(story);
-        } else {
-            console.log('⚠️  No AI configuration found, using mock analysis');
-            return generateMockAnalysis(story);
+        // Use Shared AI Service
+        if (process.env.AI_PROVIDER === 'gemini' || process.env.OPENAI_API_KEY) {
+            try {
+                analysis = await analyzeWithAI(story);
+            } catch (error) {
+                console.log(`    AI analysis failed, using mock: ${error.message}`);
+                analysis = generateMockAnalysis(story);
+            }
         }
-    } catch (error) {
-        console.error('Error in PE analysis:', error);
-        // Fallback to mock analysis on error
-        return generateMockAnalysis(story);
-    }
-}
+        // Fallback to mock analysis
+        else {
+            analysis = generateMockAnalysis(story);
+        }
 
-/**
- * Analyze using Google Gemini API
- */
-async function analyzeWithGemini(story) {
-    try {
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-        const prompt = PE_ANALYSIS_PROMPT
-            .replace('{headline}', story.headline)
-            .replace('{content}', story.content || story.summary || '')
-            .replace('{source}', story.source || 'Unknown');
-
-        const result = await model.generateContent(prompt);
-        const response = result.response;
-        const text = response.text();
-
-        // Clean up markdown code blocks if present
-        const jsonStr = text.replaceAll(/```json\n?|\n?```/g, '').trim();
-        const analysis = JSON.parse(jsonStr);
-
-        // Store analysis in database
+        // Save analysis to Firestore
         await stories.update(story.id, {
-            pe_analysis: analysis,
-            pe_impact_score: analysis.overall_pe_impact_score
+            pe_impact_score: analysis.overall_score,
+            relevance_score: analysis.relevance_score,
+            pe_analysis: analysis
         });
 
         return analysis;
+
     } catch (error) {
-        console.error('Error calling Gemini service:', error);
+        console.error('Error analyzing story:', error);
         throw error;
     }
 }
 
-/**
- * Analyze using OpenAI API (or compatible local LLM like LM Studio)
- */
-async function analyzeWithOpenAI(story) {
-    // Configure for local LLM (LM Studio) or OpenAI
-    const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY || 'lm-studio', // LM Studio often accepts any key
-        baseURL: process.env.OPENAI_BASE_URL || 'http://localhost:1234/v1'
-    });
+// Analyze using Shared AI Service
+async function analyzeWithAI(story) {
+    const aiService = require('./ai-service');
 
-    const prompt = PE_ANALYSIS_PROMPT
-        .replace('{headline}', story.headline)
-        .replace('{content}', story.content || story.summary || '')
-        .replace('{source}', story.source || 'Unknown');
+    // Fetch unified user guidance
+    const feedbackGuidance = await getFeedbackGuidance();
 
-    try {
-        const response = await openai.chat.completions.create({
-            model: process.env.AI_MODEL || 'gpt-4', // Use 'local-model' or similar for LM Studio if needed
-            messages: [
-                { role: 'system', content: 'You are a private equity analyst. Respond ONLY with valid JSON.' },
-                { role: 'user', content: prompt }
-            ],
-            response_format: { type: 'json_object' },
-            temperature: 0.3
-        });
+    let prompt = PE_ANALYSIS_PROMPT
+        .replace('{{HEADLINE}}', story.headline)
+        .replace('{{CONTENT}}', (story.content || story.summary || '').substring(0, 2000));
 
-        const content = response.choices[0].message.content;
-        const analysis = JSON.parse(content);
-
-        // Store analysis in database
-        await stories.update(story.id, {
-            pe_analysis: analysis,
-            pe_impact_score: analysis.overall_pe_impact_score
-        });
-
-        return analysis;
-    } catch (error) {
-        console.error('Error calling AI service:', error);
-        throw error;
+    if (feedbackGuidance) {
+        prompt += `\n\nIMPORTANT USER GUIDANCE:\n${feedbackGuidance}\n\nPlease adjust your analysis to align with this feedback.`;
     }
-}
 
-/**
- * Generate mock PE analysis for development/testing
- */
-function generateMockAnalysis(story) {
-    // Determine scores based on keywords in headline
-    const headline = (story.headline || '').toLowerCase();
-    const content = (story.content || story.summary || '').toLowerCase();
-    const text = headline + ' ' + content;
+    const result = await aiService.generateContent(prompt, { temperature: 0.7 });
+    const text = result.text;
 
-    const { investmentScore, dealScore, portfolioScore } = calculateScores(text);
-    const overallScore = ((investmentScore + dealScore + portfolioScore) / 3).toFixed(1);
+    // Parse the response
+    const scores = calculateScores(text);
 
-    const analysis = {
-        investment_opportunity_score: investmentScore,
-        deal_impact_score: dealScore,
-        portfolio_relevance_score: portfolioScore,
-        overall_pe_impact_score: Number.parseFloat(overallScore),
-        key_insights: [
-            `${getScoreLevel(dealScore)} M&A activity relevance`,
-            `${getScoreLevel(investmentScore, 'investment')} investment opportunity signals`,
-            `${getScoreLevel(portfolioScore, 'impact')} portfolio company impact`
-        ],
-        investment_implications: `This ${getRelevanceLevel(overallScore)} development should be monitored for potential PE implications.`,
-        sectors_affected: extractSectors(text),
-        action_items: generateActionItems(investmentScore, dealScore, portfolioScore),
-        risk_level: overallScore >= 7 ? 'medium' : 'low'
+    return {
+        overall_score: scores.overall,
+        relevance_score: scores.relevance,
+        investment_score: scores.investment,
+        deal_score: scores.deal,
+        portfolio_score: scores.portfolio,
+        sectors: extractSectors(text),
+        insights: text.split('\n')
+            .filter(line => line.trim().startsWith('-'))
+            .map(line => line.trim().replace(/^-\s*/, ''))  // Remove leading dash and whitespace
+            .map(line => line.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'))  // Convert **text** to <b>text</b>
+            .filter(line => line.length > 5 && !line.match(/^-+$/))  // Filter out very short or just dashes
+            .slice(0, 3),
+        explanation: text,
+        raw_analysis: text,
+        analyzed_at: new Date().toISOString(),
+        usage: result.usage
     };
+}
 
-    // Store in database
-    stories.update(story.id, {
-        pe_analysis: analysis,
-        pe_impact_score: analysis.overall_pe_impact_score
-    }).catch(err => console.error('Error storing mock analysis:', err));
+// Generate mock PE analysis for development/testing
+function generateMockAnalysis(story) {
+    const text = story.content || story.summary || story.headline;
+    const result = calculateScoresWithExplanation(text);
 
-    return analysis;
+    return {
+        overall_score: result.scores.overall,
+        relevance_score: result.scores.relevance,
+        investment_score: result.scores.investment,
+        deal_score: result.scores.deal,
+        portfolio_score: result.scores.portfolio,
+        sectors: extractSectors(text),
+        insights: generateActionItems(result.scores.investment, result.scores.deal, result.scores.portfolio),
+        explanation: result.explanation,
+        keywords_found: result.keywordsFound,
+        raw_analysis: 'Mock analysis based on keyword matching',
+        analyzed_at: new Date().toISOString(),
+        is_mock: true
+    };
 }
 
 function calculateScores(text) {
-    let investmentScore = 5;
-    let dealScore = 5;
-    let portfolioScore = 5;
+    const result = calculateScoresWithExplanation(text);
+    return result.scores;
+}
 
-    // Boost scores based on keywords
-    if (/\b(acqui|merger|m&a|acquisition|bought)\b/.test(text)) dealScore += 3;
-    if (/\b(valuation|funding|raised|investment|billion|million)\b/.test(text)) investmentScore += 2;
-    if (/\b(saas|software|cloud|ai|fintech)\b/.test(text)) portfolioScore += 2;
-    if (/\b(ipo|public|listing)\b/.test(text)) dealScore += 2;
-    if (/\b(growth|revenue|arr|earnings)\b/.test(text)) portfolioScore += 1;
+function calculateScoresWithExplanation(text) {
+    const lower = text.toLowerCase();
+
+    // PE-relevant keywords
+    const investmentKeywords = ['investment', 'funding', 'series', 'raise', 'capital', 'valuation', 'startup', 'venture'];
+    const dealKeywords = ['acquisition', 'merger', 'buyout', 'deal', 'exit', 'ipo', 'spac', 'sale'];
+    const portfolioKeywords = ['growth', 'expansion', 'market', 'revenue', 'saas', 'platform', 'technology'];
+
+    const foundInvestment = investmentKeywords.filter(kw => lower.includes(kw));
+    const foundDeal = dealKeywords.filter(kw => lower.includes(kw));
+    const foundPortfolio = portfolioKeywords.filter(kw => lower.includes(kw));
+
+    const investmentScore = Math.min(10, foundInvestment.length * 1.5);
+    const dealScore = Math.min(10, foundDeal.length * 1.5);
+    const portfolioScore = Math.min(10, foundPortfolio.length * 1.5);
+
+    const overall = Number(((investmentScore + dealScore + portfolioScore) / 3).toFixed(2));
+    const relevance = Number((Math.max(investmentScore, dealScore, portfolioScore)).toFixed(2));
+
+    // Generate explanation
+    let explanation = [];
+
+    if (investmentScore > 0) {
+        explanation.push(`Investment Score (${investmentScore}/10): Found ${foundInvestment.length} investment-related keywords: ${foundInvestment.join(', ')}`);
+    } else {
+        explanation.push(`Investment Score (0/10): No direct investment or funding keywords detected`);
+    }
+
+    if (dealScore > 0) {
+        explanation.push(`Deal Score (${dealScore}/10): Found ${foundDeal.length} M&A/deal keywords: ${foundDeal.join(', ')}`);
+    } else {
+        explanation.push(`Deal Score (0/10): No merger, acquisition, or exit keywords detected`);
+    }
+
+    if (portfolioScore > 0) {
+        explanation.push(`Portfolio Score (${portfolioScore}/10): Found ${foundPortfolio.length} growth/market keywords: ${foundPortfolio.join(', ')}`);
+    } else {
+        explanation.push(`Portfolio Score (0/10): No portfolio company or market expansion keywords detected`);
+    }
+
+    explanation.push(`Overall PE Impact: ${overall}/10 (average of all scores)`);
+    explanation.push(`Relevance: ${relevance}/10 (highest individual score)`);
 
     return {
-        investmentScore: Math.min(10, investmentScore),
-        dealScore: Math.min(10, dealScore),
-        portfolioScore: Math.min(10, portfolioScore)
+        scores: { investment: investmentScore, deal: dealScore, portfolio: portfolioScore, overall, relevance },
+        explanation: explanation.join('\n'),
+        keywordsFound: {
+            investment: foundInvestment,
+            deal: foundDeal,
+            portfolio: foundPortfolio
+        }
     };
 }
 
 function getScoreLevel(score, type = 'standard') {
-    if (score >= 7) {
-        if (type === 'investment') return 'Strong';
-        if (type === 'impact') return 'Significant';
-        return 'High';
-    }
-    if (score >= 5) {
-        return 'Moderate';
-    }
-    if (type === 'investment') return 'Limited';
-    if (type === 'impact') return 'Minimal';
-    return 'Low';
+    if (score >= 7) return type === 'relevance' ? 'High Relevance' : 'Critical';
+    if (score >= 5) return type === 'relevance' ? 'Medium Relevance' : 'Important';
+    if (score >= 3) return type === 'relevance' ? 'Low Relevance' : 'Notable';
+    return type === 'relevance' ? 'Not Relevant' : 'Minimal';
 }
 
 function getRelevanceLevel(score) {
-    if (score >= 7) return 'highly relevant';
-    if (score >= 5) return 'moderately relevant';
-    return 'less critical';
+    if (score >= 8) return 'Must Read';
+    if (score >= 6) return 'Recommended';
+    if (score >= 4) return 'FYI';
+    return 'Optional';
 }
 
-/**
- * Extract sectors from text
- */
+// Extract sectors from text
 function extractSectors(text) {
-    const sectors = [];
-    if (/\b(saas|software)\b/.test(text)) sectors.push('SaaS');
-    if (/\b(fintech|payment|banking)\b/.test(text)) sectors.push('FinTech');
-    if (/\b(ai|artificial intelligence|machine learning)\b/.test(text)) sectors.push('AI/ML');
-    if (/\b(cloud|aws|azure|gcp)\b/.test(text)) sectors.push('Cloud Infrastructure');
-    if (/\b(cyber|security)\b/.test(text)) sectors.push('Cybersecurity');
-    if (/\b(data|analytics)\b/.test(text)) sectors.push('Data & Analytics');
+    const sectorKeywords = {
+        'SaaS': /\b(saas|software as a service|cloud software)\b/i,
+        'FinTech': /\b(fintech|financial technology|payments?|banking)\b/i,
+        'HealthTech': /\b(healthtech|health|medical|biotech|pharma)\b/i,
+        'E-commerce': /\b(ecommerce|e-commerce|retail|marketplace)\b/i,
+        'AI/ML': /\b(ai|artificial intelligence|machine learning|ml)\b/i,
+        'Enterprise': /\b(enterprise|b2b|business software)\b/i
+    };
 
-    return sectors.length > 0 ? sectors : ['Technology'];
+    const sectors = [];
+    for (const [sector, regex] of Object.entries(sectorKeywords)) {
+        if (regex.test(text)) sectors.push(sector);
+    }
+
+    return sectors.slice(0, 3);
 }
 
-/**
- * Generate action items based on scores
- */
+// Generate action items based on scores
 function generateActionItems(investmentScore, dealScore, portfolioScore) {
     const items = [];
 
-    if (dealScore >= 7) {
-        items.push('Monitor for follow-on M&A activity in this sector');
-    }
     if (investmentScore >= 7) {
-        items.push('Evaluate investment opportunities in related companies');
+        items.push('Monitor for potential direct investment opportunity');
+    }
+    if (dealScore >= 7) {
+        items.push('Review for M&A or exit strategy implications');
     }
     if (portfolioScore >= 7) {
         items.push('Assess impact on existing portfolio companies');
     }
     if (items.length === 0) {
-        items.push('Continue monitoring sector developments');
+        items.push('File for future reference');
     }
 
     return items;
 }
 
+/**
+ * Fetch unified feedback guidance
+ */
+async function getFeedbackGuidance() {
+    try {
+        const guidanceService = require('./guidance-service');
+        return await guidanceService.getCurrentGuidance();
+    } catch (error) {
+        console.error('Error fetching feedback guidance:', error);
+        return null;
+    }
+}
+
 module.exports = {
     analyzePEImpact,
-    PE_ANALYSIS_PROMPT
+    PE_ANALYSIS_PROMPT,
+    getFeedbackGuidance
 };
