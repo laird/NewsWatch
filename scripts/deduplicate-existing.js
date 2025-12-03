@@ -41,20 +41,42 @@ async function deduplicateExisting(dryRun = false) {
 
                 const combinedScore = (headlineSim + contentSim) / 2;
 
-                // Use the same fallback logic as ingestion
-                if (combinedScore > 0.35) {
-                    console.log(`\n🔍 Potential Duplicate Found:`);
+                // Lower threshold for AI candidates (was 0.35)
+                if (combinedScore > 0.25) {
+                    console.log(`\n🔍 Potential Duplicate Found (Score: ${combinedScore.toFixed(2)}):`);
                     console.log(`   A: [${story.id}] ${story.headline}`);
                     console.log(`   B: [${candidate.id}] ${candidate.headline}`);
-                    console.log(`   Score: ${combinedScore.toFixed(2)} (H:${headlineSim.toFixed(2)} C:${contentSim.toFixed(2)})`);
 
-                    if (!dryRun) {
-                        // Merge B into A (arbitrary choice, could be improved to pick 'best')
-                        await mergeExistingStories(story, candidate);
-                        processedIds.add(candidate.id);
-                        mergeCount++;
+                    let shouldMerge = false;
+
+                    // Use AI to confirm if available
+                    if (process.env.GEMINI_API_KEY) {
+                        const { checkSemanticSimilarity } = require('../backend/services/storyDeduplication');
+                        const aiResult = await checkSemanticSimilarity(story, candidate);
+
+                        if (aiResult.isDuplicate && aiResult.confidence > 70) {
+                            console.log(`   🤖 AI Confirmed: ${aiResult.reason} (${aiResult.confidence}%)`);
+                            shouldMerge = true;
+                        } else {
+                            console.log(`   🤖 AI Rejected: ${aiResult.reason} (${aiResult.confidence}%)`);
+                        }
                     } else {
-                        console.log(`   [DRY RUN] Would merge B into A`);
+                        // Fallback to strict heuristic
+                        if (combinedScore > 0.4) {
+                            console.log(`   ⚠️  No AI key, using heuristic threshold`);
+                            shouldMerge = true;
+                        }
+                    }
+
+                    if (shouldMerge) {
+                        if (!dryRun) {
+                            // Merge B into A
+                            await mergeExistingStories(story, candidate);
+                            processedIds.add(candidate.id);
+                            mergeCount++;
+                        } else {
+                            console.log(`   [DRY RUN] Would merge B into A`);
+                        }
                     }
                 }
             }

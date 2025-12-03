@@ -470,5 +470,6 @@ module.exports = {
     processStory,
     calculateSimilarity,
     calculateOverlap,
-    normalizeUrl
+    normalizeUrl,
+    checkSemanticSimilarity
 };
