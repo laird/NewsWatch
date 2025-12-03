@@ -48,10 +48,11 @@ find_highest_priority_issue() {
   
   # Try each priority level
   for priority in P0 P1 P2 P3; do
-    local issues=$(gh issue list --label "$priority" --limit 1 --json number,title,body,url --state open 2>&1)
-    
-    # Check if the output is valid JSON
-    if echo "$issues" | jq empty 2>/dev/null; then
+    local issues=$(gh issue list --label "$priority" --limit 1 --json number,title,body,url --state open 2>/dev/null)
+    if [[ -z "$issues" ]]; then issues='[]'; fi
+    # Ensure the output is valid JSON; if not, default to empty array
+    if ! echo "$issues" | jq empty > /dev/null 2>&1; then issues='[]'; fi
+    if echo "$issues" | jq empty > /dev/null 2>&1; then
       local count=$(echo "$issues" | jq '. | length')
       
       if [[ "$count" -gt 0 ]]; then
@@ -63,9 +64,11 @@ find_highest_priority_issue() {
   
   # No prioritized issues found, get any open issue
   log_warning "No prioritized issues found, checking for any open issue..."
-  local issues=$(gh issue list --limit 1 --json number,title,body,url --state open 2>&1)
-  
-  if echo "$issues" | jq empty 2>/dev/null; then
+  local issues=$(gh issue list --limit 1 --json number,title,body,url --state open 2>/dev/null)
+  if [[ -z "$issues" ]]; then issues='[]'; fi
+  # Ensure the output is valid JSON; if not, default to empty array
+  if ! echo "$issues" | jq empty > /dev/null 2>&1; then issues='[]'; fi
+  if echo "$issues" | jq empty > /dev/null 2>&1; then
     local count=$(echo "$issues" | jq '. | length')
     
     if [[ "$count" -gt 0 ]]; then
