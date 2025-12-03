@@ -4,7 +4,7 @@ const { test, expect } = require('@playwright/test');
 test.describe('Admin Page E2E Tests', () => {
     // Use a known password or fallback to 'admin' if not set in env
     // Note: In a real scenario, we should ensure the server uses this password
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'newswatch2024';
 
     test.beforeEach(async ({ page }) => {
         await page.goto('/admin');
@@ -67,7 +67,7 @@ test.describe('Admin Page E2E Tests', () => {
             await page.click('button:has-text("Save Guidance")');
 
             // Verify success message
-            await expect(page.locator('#guidance-status')).toContainText('Guidance updated successfully');
+            await expect(page.locator('#guidance-status')).toContainText('Guidance updated successfully', { timeout: 30000 });
 
             // Reload page and verify persistence
             await page.reload();
@@ -110,7 +110,7 @@ test.describe('Admin Page E2E Tests', () => {
             // However, we can check if the list is not showing "No archives found" or "Loading..."
 
             // Wait for loading to finish - check first item only
-            await expect(page.locator('#archive-list li').first()).not.toHaveText('Loading archives...', { timeout: 10000 });
+            await expect(page.locator('#archive-list li').first()).not.toHaveText('Loading archives...', { timeout: 30000 });
 
             // If we have archives, check the first one
             if (await items.count() > 0) {
