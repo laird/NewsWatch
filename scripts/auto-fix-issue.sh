@@ -27,19 +27,19 @@ fi
 
 # Function to print colored output
 log_info() {
-  echo -e "${BLUE}ℹ️  $1${NC}"
+  echo -e "${BLUE}ℹ️  $1${NC}" >&2
 }
 
 log_success() {
-  echo -e "${GREEN}✓ $1${NC}"
+  echo -e "${GREEN}✓ $1${NC}" >&2
 }
 
 log_error() {
-  echo -e "${RED}✗ $1${NC}"
+  echo -e "${RED}✗ $1${NC}" >&2
 }
 
 log_warning() {
-  echo -e "${YELLOW}⚠️  $1${NC}"
+  echo -e "${YELLOW}⚠️  $1${NC}" >&2
 }
 
 # Function to find highest priority issue
