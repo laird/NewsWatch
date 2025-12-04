@@ -19,6 +19,7 @@ const COMMUNITY_MAX_MULTIPLIER = 1.2;
 
 /**
  * Calculate Personal Scores for a specific user
+ * Combines AI-based scoring (using user guidance) with voting-based multipliers
  * @param {Object} user - The user object (must contain email)
  * @param {Array} candidateStories - List of stories to score
  * @returns {Promise<Array>} - Stories with added `personal_score` and `personal_multiplier`
@@ -29,14 +30,71 @@ async function scoreStoriesForUser(user, candidateStories) {
         return candidateStories.map(s => ({ ...s, personal_score: s.pe_impact_score || 0 }));
     }
 
-    // 1. Fetch User's Feedback
+    // 1. Get user's text guidance (for AI filtering)
+    const userGuidanceService = require('./user-guidance-service');
+    const userGuidance = await userGuidanceService.getUserGuidance(user.email);
+
+    // 2. Apply AI-based relevance filtering if user has guidance
+    let scoredStories = [...candidateStories];
+    if (userGuidance && userGuidance.length > 50) { // Only if substantial guidance exists
+        try {
+            const aiService = require('./ai-service');
+
+            // For each story, get AI relevance score based on user guidance
+            const aiScoringPrompts = candidateStories.slice(0, 20).map((story, idx) => { // Limit to top 20 for performance
+                return {
+                    story,
+                    prompt: `
+USER PREFERENCES:
+"${userGuidance}"
+
+STORY:
+Title: ${story.headline}
+Summary: ${story.summary || 'N/A'}
+Categories: ${story.pe_analysis?.sectors?.join(', ') || 'N/A'}
+
+TASK: Rate how relevant this story is to the user's preferences on a scale of 0-10, where:
+- 0 = Completely irrelevant or explicitly against their preferences
+- 5 = Neutral, somewhat relates to their interests
+- 10 = Perfectly aligned with their stated preferences
+
+Respond with ONLY a number 0-10, no explanation.`
+                };
+            });
+
+            // Process AI scoring (simplified - in production, batch this)
+            for (const { story, prompt } of aiScoringPrompts.slice(0, 10)) { // Further limit for initial implementation
+                try {
+                    const result = await aiService.generateContent(prompt, { temperature: 0, maxTokens: 10 });
+                    const aiScore = parseFloat(result.text.trim()) || 5; // Default to neutral if parse fails
+                    story.ai_relevance_score = Math.max(0, Math.min(10, aiScore)); // Clamp to 0-10
+                } catch (error) {
+                    console.warn(`AI scoring failed for story ${story.id}:`, error.message);
+                    story.ai_relevance_score = 5; // Default neutral
+                }
+            }
+
+            // For stories we didn't AI score, default to neutral
+            candidateStories.forEach(story => {
+                if (story.ai_relevance_score === undefined) {
+                    story.ai_relevance_score = 5;
+                }
+            });
+
+        } catch (error) {
+            console.error('AI relevance scoring failed:', error.message);
+            // Fall through to voting-based scoring only
+        }
+    }
+
+    // 3. Fetch User's Voting Feedback
     const userFeedback = await feedback.getByUser(user.email);
 
-    // 2. Build Preference Profile
+    // 4. Build Preference Profile from votes
     const profile = buildPreferenceProfile(userFeedback);
 
-    // 3. Score Stories
-    return candidateStories.map(story => {
+    // 5. Calculate final personal scores (combining AI + voting)
+    return scoredStories.map(story => {
         const multipliers = calculateMultipliers(story, profile, {
             weight: PERSONAL_WEIGHT,
             min: PERSONAL_MIN_MULTIPLIER,
@@ -44,12 +102,16 @@ async function scoreStoriesForUser(user, candidateStories) {
         });
 
         const baseScore = story.pe_impact_score || 0;
-        const finalScore = baseScore * multipliers.source * multipliers.category;
+        const aiRelevance = (story.ai_relevance_score || 5) / 10; // Normalize to 0-1
+
+        // Combine: base score * AI relevance * voting multipliers
+        const finalScore = baseScore * aiRelevance * multipliers.source * multipliers.category;
 
         return {
             ...story,
             personal_score: Number(finalScore.toFixed(2)),
-            personal_multipliers: multipliers
+            personal_multipliers: multipliers,
+            ai_relevance: story.ai_relevance_score
         };
     });
 }

@@ -28,9 +28,16 @@ async function ingestEmailFeedback() {
                 processed_for_ai: false // Flag to indicate if AI has seen this yet
             });
 
-            // 4. Update Unified Guidance
+            // 4. Update Unified Guidance (Global - for community news)
             const guidanceService = require('./guidance-service');
             await guidanceService.updateGuidance(reply.body);
+
+            // 4b. Update Per-User Guidance (for personalized news)
+            const emailMatch = reply.from.match(/<(.+)>/) || [null, reply.from];
+            const email = emailMatch[1] || reply.from;
+
+            const userGuidanceService = require('./user-guidance-service');
+            await userGuidanceService.updateUserGuidance(email, reply.body);
 
             console.log(`  ✓ Saved feedback from ${reply.from} and updated guidance`);
 
@@ -40,7 +47,11 @@ async function ingestEmailFeedback() {
                 const emailMatch = reply.from.match(/<(.+)>/) || [null, reply.from];
                 const email = emailMatch[1] || reply.from;
 
-                // Get user's preference weights
+                // Get user's text-based guidance
+                const userGuidanceService = require('./user-guidance-service');
+                const userGuidance = await userGuidanceService.getUserGuidance(email);
+
+                // Get user's preference weights (voting-based)
                 const { feedback: feedbackDB } = require('../database/firestore');
                 const userFeedback = await feedbackDB.getByUser(email);
 
@@ -81,6 +92,7 @@ async function ingestEmailFeedback() {
                 const userName = emailTemplates.extractUserName(reply.from);
                 const emailContent = emailTemplates.generateFeedbackAcknowledgmentEmail({
                     userName,
+                    userGuidance,
                     preferences: { topSources, topCategories }
                 });
 
