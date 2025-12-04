@@ -135,7 +135,9 @@ body {
 }
 
 .thumb-icon {
-    font-size: 0.75rem;
+    width: 14px;
+    height: 14px;
+    fill: #333;
 }
 
 /* Story Content Column */
