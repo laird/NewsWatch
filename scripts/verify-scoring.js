@@ -11,7 +11,7 @@ const mockStories = [
         source: 'TechCrunch',
         source_domain: 'techcrunch.com',
         pe_impact_score: 8.0,
-        pe_analysis: { sectors: ['AI', 'Healthcare'] }
+        pe_analysis: { categories: ['AI/ML', 'HealthTech'] }
     },
     {
         id: 's2',
@@ -19,7 +19,7 @@ const mockStories = [
         source: 'Bloomberg',
         source_domain: 'bloomberg.com',
         pe_impact_score: 7.0,
-        pe_analysis: { sectors: ['SaaS'] }
+        pe_analysis: { categories: ['SaaS'] }
     },
     {
         id: 's3',
@@ -27,14 +27,14 @@ const mockStories = [
         source: 'CoinDesk',
         source_domain: 'coindesk.com',
         pe_impact_score: 6.0,
-        pe_analysis: { sectors: ['Crypto'] }
+        pe_analysis: { categories: ['Blockchain/Crypto'] }
     }
 ];
 
 const mockFeedback = [
-    { rating: 'up', source_domain: 'techcrunch.com', sectors: ['AI'] },
-    { rating: 'up', source_domain: 'techcrunch.com', sectors: ['Healthcare'] },
-    { rating: 'down', source_domain: 'coindesk.com', sectors: ['Crypto'] }
+    { rating: 'up', source_domain: 'techcrunch.com', categories: ['AI/ML'] },
+    { rating: 'up', source_domain: 'techcrunch.com', categories: ['HealthTech'] },
+    { rating: 'down', source_domain: 'coindesk.com', categories: ['Blockchain/Crypto'] }
 ];
 
 // Mock Firestore Methods

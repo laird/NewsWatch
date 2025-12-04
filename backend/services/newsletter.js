@@ -228,10 +228,10 @@ Maintain active coverage of:
       const thumbsUpCount = story.thumbs_up_count || 0;
       const thumbsDownCount = story.thumbs_down_count || 0;
 
-      // Extract sectors/categories
-      const sectors = peAnalysis.sectors || [];
-      const categoryHTML = sectors.length > 0
-        ? `<span style="display: inline-block; background-color: #eee; color: #555; font-size: 10px; padding: 2px 6px; border-radius: 3px; margin-left: 8px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px;">${sectors[0]}</span>`
+      // Extract categories (support both new 'categories' and legacy 'sectors')
+      const categories = peAnalysis.categories || peAnalysis.sectors || [];
+      const categoryHTML = categories.length > 0
+        ? `<span style="display: inline-block; background-color: #eee; color: #555; font-size: 10px; padding: 2px 6px; border-radius: 3px; margin-left: 8px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px;">${categories[0]}</span>`
         : '';
 
       // Format insights as italicized bullet points

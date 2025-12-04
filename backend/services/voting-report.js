@@ -34,15 +34,15 @@ async function generateVotingReport() {
         if (vote < 0) sourceStats[source].downvotes++;
         if (item.story_id) sourceStats[source].storyIds.add(item.story_id);
 
-        // Category aggregation
-        const sectors = item.sectors || [];
-        for (const sector of sectors) {
-            if (!categoryStats[sector]) {
-                categoryStats[sector] = { upvotes: 0, downvotes: 0, storyIds: new Set() };
+        // Category aggregation (support both 'categories' and 'sectors')
+        const itemCategories = item.categories || item.sectors || [];
+        for (const category of itemCategories) {
+            if (!categoryStats[category]) {
+                categoryStats[category] = { upvotes: 0, downvotes: 0, storyIds: new Set() };
             }
-            if (vote > 0) categoryStats[sector].upvotes++;
-            if (vote < 0) categoryStats[sector].downvotes++;
-            if (item.story_id) categoryStats[sector].storyIds.add(item.story_id);
+            if (vote > 0) categoryStats[category].upvotes++;
+            if (vote < 0) categoryStats[category].downvotes++;
+            if (item.story_id) categoryStats[category].storyIds.add(item.story_id);
         }
     }
 

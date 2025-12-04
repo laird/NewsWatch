@@ -215,7 +215,9 @@ const feedback = {
                     headline: story?.headline,
                     source: story?.source,
                     source_domain: story?.source_domain || story?.source, // Fallback
-                    sectors: story?.pe_analysis?.sectors || []
+                    // Support both 'categories' (new) and 'sectors' (legacy)
+                    categories: story?.pe_analysis?.categories || story?.pe_analysis?.sectors || [],
+                    sectors: story?.pe_analysis?.sectors || story?.pe_analysis?.categories || []
                 };
             }
             return fb;
@@ -248,7 +250,9 @@ const feedback = {
                     headline: story?.headline,
                     source: story?.source,
                     source_domain: story?.source_domain || story?.source,
-                    sectors: story?.pe_analysis?.sectors || []
+                    // Support both 'categories' (new) and 'sectors' (legacy)
+                    categories: story?.pe_analysis?.categories || story?.pe_analysis?.sectors || [],
+                    sectors: story?.pe_analysis?.sectors || story?.pe_analysis?.categories || []
                 };
             }
             return fb;

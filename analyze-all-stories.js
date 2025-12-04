@@ -30,7 +30,7 @@ async function analyzeAllStories() {
                 investment_score: analysis.investment_score,
                 deal_score: analysis.deal_score,
                 portfolio_score: analysis.portfolio_score,
-                sectors: analysis.sectors,
+                categories: analysis.categories || analysis.sectors || [],
                 insights: analysis.insights,
                 explanation: analysis.explanation || 'No explanation available'
             });
@@ -53,7 +53,7 @@ async function analyzeAllStories() {
         console.log(`${index + 1}. ${result.headline}`);
         console.log(`   Source: ${result.source}`);
         console.log(`   PE Impact: ${result.pe_impact_score}/10 | Investment: ${result.investment_score}/10 | Deal: ${result.deal_score}/10 | Portfolio: ${result.portfolio_score}/10`);
-        console.log(`   Sectors: ${result.sectors.join(', ') || 'N/A'}`);
+        console.log(`   Categories: ${result.categories.join(', ') || 'N/A'}`);
         if (result.explanation) {
             console.log(`   \n   WHY THIS SCORE:`);
             result.explanation.split('\n').forEach(line => console.log(`     ${line}`));

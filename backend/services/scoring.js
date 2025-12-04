@@ -114,9 +114,11 @@ function buildPreferenceProfile(feedbackList) {
         }
 
         // Category Preference
-        if (item.sectors && Array.isArray(item.sectors)) {
-            for (const sector of item.sectors) {
-                categories[sector] = (categories[sector] || 0) + vote;
+        // Support both 'categories' (new) and 'sectors' (legacy) for backward compatibility
+        const itemCategories = item.categories || item.sectors;
+        if (itemCategories && Array.isArray(itemCategories)) {
+            for (const category of itemCategories) {
+                categories[category] = (categories[category] || 0) + vote;
             }
         }
     }
@@ -145,18 +147,17 @@ function calculateMultipliers(story, profile, config) {
 
     // Category Multiplier
     let categoryMultiplier = 1;
-    const sectors = story.pe_analysis?.sectors || [];
+    // Support both 'categories' (new) and 'sectors' (legacy) for backward compatibility
+    const storyCategories = story.pe_analysis?.categories || story.pe_analysis?.sectors || [];
 
-    if (sectors.length > 0) {
-        // Find the highest multiplier among all sectors this story belongs to
-        let maxCatMult = 1;
-        let minCatMult = 1; // Track min to handle negative preferences too?
+    if (storyCategories.length > 0) {
+        // Find the highest multiplier among all categories this story belongs to
         // Strategy: If ANY category is liked, boost it. If ALL are disliked, penalize?
         // Let's stick to the plan: "If a story has multiple categories, use the highest multiplier".
         // This is optimistic.
 
-        const multipliers = sectors.map(sector => {
-            const votes = profile.categories[sector] || 0;
+        const multipliers = storyCategories.map(category => {
+            const votes = profile.categories[category] || 0;
             return 1 + (votes * weight);
         });
 
