@@ -233,13 +233,43 @@ Maintain active coverage of:
       const location = peAnalysis.location || '';
       const companies = peAnalysis.companies || [];
 
+      // Helper function to clean and shorten tag text
+      const cleanTag = (text) => {
+        if (!text) return '';
+        // Remove markdown bold formatting
+        text = text.replace(/\*\*/g, '').trim();
+
+        // Shorten common long category names
+        const shortenings = {
+          'M&A/Acquisition': 'M&A',
+          'Funding Round': 'Funding',
+          'IPO/Public Markets': 'IPO',
+          'Product Launch': 'Launch',
+          'Regulatory/Policy': 'Regulatory',
+          'Cloud Computing': 'Cloud',
+          'Blockchain/Crypto': 'Crypto',
+          'DevOps/Infrastructure': 'DevOps',
+          'Data/Analytics': 'Data',
+          'Developer Tools': 'Dev Tools'
+        };
+
+        return shortenings[text] || text;
+      };
+
       // Build tag HTML for all dimensions
       const allTags = [];
-      categories.forEach(cat => allTags.push({ text: cat, type: 'category' }));
+      categories.forEach(cat => {
+        const cleaned = cleanTag(cat);
+        if (cleaned) allTags.push({ text: cleaned, type: 'category' });
+      });
       if (location && location !== 'Unspecified' && location !== 'Global') {
-        allTags.push({ text: location, type: 'location' });
+        const cleaned = cleanTag(location);
+        if (cleaned) allTags.push({ text: cleaned, type: 'location' });
       }
-      companies.forEach(company => allTags.push({ text: company, type: 'company' }));
+      companies.forEach(company => {
+        const cleaned = cleanTag(company);
+        if (cleaned) allTags.push({ text: cleaned, type: 'company' });
+      });
 
       const tagsHTML = allTags.map(tag =>
         `<span style="display: inline-block; background-color: #eee; color: #555; font-size: 10px; padding: 2px 6px; border-radius: 3px; margin-left: 4px; margin-bottom: 4px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px;">${tag.text}</span>`
