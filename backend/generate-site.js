@@ -196,10 +196,20 @@ function generateIndexHtml(storyList) {
         return date.toLocaleString('en-US', options);
     };
 
+    // Helper to format time only
+    const formatTime = (dateObj) => formatDate(dateObj, { hour: 'numeric', minute: '2-digit' });
+
     const storiesHtml = storyList.map(story => {
-        const peScore = story.pe_impact_score || 0;
         const peAnalysis = story.pe_analysis || {};
-        const arrow = peScore >= 7 ? '↑' : '↓';
+
+        // Format insights as italicized bullet points
+        const insightsHTML = peAnalysis.key_insights && peAnalysis.key_insights.length > 0 ? `
+            <div class="pe-insights">
+                <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+                    ${peAnalysis.key_insights.slice(0, 2).map(insight => `<li><i>${insight}</i></li>`).join('')}
+                </ul>
+            </div>
+        ` : '';
 
         return `
     <a href="story/${story.id}.html" class="story-compact" data-story-id="${story.id}">
@@ -208,66 +218,58 @@ function generateIndexHtml(storyList) {
                 <svg class="thumb-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91l-.01-.01L23 10z"/></svg>
             </button>
             <button class="thumb-btn thumb-down" onclick="handleThumb('${story.id}', 'down', event)" title="Not Relevant">
-                <svg class="thumb-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v1.91l.01.01L1 14c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
+                <svg class="thumb-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14-.47-.14-.73v1.91l.01.01L1 14c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
             </button>
         </div>
         <div class="story-content-wrapper">
             <h3 class="headline">${story.headline}</h3>
             <div class="story-meta">
-                <span class="byline">${story.source || 'Unknown'} | ${formatDate(story.published_at, { hour: 'numeric', minute: '2-digit' })}</span>
-                <span class="pe-badge ${peScore >= 7 ? 'high' : 'low'}">${arrow} PE Impact: ${peScore}/10</span>
+                <span class="byline">${story.source || 'Unknown Source'} | ${formatTime(story.published_at)}</span>
             </div>
+            ${insightsHTML}
             <p class="story-preview">${story.summary || ''}</p>
-            ${peAnalysis.key_insights && peAnalysis.key_insights.length > 0 ? `
-            <div class="pe-insights">
-                <strong>PE Investor Insights:</strong>
-                <ul>
-                    ${peAnalysis.key_insights.slice(0, 2).map(insight => `<li>${insight}</li>`).join('')}
-                </ul>
-            </div>
-            ` : ''}
         </div>
     </a>
   `;
     }).join('');
 
-    return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NewsWatch - Daily Software Economy Brief</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="newspaper">
-        <header class="masthead">
-            <div class="edition-info">
-                <span class="date">${date}</span>
-                <span class="separator">|</span>
-                <span class="edition">Static Edition</span>
-                <span class="separator">|</span>
-                <span class="story-count">${storyList.length} Stories</span>
-            </div>
-            <h1 class="title">NewsWatch</h1>
-            <div class="tagline">Daily Software Economy Brief for Private Equity Investors</div>
-        </header>
-        <main class="content">
-            <div class="story-grid-compact">
-                ${storiesHtml}
-            </div>
-            <div style="text-align: center; margin-top: 30px; padding: 20px;">
-                <a href="archive.html" style="display: inline-block; padding: 10px 20px; background-color: #1a1a1a; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">View Full Archive</a>
-            </div>
-        </main>
-        <footer class="footer">
-            <p>NewsWatch delivers curated software economy news daily.</p>
-            <p class="copyright">© ${new Date().getFullYear()} NewsWatch. All rights reserved.</p>
-        </footer>
-    </div>
-    <script src="script.js"></script>
-</body>
-</html>`;
+    return `< !DOCTYPE html >
+        <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>NewsWatch - Daily Software Economy Brief</title>
+                        <link rel="stylesheet" href="styles.css">
+                        </head>
+                        <body>
+                            <div class="newspaper">
+                                <header class="masthead">
+                                    <div class="edition-info">
+                                        <span class="date">${date}</span>
+                                        <span class="separator">|</span>
+                                        <span class="edition">Static Edition</span>
+                                        <span class="separator">|</span>
+                                        <span class="story-count">${storyList.length} Stories</span>
+                                    </div>
+                                    <h1 class="title">NewsWatch</h1>
+                                    <div class="tagline">Daily Software Economy Brief for Private Equity Investors</div>
+                                </header>
+                                <main class="content">
+                                    <div class="story-grid-compact">
+                                        ${storiesHtml}
+                                    </div>
+                                    <div style="text-align: center; margin-top: 30px; padding: 20px;">
+                                        <a href="archive.html" style="display: inline-block; padding: 10px 20px; background-color: #1a1a1a; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">View Full Archive</a>
+                                    </div>
+                                </main>
+                                <footer class="footer">
+                                    <p>NewsWatch delivers curated software economy news daily.</p>
+                                    <p class="copyright">© ${new Date().getFullYear()} NewsWatch. All rights reserved.</p>
+                                </footer>
+                            </div>
+                            <script src="script.js"></script>
+                        </body>
+                    </html>`;
 }
 
 function generateStoryHtml(story) {
@@ -285,30 +287,30 @@ function generateStoryHtml(story) {
     };
 
     return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${story.headline} - NewsWatch</title>
-    <link rel="stylesheet" href="../styles.css">
-</head>
-<body>
-    <div class="newspaper">
-        <header class="masthead">
-            <div class="edition-info">
-                <a href="../index.html" style="text-decoration: none; color: #666;">&larr; Back to Today's Edition</a>
-            </div>
-        </header>
-        <main class="content">
-            <article class="story-detail">
-                <h1 class="headline-large">${story.headline}</h1>
-                <div class="story-meta-large">
-                    <span class="source">${story.source}</span>
-                    <span class="separator">|</span>
-                    <span class="time">${formatDate(story.published_at)}</span>
-                </div>
+                    <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                    <title>${story.headline} - NewsWatch</title>
+                                    <link rel="stylesheet" href="../styles.css">
+                                    </head>
+                                    <body>
+                                        <div class="newspaper">
+                                            <header class="masthead">
+                                                <div class="edition-info">
+                                                    <a href="../index.html" style="text-decoration: none; color: #666;">&larr; Back to Today's Edition</a>
+                                                </div>
+                                            </header>
+                                            <main class="content">
+                                                <article class="story-detail">
+                                                    <h1 class="headline-large">${story.headline}</h1>
+                                                    <div class="story-meta-large">
+                                                        <span class="source">${story.source}</span>
+                                                        <span class="separator">|</span>
+                                                        <span class="time">${formatDate(story.published_at)}</span>
+                                                    </div>
 
-                ${story.pe_impact_score ? `
+                                                    ${story.pe_impact_score ? `
                 <div class="pe-analysis-box">
                     <h3>PE Investor Analysis</h3>
                     <div class="score">Impact Score: <strong>${story.pe_impact_score}/10</strong></div>
@@ -318,19 +320,19 @@ function generateStoryHtml(story) {
                 </div>
                 ` : ''}
 
-                <div class="story-body">
-                    ${story.content ? story.content.split('\n').map(p => `<p>${p}</p>`).join('') : `<p>${story.summary}</p>`}
-                </div>
+                                                    <div class="story-body">
+                                                        ${story.content ? story.content.split('\n').map(p => `<p>${p}</p>`).join('') : `<p>${story.summary}</p>`}
+                                                    </div>
 
-                <div class="original-link">
-                    <a href="${story.url}" target="_blank">Read original article at ${story.source} &rarr;</a>
-                </div>
-            </article>
-        </main>
-    </div>
-    <script src="../script.js"></script>
-</body>
-</html>`;
+                                                    <div class="original-link">
+                                                        <a href="${story.url}" target="_blank">Read original article at ${story.source} &rarr;</a>
+                                                    </div>
+                                                </article>
+                                            </main>
+                                        </div>
+                                        <script src="../script.js"></script>
+                                    </body>
+                                </html>`;
 }
 
 // Run if called directly

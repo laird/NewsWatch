@@ -1,0 +1,20 @@
+Please implement a fix for GitHub issue #6: Insights
+
+Issue Details:
+Instead of scores, the AI should provide brief insights into the news story in the context of PE investors. Does the news create An opportunity or a threat? Of so, what? Put it in italics to stand out, same font size as the teaser. For example:
+
+<b>Story Title</b>
+<ul>Source, date</ul>. <ul>Source, date</ul>.
+Teaser, describe the story.
+<ul><li><i>this is important because... </i></li>
+<li><i>this presents an opportunity for... </i></li></ul>
+
+Issue URL: https://github.com/laird/NewsWatch/issues/6
+
+Please:
+1. Analyze the issue and understand what needs to be changed
+2. Implement the necessary code changes
+3. Test the changes if applicable
+4. Ensure the code follows best practices
+
+After completing the work, please summarize what was done.

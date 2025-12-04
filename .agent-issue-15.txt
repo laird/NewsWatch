@@ -1,0 +1,49 @@
+Please implement a fix for GitHub issue #15: Send acknowledgment emails for user feedback
+
+Issue Details:
+## Description
+When users reply to the newsletter with feedback, send them an automated thank-you email that includes:
+- Acknowledgment of their feedback
+- Summary of how their feedback was processed
+- Their updated preference weights (sources/categories they've upvoted/downvoted)
+
+## Example Email
+```
+Subject: Thanks for your feedback!
+
+Hi [Name],
+
+Thanks for taking the time to share your thoughts with NewsWatch!
+
+Your feedback has been recorded and will help us tailor future recommendations.
+
+Your current preferences:
+- Sources you like: [list top sources with positive weights]
+- Categories you like: [list top categories with positive weights]
+
+Keep the feedback coming!
+
+Best,
+NewsWatch Team
+```
+
+## Implementation
+- Modify `backend/services/feedback-ingestion.js` to trigger email after processing
+- Create email template
+- Include user's current preference weights from scoring service
+
+## Related
+- Issue #11 (Personal News Scoring)
+- `backend/services/feedback-ingestion.js`
+- `backend/services/scoring.js`
+
+Issue URL: https://github.com/laird/NewsWatch/issues/15
+
+Please:
+1. Analyze the issue and understand what needs to be changed
+2. Implement the necessary code changes (add email sending to feedback-ingestion.js)
+3. Ensure emails are sent ONLY to the sender of the feedback (use from_email field)
+4. Test the changes if applicable
+5. Ensure the code follows best practices
+
+After completing the work, please summarize what was done.

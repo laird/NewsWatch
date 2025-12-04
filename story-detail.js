@@ -63,49 +63,45 @@ function loadStory() {
     // Update page title
     document.getElementById('page-title').textContent = `${story.headline} - NewsWatch`;
 
-    // Build story HTML
-    let html = `
-        <h2 class="headline">${story.headline}</h2>
-        <div class="byline">${story.byline}</div>
-        <div class="story-content">
-            ${story.content.map(p => `<p>${p}</p>`).join('')}
+    // Format insights as italicized bullet points
+    const insightsHTML = story.pe_analysis && story.pe_analysis.key_insights && story.pe_analysis.key_insights.length > 0 ? `
+        <div class="pe-insights">
+            <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+                ${story.pe_analysis.key_insights.slice(0, 2).map(insight => `<li><i>${insight}</i></li>`).join('')}
+            </ul>
         </div>
-    `;
+    ` : '';
 
-    // Add source links if available
-    if (story.sources && story.sources.length > 0) {
-        html += `
-            <div class="source-links">
-                <h4>Sources & Related Reading</h4>
-                <ul>
-                    ${story.sources.map(s => `<li><a href="${s.url}" target="_blank" rel="noopener">${s.name || s.title}</a></li>`).join('')}
-                </ul>
+    const html = `
+        <div class="story-detail">
+            <h1 class="headline">${story.headline}</h1>
+            <div class="story-meta">
+                <span class="byline">${story.source || 'Unknown Source'} | ${new Date(story.published_at).toLocaleString()}</span>
             </div>
-        `;
-    }
+            
+            ${insightsHTML}
 
-    // Add feedback section
-    html += `
-        <div class="feedback-section">
-            <h4>Was this story relevant?</h4>
-            <div class="feedback-buttons">
-                <button class="thumb-btn thumb-up" onclick="handleFeedback(${storyId}, 'up')" data-active="false" aria-label="Relevant">
-                    <svg class="thumb-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91l-.01-.01L23 10z"/></svg>
-                    <span>Relevant</span>
-                </button>
-                <button class="thumb-btn thumb-down" onclick="handleFeedback(${storyId}, 'down')" data-active="false" aria-label="Not Relevant">
-                    <svg class="thumb-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v1.91l.01.01L1 14c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
-                    <span>Not Relevant</span>
-                </button>
+            <div class="story-content">
+                ${(story.content || story.summary || '').split('\n').map(p => `<p>${p}</p>`).join('')}
             </div>
-            <div class="feedback-input-container" id="feedback-input" style="display: none;">
-                <textarea class="feedback-text" id="feedback-text" placeholder="Tell us more about why this story was or wasn't relevant..."></textarea>
-                <button class="submit-feedback-btn" onclick="submitFeedback(${storyId})">Submit Feedback</button>
+            
+            <div class="feedback-section">
+                <h3>Was this story relevant?</h3>
+                <div class="feedback-buttons">
+                    <button class="thumb-btn thumb-up" onclick="handleFeedback('${storyId}', 'up')">
+                        <svg class="thumb-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91l-.01-.01L23 10z"/></svg>
+                    </button>
+                    <button class="thumb-btn thumb-down" onclick="handleFeedback('${storyId}', 'down')">
+                        <svg class="thumb-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v1.91l.01-.01L1 14c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
+                    </button>
+                </div>
+                <div id="feedback-input" style="display: none; margin-top: 15px;">
+                    <textarea id="feedback-text" placeholder="Tell us why (optional)..." rows="3" style="width: 100%; margin-bottom: 10px;"></textarea>
+                    <button onclick="submitFeedback('${storyId}')">Submit Feedback</button>
+                </div>
             </div>
         </div>
-    `;
-
-    document.getElementById('story-content').innerHTML = html;
+    `; document.getElementById('story-content').innerHTML = html;
 
     // Load existing feedback state
     loadFeedbackState(storyId);

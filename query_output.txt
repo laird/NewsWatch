@@ -1,0 +1,21 @@
+✓ Firestore database connected
+Testing newsletter query (last 24 hours)...
+(node:64869) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+(Use `node --trace-warnings ...` to show where the warning was created)
+Query failed: Error: Could not load the default credentials. Browse to https://cloud.google.com/docs/authentication/getting-started for more information.
+    at GoogleAuth.getApplicationDefaultAsync (/home/laird/src/NewsWatch/node_modules/google-auth-library/build/src/auth/googleauth.js:284:15)
+    at async #determineClient (/home/laird/src/NewsWatch/node_modules/google-auth-library/build/src/auth/googleauth.js:764:36)
+    at async GoogleAuth.getClient (/home/laird/src/NewsWatch/node_modules/google-auth-library/build/src/auth/googleauth.js:741:20)
+    at async GrpcClient._getCredentials (/home/laird/src/NewsWatch/node_modules/google-gax/build/src/grpc.js:192:24)
+    at async GrpcClient.createStub (/home/laird/src/NewsWatch/node_modules/google-gax/build/src/grpc.js:373:23)
+Caused by: Error
+    at QueryUtil._getResponse (/home/laird/src/NewsWatch/node_modules/@google-cloud/firestore/build/src/reference/query-util.js:47:23)
+    at Query._getResponse (/home/laird/src/NewsWatch/node_modules/@google-cloud/firestore/build/src/reference/query.js:801:32)
+    at Query._get (/home/laird/src/NewsWatch/node_modules/@google-cloud/firestore/build/src/reference/query.js:794:35)
+    at /home/laird/src/NewsWatch/node_modules/@google-cloud/firestore/build/src/reference/query.js:762:43
+    at /home/laird/src/NewsWatch/node_modules/@google-cloud/firestore/build/src/telemetry/enabled-trace-util.js:120:30
+    at NoopContextManager.with (/home/laird/src/NewsWatch/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+    at ContextAPI.with (/home/laird/src/NewsWatch/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+    at NoopTracer.startActiveSpan (/home/laird/src/NewsWatch/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (/home/laird/src/NewsWatch/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24)
+    at EnabledTraceUtil.startActiveSpan (/home/laird/src/NewsWatch/node_modules/@google-cloud/firestore/build/src/telemetry/enabled-trace-util.js:112:28)

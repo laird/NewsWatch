@@ -1,0 +1,69 @@
+Please implement a fix for GitHub issue #16: Fix story categorization - all stories incorrectly tagged as SaaS
+
+Issue Details:
+## Problem
+Currently, most/all stories are being categorized as 'SaaS', which is incorrect. The current categorization logic is too simplistic and doesn't accurately reflect the diversity of software economy news.
+
+## Current Implementation
+The `extractSectors` function in `backend/services/peAnalysis.js` uses basic regex matching:
+```javascript
+const sectorKeywords = {
+    'SaaS': /\b(saas|software as a service|cloud software)\b/i,
+    'FinTech': /\b(fintech|financial technology|payments?|banking)\b/i,
+    'HealthTech': /\b(healthtech|health|medical|biotech|pharma)\b/i,
+    'E-commerce': /\b(ecommerce|e-commerce|retail|marketplace)\b/i,
+    'AI/ML': /\b(ai|artificial intelligence|machine learning|ml)\b/i,
+    'Enterprise': /\b(enterprise|b2b|business software)\b/i
+};
+```
+
+## Proposed Solution
+
+### 1. Define Better Categories
+Create a comprehensive set of categories relevant to software economy news:
+- **Business Model**: SaaS, Platform, Marketplace, Infrastructure, API/Developer Tools
+- **Industry Vertical**: FinTech, HealthTech, EdTech, PropTech, LegalTech, Supply Chain, Cybersecurity
+- **Technology**: AI/ML, Cloud, Blockchain/Crypto, DevOps, Data/Analytics
+- **Stage/Activity**: M&A, Funding, IPO, Product Launch, Partnership, Regulatory
+- **Customer Type**: B2B, B2C, Enterprise, SMB
+
+### 2. Use AI for Categorization
+Instead of regex matching, ask the AI to categorize stories during the PE analysis:
+
+**Updated Prompt Addition**:
+```
+For categorization, analyze the story and assign 1-3 category tags that best describe it.
+Choose from these categories:
+
+Business Models: SaaS, Platform, Marketplace, Infrastructure, API/Developer Tools, Open Source
+Verticals: FinTech, HealthTech, EdTech, PropTech, LegalTech, Supply Chain, Cybersecurity, Media/Content, Gaming
+Technology: AI/ML, Cloud Computing, Blockchain/Crypto, DevOps/Infrastructure, Data/Analytics, IoT, AR/VR
+Activity Type: M&A/Acquisition, Funding Round, IPO/Public Markets, Product Launch, Partnership, Regulatory/Policy
+Customer Segment: Enterprise, SMB, Consumer, Developer Tools
+
+Return the categories as an array in the `categories` field (not `sectors`).
+```
+
+### 3. Update Database Schema
+- Rename `pe_analysis.sectors` to `pe_analysis.categories` for clarity
+- Migrate existing data
+
+## Files to Modify
+- `backend/services/peAnalysis.js` - Update AI prompt and response parsing
+- `backend/services/scoring.js` - Use `categories` instead of `sectors`
+- `backend/services/newsletter.js` - Display categories correctly
+
+## Related
+- Personal/Community Scoring (Issue #11) depends on accurate categories
+
+Issue URL: https://github.com/laird/NewsWatch/issues/16
+
+Please:
+1. Analyze the issue and understand what needs to be changed
+2. Update the PE analysis prompt to use AI-based categorization
+3. Update the extractSectors function or replace it
+4. Update all references from 'sectors' to 'categories'
+5. Test with a few sample stories to verify improved categorization
+6. Ensure the code follows best practices
+
+After completing the work, please summarize what was done.

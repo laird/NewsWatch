@@ -1,0 +1,14 @@
+Please implement a fix for GitHub issue #8: Thumbs buttons should be black
+
+Issue Details:
+The thumbs up / down buttons should be black thumbs on a white background, and smaller, the same size as the article headline text. Clicking on them should be counted as votes up or down on the article. Votes should affect future newsletter content, more like the up voted articles, less like the down voted stories.
+
+Issue URL: https://github.com/laird/NewsWatch/issues/8
+
+Please:
+1. Analyze the issue and understand what needs to be changed
+2. Implement the necessary code changes
+3. Test the changes if applicable
+4. Ensure the code follows best practices
+
+After completing the work, please summarize what was done.
