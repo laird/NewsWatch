@@ -13,14 +13,15 @@ Provide a structured analysis:
 1. Investment Opportunity Score (0-10): How relevant is this to PE investment opportunities?
 2. Deal Impact Score (0-10): Does this affect M&A or deal dynamics?
 3. Portfolio Impact Score (0-10): Does this affect existing portfolio companies?
-4. Categories: Select 1-3 categories that best describe this story. Choose from:
+4. Categories: Select 1-3 SHORT, CONCISE categories (1-2 words or acronyms ONLY). Choose from:
    - Business Models: SaaS, Platform, Marketplace, Infrastructure, API/Developer Tools, Open Source
    - Verticals: FinTech, HealthTech, EdTech, PropTech, LegalTech, Supply Chain, Cybersecurity, Media/Content, Gaming
    - Technology: AI/ML, Cloud Computing, Blockchain/Crypto, DevOps/Infrastructure, Data/Analytics, IoT, AR/VR
    - Activity Type: M&A/Acquisition, Funding Round, IPO/Public Markets, Product Launch, Partnership, Regulatory/Policy
    - Customer Segment: Enterprise, SMB, Consumer, Developer Tools
-5. Location: Where is the story taking place or where is the company based? (City, Country/Region). If global/unclear, state "Global" or "Unspecified".
-6. Companies: List key companies mentioned (comma-separated).
+CRITICAL: Each category must be a SHORT LABEL (1-2 words max), not a sentence or description.
+5. Location: City and Country/Region ONLY (e.g., "San Francisco", "London, UK", "India"). If global/unclear, state "Global" or "Unspecified". Do NOT use descriptive phrases.
+6. Companies: List key companies mentioned (comma-separated). Use OFFICIAL COMPANY NAMES ONLY (e.g., "OpenAI", "Microsoft", "Stripe"), not descriptions.
 7. Insights: Provide exactly 2 bullet points:
    - Opportunity: [One sentence describing the specific opportunity for PE investors]
    - Threat: [One sentence describing the specific threat or risk to PE portfolios/deals]
@@ -34,9 +35,9 @@ Focus on:
 - Regulatory or market changes affecting deals
 
 Format your response to include:
-- "Categories:" followed by the selected categories.
-- "Location:" followed by the location.
-- "Companies:" followed by the companies.`;
+- "Categories:" followed by the selected categories (SHORT LABELS ONLY).
+- "Location:" followed by the location (CITY/COUNTRY ONLY).
+- "Companies:" followed by the companies (OFFICIAL NAMES ONLY).`;
 
 /**
  * Analyze a story for PE investor impact
@@ -136,6 +137,17 @@ async function analyzeWithAI(story) {
         // Remove trailing commas
         location = location.replace(/,\s*$/, '');
 
+        // Ensure location is concise (max 40 chars for location names)
+        if (location.length > 40) {
+            // Try to extract just the city/country part
+            const parts = location.split(',');
+            location = parts.slice(0, 2).join(',').trim();
+            // If still too long, truncate
+            if (location.length > 40) {
+                location = '';
+            }
+        }
+
         // Filter out generic/unspecified values
         const lowerLocation = location.toLowerCase();
         if (lowerLocation === 'unspecified' ||
@@ -152,7 +164,9 @@ async function analyzeWithAI(story) {
         .map(c => c.replace(/\*\*/g, '').trim()) // Remove markdown bold
         .filter(c => {
             const lower = c.toLowerCase();
+            // Validate conciseness: max 35 chars for company names
             return c.length > 0 &&
+                c.length <= 35 &&
                 lower !== 'unspecified' &&
                 lower !== 'n/a' &&
                 lower !== 'unknown' &&
@@ -299,6 +313,21 @@ function getRelevanceLevel(score) {
 
 // Extract categories from AI response or text
 function extractCategories(text) {
+    // Helper to validate if a category is concise (1-2 words, max 25 chars)
+    const isConciseTag = (tag) => {
+        if (!tag || tag.length === 0) return false;
+        // Remove markdown formatting
+        tag = tag.replace(/\*\*/g, '').trim();
+        // Check length: max 25 characters
+        if (tag.length > 25) return false;
+        // Check word count: max 4 words
+        const wordCount = tag.split(/\s+/).length;
+        if (wordCount > 4) return false;
+        // Filter out full sentences (contains period, question mark, etc.)
+        if (/[.!?]/.test(tag)) return false;
+        return true;
+    };
+
     // First, try to parse categories from AI response
     const lines = text.split('\n');
     for (const line of lines) {
@@ -308,8 +337,8 @@ function extractCategories(text) {
             // Split by common separators (comma, semicolon, pipe)
             const categories = categoriesStr
                 .split(/[,;|]/)
-                .map(cat => cat.trim())
-                .filter(cat => cat.length > 0)
+                .map(cat => cat.replace(/\*\*/g, '').trim()) // Remove markdown
+                .filter(cat => isConciseTag(cat)) // Validate conciseness
                 .slice(0, 3);
             if (categories.length > 0) {
                 return categories;

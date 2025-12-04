@@ -29,6 +29,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/api/feedback', feedbackRoutes);
+app.use('/vote', require('./routes/vote'));
 app.use('/api/stories', storiesRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/subscribers', subscriberRoutes);
