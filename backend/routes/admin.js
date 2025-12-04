@@ -187,4 +187,27 @@ router.get('/voting-report', checkAuth, async (req, res) => {
     }
 });
 
+/**
+ * POST /api/admin/check-feedback
+ * Manually trigger feedback checking from emails
+ */
+router.post('/check-feedback', checkAuth, async (req, res) => {
+    try {
+        console.log('📧 Admin triggered feedback check...');
+        const feedbackService = require('../services/feedback-ingestion');
+        await feedbackService.ingestEmailFeedback();
+
+        res.json({
+            success: true,
+            message: 'Feedback check completed'
+        });
+    } catch (error) {
+        console.error('Error checking feedback:', error);
+        res.status(500).json({
+            error: 'Failed to check feedback',
+            message: error.message
+        });
+    }
+});
+
 module.exports = router;

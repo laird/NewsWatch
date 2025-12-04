@@ -282,6 +282,18 @@
                 <div id="newsletter-status"></div>
             </div>
 
+            <!-- Feedback Checking -->
+            <div class="card">
+                <h2>📧 Check Email Feedback</h2>
+                <p style="margin-bottom: 20px; color: #666;">
+                    Manually check for new email replies and process user feedback.
+                </p>
+                <button class="btn btn-primary" id="check-feedback-btn" onclick="checkFeedback()">
+                    📨 Check for New Feedback
+                </button>
+                <div id="feedback-status"></div>
+            </div>
+
             <!-- Recent Archives -->
             <div class="card">
                 <h2>📚 Recent Newsletter Archives</h2>
@@ -486,6 +498,34 @@
                 }
             } catch (error) {
                 showStatus(statusDiv, '❌ Failed to generate: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function checkFeedback() {
+            const statusDiv = document.getElementById('feedback-status');
+            const btn = document.getElementById('check-feedback-btn');
+
+            btn.disabled = true;
+            showStatus(statusDiv, '⏳ Checking for new feedback...', 'info');
+
+            try {
+                const response = await fetch('/api/admin/check-feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: adminPassword })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showStatus(statusDiv, '✅ ' + data.message, 'success');
+                } else {
+                    showStatus(statusDiv, '❌ ' + data.message, 'error');
+                }
+            } catch (error) {
+                showStatus(statusDiv, '❌ Failed to check feedback: ' + error.message, 'error');
             } finally {
                 btn.disabled = false;
             }
