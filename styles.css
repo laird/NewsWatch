@@ -265,6 +265,9 @@ body {
     padding-left: 18px;
 }
 
-.story-compact .pe-insights li {
-    margin-bottom: 3px;
+
+.thumb-icon {
+    width: 16px;
+    height: 16px;
+    fill: #333;
 }
