@@ -324,11 +324,11 @@ Maintain active coverage of:
           
           <!-- Thumbs up/down -->
           <div style="margin: 8px 0; font-size: 18px;">
-            <span style="cursor: pointer; margin-right: 12px; display: inline-flex; align-items: center; gap: 4px;" title="More like this">
+            <span class="thumb-up" style="cursor: pointer; margin-right: 12px; display: inline-flex; align-items: center; gap: 4px;" title="More like this" onclick="handleThumb('${story.id}', 'up', event)">
               <svg width="16" height="16" viewBox="0 0 24 24" style="fill: #333;"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91l-.01-.01L23 10z"/></svg>
               ${thumbsUpCount > 0 ? `<small style="font-size: 11px; color: #666;">${thumbsUpCount}</small>` : ''}
             </span>
-            <span style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Less like this">
+            <span class="thumb-down" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Less like this" onclick="handleThumb('${story.id}', 'down', event)">
               <svg width="16" height="16" viewBox="0 0 24 24" style="fill: #333;"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v1.91l.01.01L1 14c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
               ${thumbsDownCount > 0 ? `<small style="font-size: 11px; color: #666;">${thumbsDownCount}</small>` : ''}
             </span>
@@ -409,7 +409,107 @@ Maintain active coverage of:
           column-gap: 20px;
           column-rule: 1px solid #ddd;
         }
+        /* Active vote button styling */
+        .thumb-up[data-active="true"] svg,
+        .thumb-down[data-active="true"] svg {
+          fill: #0066cc !important;
+        }
       </style>
+      <script>
+        // Vote handler for newsletter
+        async function handleThumb(storyId, rating, event) {
+          if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+          }
+          
+          const clickedBtn = event.currentTarget;
+          const container = clickedBtn.parentElement;
+          const thumbUpBtn = container.querySelector('.thumb-up');
+          const thumbDownBtn = container.querySelector('.thumb-down');
+          
+          // Initialize feedback data
+          if (!window.feedbackData) {
+            window.feedbackData = {};
+          }
+          
+          if (!window.feedbackData[storyId]) {
+            window.feedbackData[storyId] = {
+              rating: null,
+              timestamp: new Date().toISOString()
+            };
+          }
+          
+          // Toggle the clicked button
+          const wasActive = clickedBtn.dataset.active === 'true';
+          
+          // Reset both buttons
+          thumbUpBtn.dataset.active = 'false';
+          thumbDownBtn.dataset.active = 'false';
+          
+          if (!wasActive) {
+            // Activate the clicked button
+            clickedBtn.dataset.active = 'true';
+            window.feedbackData[storyId].rating = rating;
+            
+            // Send to API
+            try {
+              const response = await fetch('https://newswatch.popk.in/api/feedback', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  storyId: storyId,
+                  rating: rating
+                })
+              });
+              
+              if (response.ok) {
+                console.log('Vote recorded:', rating, 'for story', storyId);
+              } else {
+                console.error('Failed to record vote:', await response.text());
+              }
+            } catch (err) {
+              console.error('Error sending vote:', err);
+            }
+          } else {
+            // Deactivate
+            window.feedbackData[storyId].rating = null;
+          }
+          
+          // Store in localStorage
+          localStorage.setItem('newswatch_feedback', JSON.stringify(window.feedbackData));
+        }
+        
+        // Load feedback state on page load
+        function loadFeedbackState() {
+          const stored = localStorage.getItem('newswatch_feedback');
+          if (stored) {
+            window.feedbackData = JSON.parse(stored);
+            
+            // Restore button states
+            Object.keys(window.feedbackData).forEach(storyId => {
+              const feedback = window.feedbackData[storyId];
+              if (feedback.rating) {
+                const buttons = document.querySelectorAll('.thumb-up, .thumb-down');
+                buttons.forEach(btn => {
+                  if (btn.onclick && btn.onclick.toString().includes(storyId) && btn.className.includes(feedback.rating)) {
+                    btn.dataset.active = 'true';
+                  }
+                });
+              }
+            });
+          }
+        }
+        
+        // Initialize on page load
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', loadFeedbackState);
+        } else {
+          loadFeedbackState();
+        }
+      </script>
     </head>
     <body style="margin: 0; padding: 0; font-family: Georgia, 'Times New Roman', serif; background-color: #f5f5f0;">
       <div style="max-width: 1200px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);">

@@ -47,6 +47,29 @@ const stories = {
     // Add more stories as needed
 };
 
+// Helper function to clean and shorten tag text
+const cleanTag = (text) => {
+    if (!text) return '';
+    // Remove markdown bold formatting
+    text = text.replace(/\*\*/g, '').trim();
+
+    // Shorten common long category names
+    const shortenings = {
+        'M&A/Acquisition': 'M&A',
+        'Funding Round': 'Funding',
+        'IPO/Public Markets': 'IPO',
+        'Product Launch': 'Launch',
+        'Regulatory/Policy': 'Regulatory',
+        'Cloud Computing': 'Cloud',
+        'Blockchain/Crypto': 'Crypto',
+        'DevOps/Infrastructure': 'DevOps',
+        'Data/Analytics': 'Data',
+        'Developer Tools': 'Dev Tools'
+    };
+
+    return shortenings[text] || text;
+};
+
 // Load story based on URL parameter
 function loadStory() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -72,12 +95,45 @@ function loadStory() {
         </div>
     ` : '';
 
+    const tagsHTML = (() => {
+        const peAnalysis = story.pe_analysis || {};
+        const categories = peAnalysis.categories || peAnalysis.sectors || [];
+        const location = peAnalysis.location || '';
+        const companies = peAnalysis.companies || [];
+        const allTags = [];
+
+        categories.forEach(cat => {
+            const cleaned = cleanTag(cat);
+            if (cleaned) allTags.push({ text: cleaned, type: 'category' });
+        });
+        if (location && location !== 'Unspecified' && location !== 'Global') {
+            const cleaned = cleanTag(location);
+            if (cleaned) allTags.push({ text: cleaned, type: 'location' });
+        }
+        companies.forEach(company => {
+            const cleaned = cleanTag(company);
+            if (cleaned) allTags.push({ text: cleaned, type: 'company' });
+        });
+
+        if (allTags.length === 0) return '';
+
+        return `
+            <div class="story-tags" style="margin-top: 10px; margin-bottom: 15px;">
+                ${allTags.map(tag =>
+            `<span style="display: inline-block; background-color: #f0f0f0; color: #333; font-size: 12px; padding: 4px 8px; border-radius: 4px; margin-right: 6px; margin-bottom: 6px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500;">${tag.text}</span>`
+        ).join('')}
+            </div>
+        `;
+    })();
+
     const html = `
         <div class="story-detail">
             <h1 class="headline">${story.headline}</h1>
             <div class="story-meta">
                 <span class="byline">${story.source || 'Unknown Source'} | ${new Date(story.published_at).toLocaleString()}</span>
             </div>
+            
+            ${tagsHTML}
             
             ${insightsHTML}
 

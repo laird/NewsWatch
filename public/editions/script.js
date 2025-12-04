@@ -43,7 +43,7 @@ async function handleThumb(storyId, rating, event) {
     if (!wasActive) {
         // Activate the clicked button
         clickedBtn.dataset.active = 'true';
-        window.feedbackData[storyId].rating = direction;
+        window.feedbackData[storyId].rating = rating;
     } else {
         // Deactivate
         window.feedbackData[storyId].rating = null;
