@@ -101,7 +101,7 @@ async function analyzeWithAI(story) {
     const lines = text.split('\n');
     let opportunity = '';
     let threat = '';
-    let location = 'Unspecified';
+    let location = '';
     let companies = [];
 
     for (const line of lines) {
@@ -120,6 +120,44 @@ async function analyzeWithAI(story) {
             companies = companiesStr.split(/[,;]/).map(c => c.trim()).filter(c => c.length > 0);
         }
     }
+
+    // Clean up location field
+    if (location) {
+        // Remove markdown bold formatting
+        location = location.replace(/\*\*/g, '');
+
+        // If it contains parentheticals like "(potential)" or multiple parts, extract the primary location
+        // e.g., "Paris, France (potential), Global (unspecified)" -> "Paris, France"
+        if (location.includes('(')) {
+            // Take everything before the first parenthesis
+            location = location.split('(')[0].trim();
+        }
+
+        // Remove trailing commas
+        location = location.replace(/,\s*$/, '');
+
+        // Filter out generic/unspecified values
+        const lowerLocation = location.toLowerCase();
+        if (lowerLocation === 'unspecified' ||
+            lowerLocation === 'global' ||
+            lowerLocation === 'n/a' ||
+            lowerLocation === 'unknown' ||
+            location.length === 0) {
+            location = '';
+        }
+    }
+
+    // Clean up companies
+    companies = companies
+        .map(c => c.replace(/\*\*/g, '').trim()) // Remove markdown bold
+        .filter(c => {
+            const lower = c.toLowerCase();
+            return c.length > 0 &&
+                lower !== 'unspecified' &&
+                lower !== 'n/a' &&
+                lower !== 'unknown' &&
+                !c.match(/^[\*\s]+$/); // Filter out strings that are just asterisks or whitespace
+        });
 
     if (opportunity) insights.push(`<b>Opportunity:</b> ${opportunity}`);
     if (threat) insights.push(`<b>Threat:</b> ${threat}`);
