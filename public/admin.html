@@ -290,6 +290,58 @@
                 </ul>
             </div>
 
+            <!-- Voting Report -->
+            <div class="card">
+                <h2>📊 Community Voting Report</h2>
+                <p style="margin-bottom: 20px; color: #666;">
+                    Aggregate voting statistics showing community preferences for sources and categories.
+                </p>
+
+                <h3 style="font-size: 18px; margin-bottom: 15px; color: #1a1a1a;">Source Preferences</h3>
+                <div style="overflow-x: auto; margin-bottom: 30px;">
+                    <table id="sources-table" style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #1a1a1a;">
+                                <th style="text-align: left; padding: 12px; font-weight: 600;">Source</th>
+                                <th style="text-align: center; padding: 12px; font-weight: 600;">Net Votes</th>
+                                <th style="text-align: center; padding: 12px; font-weight: 600;">↑</th>
+                                <th style="text-align: center; padding: 12px; font-weight: 600;">↓</th>
+                                <th style="text-align: center; padding: 12px; font-weight: 600;">Stories</th>
+                                <th style="text-align: center; padding: 12px; font-weight: 600;">Multiplier</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sources-body">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 20px; color: #999;">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 style="font-size: 18px; margin-bottom: 15px; color: #1a1a1a;">Category Preferences</h3>
+                <div style="overflow-x: auto;">
+                    <table id="categories-table" style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #1a1a1a;">
+                                <th style="text-align: left; padding: 12px; font-weight: 600;">Category</th>
+                                <th style="text-align: center; padding: 12px; font-weight: 600;">Net Votes</th>
+                                <th style="text-align: center; padding: 12px; font-weight: 600;">↑</th>
+                                <th style="text-align: center; padding: 12px; font-weight: 600;">↓</th>
+                                <th style="text-align: center; padding: 12px; font-weight: 600;">Stories</th>
+                                <th style="text-align: center; padding: 12px; font-weight: 600;">Multiplier</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categories-body">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 20px; color: #999;">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="voting-report-meta" class="meta-info" style="margin-top: 15px;"></div>
+            </div>
+
         </div>
     </div>
 
@@ -326,6 +378,7 @@
                     document.getElementById('admin-panel').classList.remove('hidden');
                     loadGuidance();
                     loadArchives();
+                    loadVotingReport();
                 } else {
                     showStatus(statusDiv, '❌ ' + data.message, 'error');
                 }
@@ -484,6 +537,72 @@
 
         function showStatus(element, message, type) {
             element.innerHTML = `<div class="status-message status-${type}">${message}</div>`;
+        }
+
+        async function loadVotingReport() {
+            try {
+                const response = await fetch(`/api/admin/voting-report?auth=${encodeURIComponent(adminPassword)}`);
+                const data = await response.json();
+
+                // Render sources table
+                const sourcesBody = document.getElementById('sources-body');
+                if (data.sources && data.sources.length > 0) {
+                    sourcesBody.innerHTML = data.sources.map(source => {
+                        const netVotes = source.netVotes;
+                        const bgColor = netVotes > 0 ? '#ecfdf5' : (netVotes < 0 ? '#fef2f2' : 'white');
+                        const isMaxed = source.multiplier === 1.2 || source.multiplier === 0.8;
+                        const multStyle = isMaxed ? 'font-weight: 700; color: #dc2626;' : '';
+
+                        return `
+                            <tr style="background-color: ${bgColor}; border-bottom: 1px solid #e0e0e0;">
+                                <td style="padding: 12px; font-weight: 500;">${source.name}</td>
+                                <td style="padding: 12px; text-align: center; font-weight: 600; color: ${netVotes > 0 ? '#16a34a' : (netVotes < 0 ? '#dc2626' : '#666')};">${netVotes > 0 ? '+' : ''}${netVotes}</td>
+                                <td style="padding: 12px; text-align: center;">${source.upvotes}</td>
+                                <td style="padding: 12px; text-align: center;">${source.downvotes}</td>
+                                <td style="padding: 12px; text-align: center;">${source.storyCount}</td>
+                                <td style="padding: 12px; text-align: center; ${multStyle}">${source.multiplier}${isMaxed ? ' (max)' : ''}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                } else {
+                    sourcesBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #999;">No voting data yet</td></tr>';
+                }
+
+                // Render categories table
+                const categoriesBody = document.getElementById('categories-body');
+                if (data.categories && data.categories.length > 0) {
+                    categoriesBody.innerHTML = data.categories.map(category => {
+                        const netVotes = category.netVotes;
+                        const bgColor = netVotes > 0 ? '#ecfdf5' : (netVotes < 0 ? '#fef2f2' : 'white');
+                        const isMaxed = category.multiplier === 1.2 || category.multiplier === 0.8;
+                        const multStyle = isMaxed ? 'font-weight: 700; color: #dc2626;' : '';
+
+                        return `
+                            <tr style="background-color: ${bgColor}; border-bottom: 1px solid #e0e0e0;">
+                                <td style="padding: 12px; font-weight: 500;">${category.name}</td>
+                                <td style="padding: 12px; text-align: center; font-weight: 600; color: ${netVotes > 0 ? '#16a34a' : (netVotes < 0 ? '#dc2626' : '#666')};">${netVotes > 0 ? '+' : ''}${netVotes}</td>
+                                <td style="padding: 12px; text-align: center;">${category.upvotes}</td>
+                                <td style="padding: 12px; text-align: center;">${category.downvotes}</td>
+                                <td style="padding: 12px; text-align: center;">${category.storyCount}</td>
+                                <td style="padding: 12px; text-align: center; ${multStyle}">${category.multiplier}${isMaxed ? ' (max)' : ''}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                } else {
+                    categoriesBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #999;">No voting data yet</td></tr>';
+                }
+
+                // Update metadata
+                const metaDiv = document.getElementById('voting-report-meta');
+                if (data.metadata) {
+                    const lastUpdated = new Date(data.metadata.lastUpdated);
+                    metaDiv.textContent = `Total feedback: ${data.metadata.totalFeedback} • Date range: ${data.metadata.dateRange} • Last updated: ${lastUpdated.toLocaleString()}`;
+                }
+            } catch (error) {
+                console.error('Failed to load voting report:', error);
+                document.getElementById('sources-body').innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #dc2626;">Failed to load report</td></tr>';
+                document.getElementById('categories-body').innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #dc2626;">Failed to load report</td></tr>';
+            }
         }
 
         // Update char count on input

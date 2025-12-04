@@ -206,14 +206,49 @@ const feedback = {
 
         const feedbackList = snapshotToArray(snapshot).slice(offset);
 
-        // Fetch associated stories for each feedback
+        // Fetch associated stories for each feedback to enrich with source/category
         const enriched = await Promise.all(feedbackList.map(async (fb) => {
             if (fb.story_id) {
                 const story = await stories.getById(fb.story_id);
                 return {
                     ...fb,
                     headline: story?.headline,
-                    source: story?.source
+                    source: story?.source,
+                    source_domain: story?.source_domain || story?.source, // Fallback
+                    sectors: story?.pe_analysis?.sectors || []
+                };
+            }
+            return fb;
+        }));
+
+        return enriched;
+    },
+
+    async getByUser(email) {
+        // Assuming 'from_email' is the field for user email in feedback
+        // Note: The feedback ingestion uses 'from_email' for email replies.
+        // For web feedback, we need to ensure we store the user's email.
+        // Currently web feedback might be anonymous or just session based?
+        // Let's check script.js... it doesn't send email. 
+        // We might need to rely on 'email_reply' feedback for now, OR update web to send email if logged in.
+        // For now, we'll query by 'from_email'.
+
+        const snapshot = await collections.feedback
+            .where('from_email', '==', email)
+            .get();
+
+        const feedbackList = snapshotToArray(snapshot);
+
+        // Enrich with story data
+        const enriched = await Promise.all(feedbackList.map(async (fb) => {
+            if (fb.story_id) {
+                const story = await stories.getById(fb.story_id);
+                return {
+                    ...fb,
+                    headline: story?.headline,
+                    source: story?.source,
+                    source_domain: story?.source_domain || story?.source,
+                    sectors: story?.pe_analysis?.sectors || []
                 };
             }
             return fb;

@@ -168,4 +168,23 @@ router.get('/newsletter-archives', checkAuth, async (req, res) => {
     }
 });
 
+/**
+ * GET /api/admin/voting-report
+ * Get aggregate voting statistics for sources and categories
+ */
+router.get('/voting-report', checkAuth, async (req, res) => {
+    try {
+        const votingReportService = require('../services/voting-report');
+        const report = await votingReportService.generateVotingReport();
+
+        res.json(report);
+    } catch (error) {
+        console.error('Error generating voting report:', error);
+        res.status(500).json({
+            error: 'Failed to generate voting report',
+            message: error.message
+        });
+    }
+});
+
 module.exports = router;

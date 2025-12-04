@@ -1,4 +1,5 @@
 const { stories, subscribers, newsletters } = require('../database/firestore');
+const scoring = require('./scoring');
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -9,12 +10,12 @@ async function generateAndSendNewsletter() {
   console.log('\n📰 Starting newsletter generation...');
 
   try {
-    // 1. Fetch top stories from last 24 hours
-    const storyList = await stories.getTopForNewsletter({ hours: 24, limit: 12 });
+    // 1. Fetch candidate stories (fetch more to allow for filtering/scoring)
+    const candidateStories = await stories.getTopForNewsletter({ hours: 24, limit: 50 });
 
-    console.log(`✓ Found ${storyList.length} stories for newsletter`);
+    console.log(`✓ Found ${candidateStories.length} candidate stories for newsletter`);
 
-    if (storyList.length === 0) {
+    if (candidateStories.length === 0) {
       console.log('⚠️  No stories found for newsletter');
       return {
         recipientCount: 0,
@@ -23,16 +24,18 @@ async function generateAndSendNewsletter() {
       };
     }
 
-    // 2. Get active subscribers
+    // 2. Score for Community (Base + Community Feedback)
+    const communityStories = await scoring.scoreStoriesForCommunity(candidateStories);
+
+    // Sort by community score
+    communityStories.sort((a, b) => (b.community_score || b.pe_impact_score) - (a.community_score || a.pe_impact_score));
+
+    // Select top 12 for Community Top Picks
+    const communityTopPicks = communityStories.slice(0, 12);
+
+    // 3. Get active subscribers
     const subscriberList = await subscribers.getActive();
     console.log(`✓ Found ${subscriberList.length} active subscribers`);
-
-    // 3. Split into test and regular users
-    const testUsers = subscriberList.filter(s => s.is_test_user);
-    const regularUsers = subscriberList.filter(s => !s.is_test_user);
-
-    console.log(`  - Test users: ${testUsers.length}`);
-    console.log(`  - Regular users: ${regularUsers.length}`);
 
     // 4. Generate and send newsletters
     const subject = `NewsWatch Daily Brief - ${new Date().toLocaleDateString('en-US', {
@@ -42,49 +45,84 @@ async function generateAndSendNewsletter() {
       day: 'numeric'
     })}`;
 
-    // Send to test users (with guidance)
+    // Helper to process user list
+    const processUsers = async (users, isTest = false) => {
+      for (const user of users) {
+        try {
+          // Score for User
+          const userStories = await scoring.scoreStoriesForUser(user, candidateStories);
+
+          // Sort by personal score
+          userStories.sort((a, b) => (b.personal_score || 0) - (a.personal_score || 0));
+
+          // Select top personal recommendations that are NOT in community top picks
+          const communityIds = new Set(communityTopPicks.map(s => s.id));
+          const personalRecs = userStories
+            .filter(s => !communityIds.has(s.id))
+            .slice(0, 5); // Top 5 personal recs
+
+          // Generate HTML with sections
+          const html = await generateNewsletterHTML({
+            communityStories: communityTopPicks,
+            personalStories: personalRecs,
+            user
+          }, { includeGuidance: isTest });
+
+          await sendBulkEmail({
+            to: [user.email],
+            subject,
+            html
+          });
+          console.log(`✓ Sent personalized newsletter to ${user.email}`);
+        } catch (err) {
+          console.error(`✗ Failed to send to ${user.email}:`, err.message);
+        }
+      }
+    };
+
+    // Split into test and regular users
+    const testUsers = subscriberList.filter(s => s.is_test_user);
+    const regularUsers = subscriberList.filter(s => !s.is_test_user);
+
     if (testUsers.length > 0) {
-      const htmlWithGuidance = await generateNewsletterHTML(storyList, { includeGuidance: true });
-      await sendBulkEmail({
-        to: testUsers.map(s => s.email),
-        subject,
-        html: htmlWithGuidance
-      });
-      console.log(`✓ Sent newsletter (with guidance) to ${testUsers.length} test users`);
+      await processUsers(testUsers, true);
     }
 
-    // Send to regular users (without guidance)
     if (regularUsers.length > 0) {
-      const htmlWithoutGuidance = await generateNewsletterHTML(storyList, { includeGuidance: false });
-      await sendBulkEmail({
-        to: regularUsers.map(s => s.email),
-        subject,
-        html: htmlWithoutGuidance
-      });
-      console.log(`✓ Sent newsletter (no guidance) to ${regularUsers.length} regular users`);
+      await processUsers(regularUsers, false);
     }
+
+    // 5. Save Archive (Community Version Only)
+    // We generate a generic version using just the community top picks
+    const archiveHtml = await generateNewsletterHTML({
+      communityStories: communityTopPicks,
+      personalStories: []
+    }, { includeGuidance: false }); // Archive typically doesn't show test guidance? Or maybe it should? 
+    // Requirement: "Only the community news should be in the archive." -> personalStories: []
 
     if (subscriberList.length === 0) {
       console.log('⚠️  No active subscribers, skipping email send');
-      // Generate preview with guidance for logging/debugging
-      const html = await generateNewsletterHTML(storyList, { includeGuidance: true });
-      console.log('📄 Newsletter HTML generated (would be sent to subscribers)');
+      // Save preview
+      const path = require('path');
+      const outputPath = path.join(__dirname, '../../newsletter-preview.html');
+      await fs.writeFile(outputPath, archiveHtml);
+      console.log(`✓ Newsletter preview saved to: ${outputPath}`);
     }
 
-    // 5. Record newsletter send
+    // 6. Record newsletter send
     await newsletters.create({
       date: new Date(),
       subject,
       sent_at: new Date(),
       recipient_count: subscriberList.length,
-      story_ids: storyList.map(s => s.id)
+      story_ids: communityTopPicks.map(s => s.id)
     });
 
     console.log('✅ Newsletter generation complete\n');
 
     return {
       recipientCount: subscriberList.length,
-      storyCount: storyList.length,
+      storyCount: communityTopPicks.length,
       sentAt: new Date()
     };
 
@@ -97,7 +135,24 @@ async function generateAndSendNewsletter() {
 /**
  * Generate newsletter HTML from stories
  */
-async function generateNewsletterHTML(stories, options = {}) {
+/**
+ * Generate newsletter HTML from stories
+ * Supports sections: Community Top Picks and Personal Recommendations
+ */
+async function generateNewsletterHTML(data, options = {}) {
+  // Handle legacy call signature (stories array)
+  let communityStories = [];
+  let personalStories = [];
+  let user = null;
+
+  if (Array.isArray(data)) {
+    communityStories = data;
+  } else {
+    communityStories = data.communityStories || [];
+    personalStories = data.personalStories || [];
+    user = data.user;
+  }
+
   const { includeGuidance = false, tokenCost = 0 } = options;
   const tokenTracker = require('../utils/token-tracker');
 
@@ -163,103 +218,122 @@ Maintain active coverage of:
   // Format token cost for banner
   const costDisplay = tokenTracker.formatTokenCost(tokenCost || tokenTracker.getTokenCount());
 
-  const storiesHTML = stories.map((story, index) => {
-    const peScore = story.pe_impact_score || 0;
-    const peAnalysis = story.pe_analysis || {};
-    const thumbsUpCount = story.thumbs_up_count || 0;
-    const thumbsDownCount = story.thumbs_down_count || 0;
+  // Helper to render a list of stories
+  const renderStories = (storyList) => {
+    if (!storyList || storyList.length === 0) return '';
 
-    // Determine arrow and color based on PE impact score
-    let arrow, bgGradient;
-    if (peScore >= 8) {
-      arrow = '↗';
-      bgGradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-    } else if (peScore >= 6) {
-      arrow = '↑';
-      bgGradient = 'linear-gradient(135deg, #4c9aff 0%, #5b7fc7 100%)';
-    } else if (peScore >= 4) {
-      arrow = '→';
-      bgGradient = 'linear-gradient(135deg, #999 0%, #777 100%)';
-    } else if (peScore >= 2) {
-      arrow = '↓';
-      bgGradient = 'linear-gradient(135deg, #888 0%, #666 100%)';
-    } else {
-      arrow = '↘';
-      bgGradient = 'linear-gradient(135deg, #777 0%, #555 100%)';
-    }
+    return storyList.map((story, index) => {
+      const peScore = story.pe_impact_score || 0;
+      const peAnalysis = story.pe_analysis || {};
+      const thumbsUpCount = story.thumbs_up_count || 0;
+      const thumbsDownCount = story.thumbs_down_count || 0;
 
-    // Format insights as italicized text
-    const insightsHTML = peAnalysis.key_insights && peAnalysis.key_insights.length > 0 ? `
-      <div style="margin: 10px 0; font-style: italic; font-size: 13px; color: #444; line-height: 1.6;">
-        ${peAnalysis.key_insights.slice(0, 2).map(insight => `• ${insight}`).join('<br>')}
-      </div>
-    ` : '';
+      // Extract sectors/categories
+      const sectors = peAnalysis.sectors || [];
+      const categoryHTML = sectors.length > 0
+        ? `<span style="display: inline-block; background-color: #eee; color: #555; font-size: 10px; padding: 2px 6px; border-radius: 3px; margin-left: 8px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px;">${sectors[0]}</span>`
+        : '';
 
-    // Display all sources if story has multiple sources
-    let sourcesHTML = '';
-    if (story.sources && Array.isArray(story.sources) && story.sources.length > 0) {
-      // Story has been merged from multiple sources
-      const sourcesList = story.sources.map(src => {
-        const srcName = src.name || 'Unknown Source';
-        const srcUrl = src.url || '#';
-        const srcDate = src.published_at ? formatDate(src.published_at, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
-        return `<a href="${srcUrl}" style="color: #666; text-decoration: none;">${srcName}</a>${srcDate ? ` (${srcDate})` : ''}`;
-      }).join(' • ');
+      // Format insights as italicized bullet points
+      const insightsHTML = peAnalysis.key_insights && peAnalysis.key_insights.length > 0 ? `
+        <ul style="margin: 10px 0 10px 20px; padding: 0; list-style-type: disc; font-size: 13px; color: #444; line-height: 1.6;">
+          ${peAnalysis.key_insights.slice(0, 2).map(insight => `<li><i>${insight}</i></li>`).join('')}
+        </ul>
+      ` : '';
 
-      sourcesHTML = `
-        <div style="font-size: 11px; color: #666; margin-bottom: 8px; font-family: Arial, sans-serif;">
-          ${story.sources.length > 1 ? `<strong>${story.sources.length} sources:</strong> ` : ''}${sourcesList}
+      // Display all sources if story has multiple sources
+      let sourcesHTML = '';
+      if (story.sources && Array.isArray(story.sources) && story.sources.length > 0) {
+        // Story has been merged from multiple sources
+        const sourcesList = story.sources.map(src => {
+          const srcName = src.name || 'Unknown Source';
+          const srcUrl = src.url || '#';
+          const srcDate = src.published_at ? formatDate(src.published_at, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
+          return `<a href="${srcUrl}" style="color: #666; text-decoration: none;">${srcName}</a>${srcDate ? ` (${srcDate})` : ''}`;
+        }).join(' • ');
+
+        sourcesHTML = `
+          <div style="font-size: 11px; color: #666; margin-bottom: 8px; font-family: Arial, sans-serif;">
+            ${story.sources.length > 1 ? `<strong>${story.sources.length} sources:</strong> ` : ''}${sourcesList}
+          </div>
+        `;
+      } else {
+        // Single source story
+        const sourceHTML = story.url ?
+          `<a href="${story.url}" style="color: #666; text-decoration: none; text-transform: uppercase;">${story.source || 'Unknown Source'}</a>` :
+          `${story.source || 'Unknown Source'}`;
+
+        sourcesHTML = `
+          <div style="font-size: 11px; color: #666; margin-bottom: 8px; font-family: Arial, sans-serif;">
+            ${sourceHTML} ${story.published_at ? '| ' + formatDate(story.published_at, { hour: 'numeric', minute: '2-digit' }) : ''}
+          </div>
+        `;
+      }
+
+      return `
+        <div class="story-item" style="break-inside: avoid; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid #ddd;">
+          <h3 style="margin: 0 0 8px 0; font-size: 16px; line-height: 1.3; font-weight: bold;">
+            <a href="${story.url || '#'}" style="color: #1a1a1a; text-decoration: none;">
+              ${story.headline}
+            </a>
+            ${categoryHTML}
+          </h3>
+          
+          <!-- Thumbs up/down -->
+          <div style="margin: 8px 0; font-size: 18px;">
+            <span style="cursor: pointer; margin-right: 12px; display: inline-flex; align-items: center; gap: 4px;" title="More like this">
+              <svg width="16" height="16" viewBox="0 0 24 24" style="fill: #333;"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91l-.01-.01L23 10z"/></svg>
+              ${thumbsUpCount > 0 ? `<small style="font-size: 11px; color: #666;">${thumbsUpCount}</small>` : ''}
+            </span>
+            <span style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Less like this">
+              <svg width="16" height="16" viewBox="0 0 24 24" style="fill: #333;"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v1.91l.01.01L1 14c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
+              ${thumbsDownCount > 0 ? `<small style="font-size: 11px; color: #666;">${thumbsDownCount}</small>` : ''}
+            </span>
+          </div>
+          
+          <!-- Source(s) and date -->${sourcesHTML}
+          
+          ${insightsHTML}
+          
+          <!-- Teaser/Summary -->
+          <p style="margin: 8px 0 0 0; font-size: 14px; line-height: 1.6; color: #333;">
+            ${story.summary || 'Click to read the full story...'}
+          </p>
         </div>
       `;
-    } else {
-      // Single source story
-      const sourceHTML = story.url ?
-        `<a href="${story.url}" style="color: #666; text-decoration: none; text-transform: uppercase;">${story.source || 'Unknown Source'}</a>` :
-        `${story.source || 'Unknown Source'}`;
+    }).join('');
+  };
 
-      sourcesHTML = `
-        <div style="font-size: 11px; color: #666; margin-bottom: 8px; font-family: Arial, sans-serif;">
-          ${sourceHTML} ${story.published_at ? '| ' + formatDate(story.published_at, { hour: 'numeric', minute: '2-digit' }) : ''}
+  const communityHTML = renderStories(communityStories);
+  const personalHTML = renderStories(personalStories);
+
+  let contentHTML = '';
+
+  if (personalStories.length > 0) {
+    contentHTML += `
+        <div style="margin-bottom: 40px;">
+            <h2 style="font-size: 18px; text-transform: uppercase; border-bottom: 2px solid #1a1a1a; padding-bottom: 10px; margin-bottom: 20px;">
+                Recommended for You
+            </h2>
+            <div class="stories-grid">
+                ${personalHTML}
+            </div>
         </div>
       `;
-    }
+  }
 
-    return `
-      <div class="story-item" style="break-inside: avoid; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid #ddd;">
-        <h3 style="margin: 0 0 8px 0; font-size: 16px; line-height: 1.3; font-weight: bold;">
-          <a href="${story.url || '#'}" style="color: #1a1a1a; text-decoration: none;">
-            ${story.headline}
-          </a>
-        </h3>
-        
-        <!-- Thumbs up/down -->
-        <div style="margin: 8px 0; font-size: 18px;">
-          <span style="cursor: pointer; margin-right: 12px; display: inline-flex; align-items: center; gap: 4px;" title="More like this">
-            <svg width="16" height="16" viewBox="0 0 24 24" style="fill: #333;"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91l-.01-.01L23 10z"/></svg>
-            ${thumbsUpCount > 0 ? `<small style="font-size: 11px; color: #666;">${thumbsUpCount}</small>` : ''}
-          </span>
-          <span style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Less like this">
-            <svg width="16" height="16" viewBox="0 0 24 24" style="fill: #333;"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v1.91l.01.01L1 14c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
-            ${thumbsDownCount > 0 ? `<small style="font-size: 11px; color: #666;">${thumbsDownCount}</small>` : ''}
-          </span>
+  if (communityStories.length > 0) {
+    contentHTML += `
+        <div>
+            <h2 style="font-size: 18px; text-transform: uppercase; border-bottom: 2px solid #1a1a1a; padding-bottom: 10px; margin-bottom: 20px;">
+                Community Top Picks
+            </h2>
+            <div class="stories-grid">
+                ${communityHTML}
+            </div>
         </div>
-        
-        <!-- Source(s) and date -->${sourcesHTML}
-        
-        <!-- PE Impact badge -->
-        <div style="display: inline-block; background: ${bgGradient}; color: white; padding: 3px 10px; font-size: 11px; font-weight: 600; margin-bottom: 8px; font-family: Arial, sans-serif;">
-          ${arrow} PE Impact: ${peScore}/10
-        </div>
-        
-        ${insightsHTML}
-        
-        <!-- Teaser/Summary -->
-        <p style="margin: 8px 0 0 0; font-size: 14px; line-height: 1.6; color: #333;">
-          ${story.summary || 'Click to read the full story...'}
-        </p>
-      </div>
-    `;
-  }).join('');
+      `;
+  }
 
   return `
     <!DOCTYPE html>
@@ -321,8 +395,8 @@ Maintain active coverage of:
         </div>
 
         <!-- Stories in newspaper columns -->
-        <div class="stories-grid" style="padding: 30px;">
-          ${storiesHTML}
+        <div style="padding: 30px;">
+          ${contentHTML}
         </div>
 
         <!-- Footer -->
@@ -466,7 +540,14 @@ async function generateAndSendTestNewsletter() {
     }
 
     // 3. Generate newsletter with guidance
-    const html = await generateNewsletterHTML(storyList, { includeGuidance: true });
+    // 3. Generate newsletter with guidance (Community only for test/archive)
+    // For test newsletter, we might want to simulate a user? 
+    // Or just show the community version.
+    // Let's show community version for now as the "Test" output.
+    const html = await generateNewsletterHTML({
+      communityStories: storyList,
+      personalStories: []
+    }, { includeGuidance: true });
 
     // 4. Save to archive
     const archiveResult = await saveNewsletterToArchive(html, {
