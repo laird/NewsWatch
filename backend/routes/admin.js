@@ -210,4 +210,135 @@ router.post('/check-feedback', checkAuth, async (req, res) => {
     }
 });
 
+/**
+ * POST /api/admin/reprocess-stories
+ * Trigger reprocessing of stories to update categorization
+ */
+router.post('/reprocess-stories', checkAuth, async (req, res) => {
+    try {
+        console.log('🔄 Admin triggered story reprocessing...');
+
+        // Run asynchronously to avoid timeout
+        // In a real production app, this should be a background job (Cloud Tasks/PubSub)
+        // For now, we'll start it and return success, logging progress to server logs.
+
+        const { queryDocs } = require('../database/db-firestore');
+        const { analyzePEImpact } = require('../services/peAnalysis');
+
+        (async () => {
+            try {
+                const stories = await queryDocs('stories', [], {
+                    orderBy: { field: 'ingested_at', direction: 'desc' },
+                    limit: 100 // Limit to 100 most recent for safety/timeout
+                });
+
+                console.log(`[REPROCESS] Found ${stories.length} stories to reprocess`);
+
+                for (const story of stories) {
+                    try {
+                        console.log(`[REPROCESS] Analyzing: ${story.headline.substring(0, 30)}...`);
+                        await analyzePEImpact(story);
+                        // Small delay
+                        await new Promise(r => setTimeout(r, 500));
+                    } catch (err) {
+                        console.error(`[REPROCESS] Failed story ${story.id}:`, err.message);
+                    }
+                }
+                console.log('[REPROCESS] Completed successfully');
+            } catch (err) {
+                console.error('[REPROCESS] Fatal error:', err);
+            }
+        })();
+
+        res.json({
+            success: true,
+            message: 'Reprocessing started in background (checking last 100 stories). Check server logs for progress.'
+        });
+    } catch (error) {
+        console.error('Error triggering reprocessing:', error);
+        res.status(500).json({
+            error: 'Failed to trigger reprocessing',
+            message: error.message
+        });
+    }
+});
+
+/**
+ * GET /api/admin/logs
+ * Get available log files or read log content
+ * Query params:
+ *   - list: if true, returns list of available log files
+ *   - file: log filename to read
+ *   - lines: number of lines to retrieve (default 100)
+ */
+router.get('/logs', checkAuth, async (req, res) => {
+    try {
+        const { list, file, lines = 100 } = req.query;
+        const fs = require('fs').promises;
+        const path = require('path');
+        const logsDir = path.join(__dirname, '../..');
+
+        if (list) {
+            // List all .log files
+            const allFiles = await fs.readdir(logsDir);
+            const logFiles = allFiles.filter(f => f.endsWith('.log'));
+
+            // Get file sizes and modification times
+            const filesWithInfo = await Promise.all(
+                logFiles.map(async (filename) => {
+                    const filePath = path.join(logsDir, filename);
+                    const stats = await fs.stat(filePath);
+                    return {
+                        filename,
+                        size: stats.size,
+                        modified: stats.mtime
+                    };
+                })
+            );
+
+            // Sort by modification time (newest first)
+            filesWithInfo.sort((a, b) => b.modified - a.modified);
+
+            res.json({ files: filesWithInfo });
+        } else if (file) {
+            // Read specific log file
+            const filePath = path.join(logsDir, file);
+
+            // Security check: prevent path traversal
+            if (!filePath.startsWith(logsDir) || !file.endsWith('.log')) {
+                return res.status(400).json({ error: 'Invalid file name' });
+            }
+
+            try {
+                const content = await fs.readFile(filePath, 'utf-8');
+                const allLines = content.split('\n');
+                const numLines = parseInt(lines) || 100;
+
+                // Get last N lines
+                const lastLines = allLines.slice(-numLines);
+
+                res.json({
+                    filename: file,
+                    totalLines: allLines.length,
+                    lines: numLines,
+                    content: lastLines.join('\n')
+                });
+            } catch (err) {
+                if (err.code === 'ENOENT') {
+                    return res.status(404).json({ error: 'Log file not found' });
+                }
+                throw err;
+            }
+        } else {
+            res.status(400).json({ error: 'Must specify either list=true or file=filename' });
+        }
+    } catch (error) {
+        console.error('Error reading logs:', error);
+        res.status(500).json({
+            error: 'Failed to read logs',
+            message: error.message
+        });
+    }
+});
+
 module.exports = router;

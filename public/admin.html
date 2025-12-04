@@ -25,7 +25,7 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
@@ -56,15 +56,41 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
         }
 
-        .card h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 24px;
+        /* Tab Styles */
+        .tabs {
+            display: flex;
+            gap: 10px;
             margin-bottom: 20px;
-            color: #1a1a1a;
+            border-bottom: 2px solid #e0e0e0;
         }
 
-        .auth-section {
-            text-align: center;
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: #666;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: #667eea;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         .form-group {
@@ -79,7 +105,9 @@
         }
 
         .form-group input[type="password"],
-        .form-group textarea {
+        .form-group input[type="text"],
+        .form-group textarea,
+        .form-group select {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
@@ -89,8 +117,9 @@
             transition: border-color 0.3s;
         }
 
-        .form-group input[type="password"]:focus,
-        .form-group textarea:focus {
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
             outline: none;
             border-color: #667eea;
         }
@@ -173,9 +202,77 @@
             display: none;
         }
 
+        .char-counter {
+            font-size: 12px;
+            color: #666;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .log-viewer {
+            background: #1a1a1a;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            min-height: 400px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .log-file-list {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .log-file-item {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .log-file-item:hover {
+            background: #f5f5f5;
+        }
+
+        .log-file-item.active {
+            background: #e8eaf6;
+            font-weight: 600;
+        }
+
+        .log-file-name {
+            font-weight: 500;
+        }
+
+        .log-file-meta {
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        table th {
+            text-align: left;
+            padding: 12px;
+            font-weight: 600;
+            border-bottom: 2px solid #1a1a1a;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
         .archive-list {
             list-style: none;
-            margin-top: 15px;
         }
 
         .archive-item {
@@ -184,31 +281,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .archive-item:last-child {
-            border-bottom: none;
-        }
-
-        .archive-date {
-            font-weight: 500;
-            color: #1a1a1a;
-        }
-
-        .archive-meta {
-            font-size: 12px;
-            color: #666;
-            margin-left: 10px;
-        }
-
-        .archive-link {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .archive-link:hover {
-            text-decoration: underline;
         }
 
         .badge {
@@ -224,13 +296,6 @@
             background: #fef2f2;
             color: #dc2626;
         }
-
-        .char-counter {
-            font-size: 12px;
-            color: #666;
-            text-align: right;
-            margin-top: 5px;
-        }
     </style>
 </head>
 
@@ -242,7 +307,7 @@
         </div>
 
         <!-- Authentication Section -->
-        <div id="auth-card" class="card auth-section">
+        <div id="auth-card" class="card auth-section" style="text-align: center;">
             <h2>🔐 Authentication Required</h2>
             <div class="form-group">
                 <input type="password" id="auth-password" placeholder="Enter admin password"
@@ -254,111 +319,158 @@
 
         <!-- Main Admin Panel (hidden until authenticated) -->
         <div id="admin-panel" class="hidden">
-
-            <!-- Guidance Editor -->
             <div class="card">
-                <h2>🤖 AI Guidance Editor</h2>
-                <div class="form-group">
-                    <label for="guidance-text">Current AI Instructions:</label>
-                    <textarea id="guidance-text" placeholder="Loading guidance..."></textarea>
-                    <div class="char-counter">
-                        <span id="char-count">0</span> characters
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('guidance')">🤖 Guidance</button>
+                    <button class="tab" onclick="switchTab('analytics')">📊 Analytics</button>
+                    <button class="tab" onclick="switchTab('logs')">📋 Logs</button>
+                </div>
+
+                <!-- Guidance Tab -->
+                <div id="tab-guidance" class="tab-content active">
+                    <h2 style="margin-bottom: 20px;">AI Guidance Editor</h2>
+                    <div class="form-group">
+                        <label for="guidance-text">Current AI Instructions:</label>
+                        <textarea id="guidance-text" placeholder="Loading guidance..."></textarea>
+                        <div class="char-counter">
+                            <span id="char-count">0</span> characters
+                        </div>
                     </div>
-                </div>
-                <button class="btn btn-primary" onclick="saveGuidance()">💾 Save Guidance</button>
-                <div id="guidance-status"></div>
-                <div class="meta-info" id="guidance-meta"></div>
-            </div>
+                    <button class="btn btn-primary" onclick="saveGuidance()">💾 Save Guidance</button>
+                    <div id="guidance-status"></div>
+                    <div class="meta-info" id="guidance-meta"></div>
 
-            <!-- Newsletter Testing -->
-            <div class="card">
-                <h2>📧 Newsletter Testing</h2>
-                <p style="margin-bottom: 20px; color: #666;">
-                    Generate and send a test newsletter to all test users with the current guidance included.
-                </p>
-                <button class="btn btn-success" id="trigger-btn" onclick="triggerNewsletter()">
-                    ⚡ Generate & Send Test Newsletter
-                </button>
-                <div id="newsletter-status"></div>
-            </div>
+                    <hr style="margin: 30px 0; border: none; border-top: 1px solid #e0e0e0;">
 
-            <!-- Feedback Checking -->
-            <div class="card">
-                <h2>📧 Check Email Feedback</h2>
-                <p style="margin-bottom: 20px; color: #666;">
-                    Manually check for new email replies and process user feedback.
-                </p>
-                <button class="btn btn-primary" id="check-feedback-btn" onclick="checkFeedback()">
-                    📨 Check for New Feedback
-                </button>
-                <div id="feedback-status"></div>
-            </div>
+                    <h3 style="margin-bottom: 15px; font-size: 18px;">Newsletter Testing</h3>
+                    <p style="margin-bottom: 15px; color: #666;">
+                        Generate and send a test newsletter to all test users with the current guidance included.
+                    </p>
+                    <button class="btn btn-success" id="trigger-btn" onclick="triggerNewsletter()">
+                        ⚡ Generate & Send Test Newsletter
+                    </button>
+                    <div id="newsletter-status"></div>
 
-            <!-- Recent Archives -->
-            <div class="card">
-                <h2>📚 Recent Newsletter Archives</h2>
-                <ul class="archive-list" id="archive-list">
-                    <li style="text-align: center; color: #999;">Loading archives...</li>
-                </ul>
-            </div>
+                    <hr style="margin: 30px 0; border: none; border-top: 1px solid #e0e0e0;">
 
-            <!-- Voting Report -->
-            <div class="card">
-                <h2>📊 Community Voting Report</h2>
-                <p style="margin-bottom: 20px; color: #666;">
-                    Aggregate voting statistics showing community preferences for sources and categories.
-                </p>
+                    <h3 style="margin-bottom: 15px; font-size: 18px;">Check Email Feedback</h3>
+                    <p style="margin-bottom: 15px; color: #666;">
+                        Manually check for new email replies and process user feedback.
+                    </p>
+                    <button class="btn btn-primary" id="check-feedback-btn" onclick="checkFeedback()">
+                        📨 Check for New Feedback
+                    </button>
+                    <div id="feedback-status"></div>
 
-                <h3 style="font-size: 18px; margin-bottom: 15px; color: #1a1a1a;">Source Preferences</h3>
-                <div style="overflow-x: auto; margin-bottom: 30px;">
-                    <table id="sources-table" style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 2px solid #1a1a1a;">
-                                <th style="text-align: left; padding: 12px; font-weight: 600;">Source</th>
-                                <th style="text-align: center; padding: 12px; font-weight: 600;">Net Votes</th>
-                                <th style="text-align: center; padding: 12px; font-weight: 600;">↑</th>
-                                <th style="text-align: center; padding: 12px; font-weight: 600;">↓</th>
-                                <th style="text-align: center; padding: 12px; font-weight: 600;">Stories</th>
-                                <th style="text-align: center; padding: 12px; font-weight: 600;">Multiplier</th>
-                            </tr>
-                        </thead>
-                        <tbody id="sources-body">
-                            <tr>
-                                <td colspan="6" style="text-align: center; padding: 20px; color: #999;">Loading...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <hr style="margin: 30px 0; border: none; border-top: 1px solid #e0e0e0;">
+
+                    <h3 style="margin-bottom: 15px; font-size: 18px;">Recent Newsletter Archives</h3>
+                    <ul class="archive-list" id="archive-list">
+                        <li style="text-align: center; color: #999;">Loading archives...</li>
+                    </ul>
                 </div>
 
-                <h3 style="font-size: 18px; margin-bottom: 15px; color: #1a1a1a;">Category Preferences</h3>
-                <div style="overflow-x: auto;">
-                    <table id="categories-table" style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 2px solid #1a1a1a;">
-                                <th style="text-align: left; padding: 12px; font-weight: 600;">Category</th>
-                                <th style="text-align: center; padding: 12px; font-weight: 600;">Net Votes</th>
-                                <th style="text-align: center; padding: 12px; font-weight: 600;">↑</th>
-                                <th style="text-align: center; padding: 12px; font-weight: 600;">↓</th>
-                                <th style="text-align: center; padding: 12px; font-weight: 600;">Stories</th>
-                                <th style="text-align: center; padding: 12px; font-weight: 600;">Multiplier</th>
-                            </tr>
-                        </thead>
-                        <tbody id="categories-body">
-                            <tr>
-                                <td colspan="6" style="text-align: center; padding: 20px; color: #999;">Loading...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- Analytics Tab -->
+                <div id="tab-analytics" class="tab-content">
+                    <h2 style="margin-bottom: 20px;">Community Voting Report</h2>
+                    <p style="margin-bottom: 20px; color: #666;">
+                        Aggregate voting statistics showing community preferences for sources and categories.
+                    </p>
+
+                    <h3 style="font-size: 18px; margin-bottom: 15px;">Source Preferences</h3>
+                    <div style="overflow-x: auto; margin-bottom: 30px;">
+                        <table id="sources-table">
+                            <thead>
+                                <tr>
+                                    <th>Source</th>
+                                    <th style="text-align: center;">Net Votes</th>
+                                    <th style="text-align: center;">↑</th>
+                                    <th style="text-align: center;">↓</th>
+                                    <th style="text-align: center;">Stories</th>
+                                    <th style="text-align: center;">Multiplier</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sources-body">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 20px; color: #999;">Loading...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 style="font-size: 18px; margin-bottom: 15px;">Category Preferences</h3>
+                    <div style="overflow-x: auto;">
+                        <table id="categories-table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th style="text-align: center;">Net Votes</th>
+                                    <th style="text-align: center;">↑</th>
+                                    <th style="text-align: center;">↓</th>
+                                    <th style="text-align: center;">Stories</th>
+                                    <th style="text-align: center;">Multiplier</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categories-body">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 20px; color: #999;">Loading...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="voting-report-meta" class="meta-info" style="margin-top: 15px;"></div>
                 </div>
 
-                <div id="voting-report-meta" class="meta-info" style="margin-top: 15px;"></div>
-            </div>
+                <!-- Logs Tab -->
+                <div id="tab-logs" class="tab-content">
+                    <h2 style="margin-bottom: 20px;">Server Logs</h2>
 
+                    <div class="form-group">
+                        <label for="log-file-select">Select Log File:</label>
+                        <select id="log-file-select" onchange="loadLogFile()">
+                            <option value="">Loading log files...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="log-lines">Number of lines to display:</label>
+                        <input type="number" id="log-lines" value="100" min="10" max="10000" style="width: 150px;">
+                        <button class="btn btn-primary" style="margin-left: 10px;" onclick="loadLogFile()">📥 Refresh
+                        </button>
+                    </div>
+
+                    <div class="meta-info" id="log-meta"></div>
+
+                    <div class="log-viewer" id="log-content">Select a log file to view its contents...</div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         let adminPassword = '';
+        let currentTab = 'guidance';
+
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            currentTab = tabName;
+
+            // Load tab-specific data if needed
+            if (tabName === 'logs' && adminPassword) {
+                loadLogFileList();
+            }
+        }
 
         function handleAuthKeypress(event) {
             if (event.key === 'Enter') {
@@ -416,7 +528,6 @@
                 updateCharCount();
 
                 if (data.lastUpdated) {
-                    // Handle Firestore Timestamp object
                     let lastUpdated;
                     if (data.lastUpdated._seconds) {
                         lastUpdated = new Date(data.lastUpdated._seconds * 1000);
@@ -432,12 +543,10 @@
                         'No guidance set yet';
                 }
 
-                // Clear any previous errors
                 statusDiv.innerHTML = '';
             } catch (error) {
                 console.error('Load guidance error:', error);
-                showStatus(statusDiv,
-                    '❌ Failed to load guidance: ' + error.message, 'error');
+                showStatus(statusDiv, '❌ Failed to load guidance: ' + error.message, 'error');
                 textArea.value = '';
                 textArea.placeholder = 'Failed to load guidance. Check console for details.';
             }
@@ -490,7 +599,7 @@
 
                 if (data.success) {
                     const message = `✅ Newsletter sent to ${data.recipientCount} test users with ${data.storyCount} stories. 
-                        <a href="${data.archiveUrl}" target="_blank" class="archive-link">View Archive</a>`;
+                        <a href="${data.archiveUrl}" target="_blank" style="color: #667eea; text-decoration: underline;">View Archive</a>`;
                     showStatus(statusDiv, message, 'success');
                     setTimeout(() => loadArchives(), 1000);
                 } else {
@@ -540,7 +649,6 @@
 
                 if (data.archives && data.archives.length > 0) {
                     listEl.innerHTML = data.archives.map(archive => {
-                        // Handle Firestore Timestamp object
                         let date;
                         if (archive.date._seconds) {
                             date = new Date(archive.date._seconds * 1000);
@@ -553,11 +661,11 @@
                         return `
                             <li class="archive-item">
                                 <div>
-                                    <span class="archive-date">${date.toLocaleDateString()} ${date.toLocaleTimeString()}</span>
+                                    <span style="font-weight: 500;">${date.toLocaleDateString()} ${date.toLocaleTimeString()}</span>
                                     ${testBadge}
-                                    <span class="archive-meta">${archive.recipientCount} recipients • ${archive.storyCount} stories</span>
+                                    <span style="font-size: 12px; color: #666; margin-left: 10px;">${archive.recipientCount} recipients • ${archive.storyCount} stories</span>
                                 </div>
-                                <a href="${archive.archiveUrl || '#'}" target="_blank" class="archive-link">View →</a>
+                                <a href="${archive.archiveUrl || '#'}" target="_blank" style="color: #667eea; text-decoration: none; font-weight: 500;">View →</a>
                             </li>
                         `;
                     }).join('');
@@ -594,13 +702,13 @@
                         const multStyle = isMaxed ? 'font-weight: 700; color: #dc2626;' : '';
 
                         return `
-                            <tr style="background-color: ${bgColor}; border-bottom: 1px solid #e0e0e0;">
-                                <td style="padding: 12px; font-weight: 500;">${source.name}</td>
-                                <td style="padding: 12px; text-align: center; font-weight: 600; color: ${netVotes > 0 ? '#16a34a' : (netVotes < 0 ? '#dc2626' : '#666')};">${netVotes > 0 ? '+' : ''}${netVotes}</td>
-                                <td style="padding: 12px; text-align: center;">${source.upvotes}</td>
-                                <td style="padding: 12px; text-align: center;">${source.downvotes}</td>
-                                <td style="padding: 12px; text-align: center;">${source.storyCount}</td>
-                                <td style="padding: 12px; text-align: center; ${multStyle}">${source.multiplier}${isMaxed ? ' (max)' : ''}</td>
+                            <tr style="background-color: ${bgColor};">
+                                <td style="font-weight: 500;">${source.name}</td>
+                                <td style="text-align: center; font-weight: 600; color: ${netVotes > 0 ? '#16a34a' : (netVotes < 0 ? '#dc2626' : '#666')};">${netVotes > 0 ? '+' : ''}${netVotes}</td>
+                                <td style="text-align: center;">${source.upvotes}</td>
+                                <td style="text-align: center;">${source.downvotes}</td>
+                                <td style="text-align: center;">${source.storyCount}</td>
+                                <td style="text-align: center; ${multStyle}">${source.multiplier}${isMaxed ? ' (max)' : ''}</td>
                             </tr>
                         `;
                     }).join('');
@@ -618,13 +726,13 @@
                         const multStyle = isMaxed ? 'font-weight: 700; color: #dc2626;' : '';
 
                         return `
-                            <tr style="background-color: ${bgColor}; border-bottom: 1px solid #e0e0e0;">
-                                <td style="padding: 12px; font-weight: 500;">${category.name}</td>
-                                <td style="padding: 12px; text-align: center; font-weight: 600; color: ${netVotes > 0 ? '#16a34a' : (netVotes < 0 ? '#dc2626' : '#666')};">${netVotes > 0 ? '+' : ''}${netVotes}</td>
-                                <td style="padding: 12px; text-align: center;">${category.upvotes}</td>
-                                <td style="padding: 12px; text-align: center;">${category.downvotes}</td>
-                                <td style="padding: 12px; text-align: center;">${category.storyCount}</td>
-                                <td style="padding: 12px; text-align: center; ${multStyle}">${category.multiplier}${isMaxed ? ' (max)' : ''}</td>
+                            <tr style="background-color: ${bgColor};">
+                                <td style="font-weight: 500;">${category.name}</td>
+                                <td style="text-align: center; font-weight: 600; color: ${netVotes > 0 ? '#16a34a' : (netVotes < 0 ? '#dc2626' : '#666')};">${netVotes > 0 ? '+' : ''}${netVotes}</td>
+                                <td style="text-align: center;">${category.upvotes}</td>
+                                <td style="text-align: center;">${category.downvotes}</td>
+                                <td style="text-align: center;">${category.storyCount}</td>
+                                <td style="text-align: center; ${multStyle}">${category.multiplier}${isMaxed ? ' (max)' : ''}</td>
                             </tr>
                         `;
                     }).join('');
@@ -642,6 +750,59 @@
                 console.error('Failed to load voting report:', error);
                 document.getElementById('sources-body').innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #dc2626;">Failed to load report</td></tr>';
                 document.getElementById('categories-body').innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #dc2626;">Failed to load report</td></tr>';
+            }
+        }
+
+        async function loadLogFileList() {
+            try {
+                const response = await fetch(`/api/admin/logs?list=true&auth=${encodeURIComponent(adminPassword)}`);
+                const data = await response.json();
+
+                const select = document.getElementById('log-file-select');
+                if (data.files && data.files.length > 0) {
+                    select.innerHTML = '<option value="">-- Select a log file --</option>' +
+                        data.files.map(file => {
+                            const sizeKb = (file.size / 1024).toFixed(2);
+                            const modified = new Date(file.modified).toLocaleString();
+                            return `<option value="${file.filename}">${file.filename} (${sizeKb} KB, ${modified})</option>`;
+                        }).join('');
+                } else {
+                    select.innerHTML = '<option value="">No log files found</option>';
+                }
+            } catch (error) {
+                console.error('Failed to load log file list:', error);
+                document.getElementById('log-file-select').innerHTML = '<option value="">Error loading files</option>';
+            }
+        }
+
+        async function loadLogFile() {
+            const filename = document.getElementById('log-file-select').value;
+            const lines = document.getElementById('log-lines').value;
+            const contentDiv = document.getElementById('log-content');
+            const metaDiv = document.getElementById('log-meta');
+
+            if (!filename) {
+                contentDiv.textContent = 'Please select a log file.';
+                metaDiv.textContent = '';
+                return;
+            }
+
+            contentDiv.textContent = 'Loading...';
+            metaDiv.textContent = '';
+
+            try {
+                const response = await fetch(`/api/admin/logs?file=${encodeURIComponent(filename)}&lines=${lines}&auth=${encodeURIComponent(adminPassword)}`);
+                const data = await response.json();
+
+                if (data.content) {
+                    contentDiv.textContent = data.content;
+                    metaDiv.textContent = `Showing last ${data.lines} of ${data.totalLines} lines from ${data.filename}`;
+                } else {
+                    contentDiv.textContent = 'No content available.';
+                }
+            } catch (error) {
+                console.error('Failed to load log file:', error);
+                contentDiv.textContent = 'Error loading log file: ' + error.message;
             }
         }
 

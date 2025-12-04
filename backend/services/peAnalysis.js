@@ -19,7 +19,9 @@ Provide a structured analysis:
    - Technology: AI/ML, Cloud Computing, Blockchain/Crypto, DevOps/Infrastructure, Data/Analytics, IoT, AR/VR
    - Activity Type: M&A/Acquisition, Funding Round, IPO/Public Markets, Product Launch, Partnership, Regulatory/Policy
    - Customer Segment: Enterprise, SMB, Consumer, Developer Tools
-5. Insights: Provide exactly 2 bullet points:
+5. Location: Where is the story taking place or where is the company based? (City, Country/Region). If global/unclear, state "Global" or "Unspecified".
+6. Companies: List key companies mentioned (comma-separated).
+7. Insights: Provide exactly 2 bullet points:
    - Opportunity: [One sentence describing the specific opportunity for PE investors]
    - Threat: [One sentence describing the specific threat or risk to PE portfolios/deals]
 
@@ -31,7 +33,10 @@ Focus on:
 - Category-specific developments
 - Regulatory or market changes affecting deals
 
-Format your response to include a line starting with "Categories:" followed by the 1-3 selected categories.`;
+Format your response to include:
+- "Categories:" followed by the selected categories.
+- "Location:" followed by the location.
+- "Companies:" followed by the companies.`;
 
 /**
  * Analyze a story for PE investor impact
@@ -96,13 +101,23 @@ async function analyzeWithAI(story) {
     const lines = text.split('\n');
     let opportunity = '';
     let threat = '';
+    let location = 'Unspecified';
+    let companies = [];
 
     for (const line of lines) {
-        if (line.toLowerCase().includes('opportunity:') && !line.toLowerCase().includes('score')) {
+        const lowerLine = line.toLowerCase();
+        if (lowerLine.includes('opportunity:') && !lowerLine.includes('score')) {
             opportunity = line.replace(/.*Opportunity:\s*/i, '').trim();
         }
-        if (line.toLowerCase().includes('threat:') && !line.toLowerCase().includes('score')) {
+        if (lowerLine.includes('threat:') && !lowerLine.includes('score')) {
             threat = line.replace(/.*Threat:\s*/i, '').trim();
+        }
+        if (lowerLine.includes('location:')) {
+            location = line.replace(/.*Location:\s*/i, '').trim();
+        }
+        if (lowerLine.includes('companies:')) {
+            const companiesStr = line.replace(/.*Companies:\s*/i, '').trim();
+            companies = companiesStr.split(/[,;]/).map(c => c.trim()).filter(c => c.length > 0);
         }
     }
 
@@ -127,6 +142,8 @@ async function analyzeWithAI(story) {
         deal_score: scores.deal,
         portfolio_score: scores.portfolio,
         categories: extractCategories(text),
+        location: location,
+        companies: companies,
         insights: insights,
         explanation: text,
         raw_analysis: text,

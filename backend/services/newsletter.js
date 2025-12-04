@@ -228,11 +228,22 @@ Maintain active coverage of:
       const thumbsUpCount = story.thumbs_up_count || 0;
       const thumbsDownCount = story.thumbs_down_count || 0;
 
-      // Extract categories (support both new 'categories' and legacy 'sectors')
+      // Extract all tags: categories, location, companies
       const categories = peAnalysis.categories || peAnalysis.sectors || [];
-      const categoryHTML = categories.length > 0
-        ? `<span style="display: inline-block; background-color: #eee; color: #555; font-size: 10px; padding: 2px 6px; border-radius: 3px; margin-left: 8px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px;">${categories[0]}</span>`
-        : '';
+      const location = peAnalysis.location || '';
+      const companies = peAnalysis.companies || [];
+
+      // Build tag HTML for all dimensions
+      const allTags = [];
+      categories.forEach(cat => allTags.push({ text: cat, type: 'category' }));
+      if (location && location !== 'Unspecified' && location !== 'Global') {
+        allTags.push({ text: location, type: 'location' });
+      }
+      companies.forEach(company => allTags.push({ text: company, type: 'company' }));
+
+      const tagsHTML = allTags.map(tag =>
+        `<span style="display: inline-block; background-color: #eee; color: #555; font-size: 10px; padding: 2px 6px; border-radius: 3px; margin-left: 4px; margin-bottom: 4px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px;">${tag.text}</span>`
+      ).join('');
 
       // Format insights as italicized bullet points
       const insightsHTML = peAnalysis.key_insights && peAnalysis.key_insights.length > 0 ? `
@@ -276,8 +287,10 @@ Maintain active coverage of:
             <a href="${story.url || '#'}" style="color: #1a1a1a; text-decoration: none;">
               ${story.headline}
             </a>
-            ${categoryHTML}
           </h3>
+          <div style="margin: 4px 0 8px 0;">
+            ${tagsHTML}
+          </div>
           
           <!-- Thumbs up/down -->
           <div style="margin: 8px 0; font-size: 18px;">
