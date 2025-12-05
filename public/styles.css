@@ -194,3 +194,80 @@ body {
             display: none;
         }
     }
+}
+
+/* Compact Story Card (for Index) */
+.story-compact {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    margin-bottom: 20px;
+    break-inside: avoid;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 15px;
+}
+
+.story-compact:hover .headline {
+    text-decoration: underline;
+}
+
+.story-compact .headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+    color: #111;
+}
+
+.story-compact .byline {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+}
+
+.story-compact .story-preview {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    color: #333;
+    margin-top: 5px;
+}
+
+.story-compact .pe-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.story-compact .pe-badge.low {
+    background: linear-gradient(135deg, #999 0%, #666 100%);
+}
+
+.story-compact .pe-insights {
+    background-color: #f0f4ff;
+    border-left: 3px solid #667eea;
+    padding: 10px;
+    margin-top: 8px;
+    font-size: 0.85rem;
+}
+
+.story-compact .pe-insights strong {
+    color: #667eea;
+}
+
+.story-compact .pe-insights ul {
+    margin: 6px 0 0 0;
+    padding-left: 18px;
+}
+
+
+.thumb-icon {
+    width: 16px;
+    height: 16px;
+    fill: #333;
+}
