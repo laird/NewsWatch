@@ -294,6 +294,19 @@ const newsletters = {
 
 // Subscribers collection helpers
 const subscribers = {
+    async getAll({ limit = 1000 } = {}) {
+        const snapshot = await collections.subscribers
+            .orderBy('email', 'asc')
+            .limit(limit)
+            .get();
+        return snapshotToArray(snapshot);
+    },
+
+    async get(id) {
+        const doc = await collections.subscribers.doc(id).get();
+        return docToObject(doc);
+    },
+
     async getActive() {
         const snapshot = await collections.subscribers
             .where('is_active', '==', true)
@@ -322,7 +335,7 @@ const subscribers = {
             subscribed_at: new Date()
         };
         await collections.subscribers.doc(id).set(subscriberData);
-        return { id, ...subscriberData };
+        return id;
     }
 };
 
