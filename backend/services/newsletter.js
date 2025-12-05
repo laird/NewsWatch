@@ -339,7 +339,7 @@ Maintain active coverage of:
           ${insightsHTML}
           
           <!-- Teaser/Summary -->
-          <p style="margin: 8px 0 0 0; font-size: 14px; line-height: 1.6; color: #333;">
+          <p style="margin: 8px 0 0 0; font-size: 13px; line-height: 1.5; color: #333; word-wrap: break-word; overflow-wrap: break-word; hyphens: auto;">
             ${story.summary || 'Click to read the full story...'}
           </p>
         </div>
@@ -423,7 +423,7 @@ Maintain active coverage of:
             </div>
             <div style="flex: 1; text-align: center; min-width: 200px;">
               <h1 style="font-size: 48px; font-weight: bold; letter-spacing: -2px; margin: 0; text-transform: uppercase; color: #1a1a1a;">
-                NEWSWATCH
+                NEWSWATCH${process.env.NODE_ENV === 'production' ? '' : ' (Dev)'}
               </h1>
             </div>
             <div style="font-family: Arial, sans-serif; font-size: 11px; text-align: right; color: #666; min-width: 150px;">

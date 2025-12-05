@@ -22,6 +22,32 @@ function normalizeUrl(url) {
 }
 
 /**
+ * Deduplicate sources array by normalized URL
+ * Returns a new array with duplicate sources removed
+ */
+function dedupeSources(sources) {
+    if (!sources || !Array.isArray(sources) || sources.length <= 1) {
+        return sources || [];
+    }
+
+    const uniqueSources = [];
+    const seenUrls = new Set();
+
+    for (const source of sources) {
+        if (!source || !source.url) continue;
+
+        const normalizedUrl = normalizeUrl(source.url);
+
+        if (!seenUrls.has(normalizedUrl)) {
+            seenUrls.add(normalizedUrl);
+            uniqueSources.push(source);
+        }
+    }
+
+    return uniqueSources;
+}
+
+/**
  * Calculate similarity between two strings (simple word overlap approach)
  * Returns a score between 0 and 1
  */
@@ -241,8 +267,9 @@ async function findSimilarStory(newStory) {
         }
 
         // If moderately similar, add to candidates for AI check
-        // Lowered thresholds to catch more potential duplicates (e.g. "Black Forest Labs" matches)
-        if (headlineSimilarity > 0.4 || contentSimilarity > 0.4) {
+        // Require BOTH headline AND content similarity to avoid false positives
+        // Changed from OR to AND to prevent unrelated stories from same domain being merged
+        if (headlineSimilarity > 0.5 && contentSimilarity > 0.3) {
             console.log('      -> Added to AI candidates');
             wordBasedCandidates.push({ story: existing, headlineSim: headlineSimilarity, contentSim: contentSimilarity });
         }
@@ -266,12 +293,13 @@ async function findSimilarStory(newStory) {
                 }
             } else {
                 // Fallback if no AI key: use stricter heuristic for "candidates" that passed the loose filter
-                // If they share significant words (like proper nouns), merge them
-                // Lowered to 0.35 to catch cases like "Black Forest Labs" (score ~0.38)
+                // Require both headline AND content to have meaningful similarity
                 const combinedScore = (candidate.headlineSim + candidate.contentSim) / 2;
-                if (combinedScore > 0.35) {
+                if (combinedScore > 0.45 && candidate.headlineSim > 0.4 && candidate.contentSim > 0.2) {
                     console.log(`    ⚠️  No AI key, but high combined similarity (${combinedScore.toFixed(2)}), assuming duplicate`);
                     return candidate.story;
+                } else {
+                    console.log(`    ℹ️  Candidate rejected: combined=${combinedScore.toFixed(2)}, headline=${candidate.headlineSim.toFixed(2)}, content=${candidate.contentSim.toFixed(2)}`);
                 }
             }
         }
@@ -316,6 +344,9 @@ async function mergeStories(existingStory, newStory) {
         console.log(`  ⚠️  Source ${newStory.source} already exists for this story, skipping merge`);
         return existingStory.id;
     }
+
+    // Deduplicate sources array to ensure no duplicates persist
+    sources = dedupeSources(sources);
 
     // Calculate source count multiplier for PE impact score
     // More sources = more important story
@@ -370,11 +401,11 @@ async function processStory(newStory) {
 
     // No duplicate found, insert as new story
     // Initialize sources array with the first source
-    const sources = [{
+    const sources = dedupeSources([{
         name: newStory.source,
         url: newStory.url,
         published_at: newStory.published_at
-    }];
+    }]);
 
     const storyData = {
         headline: newStory.headline,
@@ -426,6 +457,9 @@ async function mergeExistingStories(winner, loser) {
         }
     }
 
+    // Deduplicate sources array to ensure no duplicates persist
+    sources = dedupeSources(sources);
+
     // 2. Update winner
     const sourceMultiplier = 1 + (sources.length - 1) * 0.15;
     const boostedScore = winner.pe_impact_score
@@ -471,5 +505,6 @@ module.exports = {
     calculateSimilarity,
     calculateOverlap,
     normalizeUrl,
+    dedupeSources,
     checkSemanticSimilarity
 };

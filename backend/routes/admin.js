@@ -211,6 +211,32 @@ router.post('/check-feedback', checkAuth, async (req, res) => {
 });
 
 /**
+ * POST /api/admin/cleanup-duplicates
+ * Run the duplicate sources cleanup script
+ */
+router.post('/cleanup-duplicates', checkAuth, async (req, res) => {
+    try {
+        console.log('🧹 Admin triggered duplicate sources cleanup...');
+        const { cleanupDuplicateSources } = require('../../cleanup-duplicate-sources');
+
+        // Run cleanup and track results
+        // Since cleanup logs to console, we'll capture basic info
+        const result = await cleanupDuplicateSources();
+
+        res.json({
+            success: true,
+            message: 'Duplicate sources cleanup completed. Check server logs for details.'
+        });
+    } catch (error) {
+        console.error('Error running cleanup:', error);
+        res.status(500).json({
+            error: 'Failed to run cleanup',
+            message: error.message
+        });
+    }
+});
+
+/**
  * POST /api/admin/reprocess-stories
  * Trigger reprocessing of stories to update categorization
  */

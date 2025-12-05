@@ -10,6 +10,45 @@ const parser = new Parser({
     }
 });
 
+/**
+ * Generate a concise 1-2 sentence summary using AI
+ */
+async function generateSummary(headline, content) {
+    try {
+        const aiService = require('./ai-service');
+
+        const prompt = `Summarize this news article in EXACTLY 1-2 concise sentences (maximum 150 characters total). Focus on the most newsworthy aspect. Do not include marketing language or boilerplate.
+
+Headline: ${headline}
+
+Content: ${content.substring(0, 1500)}
+
+Respond with ONLY the summary text, no additional formatting.`;
+
+        const result = await aiService.generateContent(prompt, {
+            temperature: 0.3,  // Lower temperature for consistency
+            maxTokens: 100
+        });
+
+        const summary = result.text.trim();
+
+        // Validate it's 1-2 sentences
+        const sentences = summary.split(/[.!?]+/).filter(s => s.trim().length > 0);
+        if (sentences.length > 2) {
+            // Take only first 2 sentences
+            return sentences.slice(0, 2).join('. ') + '.';
+        }
+
+        return summary;
+
+    } catch (error) {
+        console.warn('Failed to generate AI summary:', error.message);
+        // Fallback: create simple summary from first sentence of content
+        const firstSentence = content.match(/^[^.!?]+[.!?]/)?.[0] || content.substring(0, 150);
+        return firstSentence.trim();
+    }
+}
+
 // News sources to monitor
 const NEWS_SOURCES = [
     {
@@ -117,7 +156,9 @@ async function ingestNews() {
                 try {
                     // Extract content
                     const content = item.contentSnippet || item.content || item.summary || '';
-                    const summary = content.substring(0, 800) + (content.length > 800 ? '...' : '');
+
+                    // Generate concise 1-2 sentence summary using AI
+                    const summary = await generateSummary(item.title, content);
 
                     // Process story (will deduplicate if similar story exists)
                     const story = await processStory({

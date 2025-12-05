@@ -366,6 +366,17 @@
 
                     <hr style="margin: 30px 0; border: none; border-top: 1px solid #e0e0e0;">
 
+                    <h3 style="margin-bottom: 15px; font-size: 18px;">Clean Up Duplicate Sources</h3>
+                    <p style="margin-bottom: 15px; color: #666;">
+                        Run the cleanup script to remove duplicate source URLs from merged stories in the database.
+                    </p>
+                    <button class="btn btn-primary" id="cleanup-btn" onclick="runCleanup()">
+                        🧹 Run Cleanup
+                    </button>
+                    <div id="cleanup-status"></div>
+
+                    <hr style="margin: 30px 0; border: none; border-top: 1px solid #e0e0e0;">
+
                     <h3 style="margin-bottom: 15px; font-size: 18px;">Recent Newsletter Archives</h3>
                     <ul class="archive-list" id="archive-list">
                         <li style="text-align: center; color: #999;">Loading archives...</li>
@@ -674,6 +685,34 @@
                 }
             } catch (error) {
                 showStatus(statusDiv, '❌ Failed to check feedback: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function runCleanup() {
+            const statusDiv = document.getElementById('cleanup-status');
+            const btn = document.getElementById('cleanup-btn');
+
+            btn.disabled = true;
+            showStatus(statusDiv, '⏳ Running cleanup script... This may take a moment.', 'info');
+
+            try {
+                const response = await fetch('/api/admin/cleanup-duplicates', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: adminPassword })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showStatus(statusDiv, '✅ ' + data.message, 'success');
+                } else {
+                    showStatus(statusDiv, '❌ ' + data.message, 'error');
+                }
+            } catch (error) {
+                showStatus(statusDiv, '❌ Failed to run cleanup: ' + error.message, 'error');
             } finally {
                 btn.disabled = false;
             }
