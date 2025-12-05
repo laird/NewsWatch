@@ -1,416 +1,193 @@
-const { Storage } = require('@google-cloud/storage');
-const { stories, db } = require('./database/firestore');
-const { ingestNews } = require('./services/newsIngestion');
-const fs = require('fs').promises;
 const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+const fs = require('fs').promises;
+const db = require('./database/db');
 
-const storage = new Storage();
-const BUCKET_NAME = 'newswatch-479605-public';
-const bucket = storage.bucket(BUCKET_NAME);
+const OUTPUT_DIR = path.join(__dirname, '../public');
 
-const IS_DEV = process.env.NODE_ENV !== 'production';
-const PUBLIC_DIR = path.join(__dirname, '../public');
-
-// Helper function to clean and shorten tag text
-const cleanTag = (text) => {
-    if (!text) return '';
-    // Remove markdown bold formatting
-    text = text.replace(/\*\*/g, '').trim();
-
-    // Shorten common long category names
-    const shortenings = {
-        'M&A/Acquisition': 'M&A',
-        'Funding Round': 'Funding',
-        'IPO/Public Markets': 'IPO',
-        'Product Launch': 'Launch',
-        'Regulatory/Policy': 'Regulatory',
-        'Cloud Computing': 'Cloud',
-        'Blockchain/Crypto': 'Crypto',
-        'DevOps/Infrastructure': 'DevOps',
-        'Data/Analytics': 'Data',
-        'Developer Tools': 'Dev Tools'
-    };
-
-    return shortenings[text] || text;
-};
-
-async function writeToLocal(filename, content) {
-    const filePath = path.join(PUBLIC_DIR, filename);
-    const dir = path.dirname(filePath);
-
-    // Ensure directory exists
-    await fs.mkdir(dir, { recursive: true });
-
-    // Write file
-    await fs.writeFile(filePath, content);
-    console.log(`✓ Wrote ${filePath}`);
-}
-
-async function uploadToGCS(filename, content, contentType = 'text/html') {
-    const file = bucket.file(filename);
-    await file.save(content, {
-        metadata: {
-            contentType,
-            cacheControl: 'public, max-age=3600',
-        },
-    });
-    console.log(`✓ Uploaded gs://${BUCKET_NAME}/${filename}`);
-}
-
-async function saveFile(filename, content, contentType = 'text/html') {
-    if (IS_DEV) {
-        await writeToLocal(filename, content);
-    } else {
-        await uploadToGCS(filename, content, contentType);
-    }
-}
-
+/**
+ * Generate the static site: index page and individual story pages.
+ */
 async function generateStaticSite() {
-    console.log(`🏗️  Starting static site generation (${IS_DEV ? 'Local' : 'GCS'})...`);
+    console.log('🏗️  Starting static site generation...');
 
-    // 1. Check if we need to ingest news (skip if run within last hour)
-    const metadataRef = db.collection('system_metadata').doc('ingestion');
-    const metadataDoc = await metadataRef.get();
-    const lastIngestion = metadataDoc.exists ? metadataDoc.data().last_run : null;
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    // Ensure output directories exist
+    await fs.mkdir(OUTPUT_DIR, { recursive: true });
+    await fs.mkdir(path.join(OUTPUT_DIR, 'story'), { recursive: true });
 
-    if (!lastIngestion || lastIngestion.toDate() < oneHourAgo) {
-        console.log('🔄 Ingesting latest news... (SKIPPED FOR VERIFICATION)');
-        // await ingestNews();
-        // await metadataRef.set({ last_run: new Date() });
-    } else {
-        console.log('⏭️  Skipping ingestion (last run was less than 1 hour ago)');
+    // Fetch top stories
+    try {
+        const { rows: stories } = await db.query(`
+        SELECT id, headline, source, author, url, summary, content, published_at,
+               pe_impact_score, pe_analysis
+        FROM stories
+        ORDER BY pe_impact_score DESC NULLS LAST, ingested_at DESC
+        LIMIT 25
+      `);
+        console.log('✓ Connected to database');
+        console.log(`✓ Fetched ${stories.length} stories for the front page`);
+
+        // Write index.html
+        const indexHtml = generateIndexHtml(stories);
+        await fs.writeFile(path.join(OUTPUT_DIR, 'index.html'), indexHtml);
+        console.log('✓ Generated public/index.html');
+
+        // Write individual story pages
+        for (const story of stories) {
+            const storyHtml = generateStoryHtml(story);
+            await fs.writeFile(path.join(OUTPUT_DIR, 'story', `${story.id}.html`), storyHtml);
+        }
+        console.log(`✓ Generated ${stories.length} individual story pages`);
+
+        // Copy CSS
+        try {
+            await fs.copyFile(path.join(__dirname, '../styles.css'), path.join(OUTPUT_DIR, 'styles.css'));
+            console.log('✓ Copied styles.css');
+        } catch (e) {
+            console.warn('⚠️ Could not copy styles.css', e.message);
+        }
+
+        console.log('✓ Static site generation complete!');
+
+    } catch (err) {
+        console.error('Error generating site:', err);
+        throw err;
     }
-
-    // 2. Fetch top stories
-    const storyList = await stories.getTopStories({ limit: 12 });
-
-    // 3. Generate Index Page (Cover)
-    const indexHtml = generateIndexHtml(storyList);
-    await saveFile('index.html', indexHtml);
-
-    // 4. Generate Story Detail Pages
-    for (const story of storyList) {
-        const storyHtml = generateStoryHtml(story);
-        await saveFile(`story/${story.id}.html`, storyHtml);
-    }
-    console.log(`✓ Generated and uploaded ${storyList.length} story pages`);
-
-    // 5. Upload Assets (CSS/JS) - Read from local source
-    const cssContent = await fs.readFile(path.join(__dirname, '../styles.css'));
-    await saveFile('styles.css', cssContent, 'text/css');
-
-    const jsContent = await fs.readFile(path.join(__dirname, '../script.js'));
-    await saveFile('script.js', jsContent, 'application/javascript');
-
-    // 6. Generate Archive Page
-    const archiveHtml = await generateArchiveHtml();
-    await saveFile('archive.html', archiveHtml);
-
-    console.log('\n✅ Static site generation complete!');
 }
 
-async function generateArchiveHtml() {
-    const date = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-    // Read index.json from editions directory
-    let archives = [];
-    try {
-        if (process.env.NODE_ENV === 'production' && process.env.GCP_PROJECT_ID) {
-            const { Storage } = require('@google-cloud/storage');
-            const storage = new Storage();
-            const bucketName = `${process.env.GCP_PROJECT_ID}-public`;
-            const bucket = storage.bucket(bucketName);
-            const file = bucket.file('editions/index.json');
-
-            const [exists] = await file.exists();
-            if (exists) {
-                const [content] = await file.download();
-                archives = JSON.parse(content.toString('utf8'));
-                console.log('✓ Downloaded index.json from GCS for archive generation');
+/**
+ * Create the index page HTML.
+ */
+function generateIndexHtml(stories) {
+    const date = new Date().toLocaleDateString('en-US');
+    const storiesHtml = stories.map(story => {
+        // Build teaser from summary (first 1‑2 sentences)
+        let teaser = story.summary || '';
+        if (!teaser || teaser.trim() === 'Comments' || teaser.length < 20) {
+            teaser = 'Read the full story for details.';
+        } else if (teaser.length > 150) {
+            const firstSentenceEnd = teaser.indexOf('.', 50);
+            if (firstSentenceEnd !== -1 && firstSentenceEnd < 200) {
+                teaser = teaser.substring(0, firstSentenceEnd + 1);
             } else {
-                console.warn('⚠️ editions/index.json does not exist in GCS');
+                teaser = teaser.substring(0, 150) + '...';
             }
-        } else {
-            // Local development
-            const indexPath = path.join(__dirname, '../public/editions/index.json');
-            const indexContent = await fs.readFile(indexPath, 'utf8');
-            archives = JSON.parse(indexContent);
         }
-    } catch (err) {
-        console.warn('⚠️ Could not read editions/index.json for archive generation:', err.message);
-    }
-
-    const archiveListHtml = archives.map(item => {
-        const itemDate = new Date(item.date).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit'
-        });
-
-        // Use local path for dev, GCS URL for prod (or relative if we are on the same domain)
-        // Since we are generating a static site, relative links are best if files are in editions/
-        // But editions are in a subdirectory.
-        // item.url is the public URL (GCS). We can use that.
-
         return `
-        <div class="archive-item" style="padding: 15px; border-bottom: 1px solid #eee; margin-bottom: 10px;">
-            <div style="font-size: 14px; color: #666;">${itemDate}</div>
-            <h3 style="margin: 5px 0;">
-                <a href="${item.url}" target="_blank" style="color: #1a1a1a; text-decoration: none;">${item.filename}</a>
-            </h3>
-            <div style="font-size: 12px; color: #999;">
-                ${item.recipientCount ? `${item.recipientCount} Recipients` : ''} 
-                ${item.storyCount ? `| ${item.storyCount} Stories` : ''}
-            </div>
+      <article class="story">
+        <h2 class="headline"><a href="story/${story.id}.html">${story.headline}</a></h2>
+        <div class="meta">
+          <span class="source-badge">${story.source || 'Unknown Source'}</span>
+          <span class="separator">•</span>
+          <span>${new Date(story.published_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
         </div>
-        `;
+        <div class="summary">${teaser}<a href="story/${story.id}.html" class="read-more">[Read Full Story]</a></div>
+      </article>`;
     }).join('');
 
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NewsWatch - Archive</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NewsWatch - Daily Software Economy Brief</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chomsky&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@400;700;900&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="newspaper">
-        <header class="masthead">
-            <div class="edition-info">
-                <a href="index.html" style="text-decoration: none; color: #666;">&larr; Back to Today's Edition</a>
-            </div>
-            <h1 class="title">NewsWatch Archive</h1>
-            <div class="tagline">Past Editions</div>
-        </header>
-        <main class="content">
-            <div class="archive-list" style="max-width: 800px; margin: 0 auto;">
-                ${archives.length > 0 ? archiveListHtml : '<p style="text-align: center; color: #666;">No archives found.</p>'}
-            </div>
-        </main>
-        <footer class="footer">
-            <p>NewsWatch delivers curated software economy news daily.</p>
-            <p class="copyright">© ${new Date().getFullYear()} NewsWatch. All rights reserved.</p>
-        </footer>
-    </div>
-    <script src="script.js"></script>
+  <div class="newspaper">
+    <header class="masthead">
+      <div class="ears">
+        <div class="ear-left">VOL. CLXXII... No. 42<br>NEW YORK, SATURDAY</div>
+        <div class="title-wrapper">
+          <h1 class="paper-title">NewsWatch</h1>
+          <div class="paper-subtitle">Daily Software Economy Brief</div>
+        </div>
+        <div class="ear-right"><span id="current-date">${date}</span></div>
+      </div>
+    </header>
+    <main class="content">
+      <div id="stories-container" class="story-grid">
+        ${storiesHtml}
+      </div>
+    </main>
+    <footer class="footer">
+      <div class="separator-line-single"></div>
+      <p>© ${new Date().getFullYear()} NewsWatch. All rights reserved.</p>
+    </footer>
+  </div>
 </body>
 </html>`;
 }
 
-function generateIndexHtml(storyList) {
-    const date = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-    // Helper to safely format dates from Firestore Timestamps or strings
-    const formatDate = (dateObj, options = {}) => {
-        if (!dateObj) return '';
-        let date;
-        // Handle Firestore Timestamp
-        if (dateObj && typeof dateObj.toDate === 'function') {
-            date = dateObj.toDate();
-        } else {
-            date = new Date(dateObj);
-        }
-
-        if (isNaN(date.getTime())) return '';
-        return date.toLocaleString('en-US', options);
-    };
-
-    // Helper to format time only
-    const formatTime = (dateObj) => formatDate(dateObj, { hour: 'numeric', minute: '2-digit' });
-
-    const storiesHtml = storyList.map(story => {
-        const peAnalysis = story.pe_analysis || {};
-
-        // Format insights as italicized bullet points
-        const insightsHTML = peAnalysis.key_insights && peAnalysis.key_insights.length > 0 ? `
-            <div class="pe-insights">
-                <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
-                    ${peAnalysis.key_insights.slice(0, 2).map(insight => `<li><i>${insight}</i></li>`).join('')}
-                </ul>
-            </div>
-        ` : '';
-
-        return `
-    <a href="story/${story.id}.html" class="story-compact" data-story-id="${story.id}">
-        <div class="feedback-buttons">
-            <button class="thumb-btn thumb-up" onclick="handleThumb('${story.id}', 'up', event)" title="Relevant">
-                <svg class="thumb-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91l-.01-.01L23 10z"/></svg>
-            </button>
-            <button class="thumb-btn thumb-down" onclick="handleThumb('${story.id}', 'down', event)" title="Not Relevant">
-                <svg class="thumb-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14-.47-.14-.73v1.91l.01.01L1 14c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
-            </button>
-        </div>
-        <div class="story-content-wrapper">
-            <h3 class="headline">${story.headline}</h3>
-            <div class="story-meta">
-                <span class="byline">${story.source || 'Unknown Source'} | ${formatTime(story.published_at)}</span>
-            </div>
-            <div class="story-tags" style="margin-top: 5px;">
-                ${(() => {
-                const categories = peAnalysis.categories || peAnalysis.sectors || [];
-                const location = peAnalysis.location || '';
-                const companies = peAnalysis.companies || [];
-                const allTags = [];
-
-                categories.forEach(cat => {
-                    const cleaned = cleanTag(cat);
-                    if (cleaned) allTags.push({ text: cleaned, type: 'category' });
-                });
-                if (location && location !== 'Unspecified' && location !== 'Global') {
-                    const cleaned = cleanTag(location);
-                    if (cleaned) allTags.push({ text: cleaned, type: 'location' });
-                }
-                companies.forEach(company => {
-                    const cleaned = cleanTag(company);
-                    if (cleaned) allTags.push({ text: cleaned, type: 'company' });
-                });
-
-                return allTags.map(tag =>
-                    `<span style="display: inline-block; background-color: #eee; color: #555; font-size: 10px; padding: 2px 6px; border-radius: 3px; margin-right: 4px; margin-bottom: 4px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px;">${tag.text}</span>`
-                ).join('');
-            })()}
-            </div>
-            ${insightsHTML}
-            <p class="story-preview">${story.summary || ''}</p>
-        </div>
-    </a>
-  `;
-    }).join('');
-
-    return `< !DOCTYPE html >
-        <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>NewsWatch - Daily Software Economy Brief</title>
-                        <link rel="stylesheet" href="styles.css">
-                        </head>
-                        <body>
-                            <div class="newspaper">
-                                <header class="masthead">
-                                    <div class="edition-info">
-                                        <span class="date">${date}</span>
-                                        <span class="separator">|</span>
-                                        <span class="edition">Static Edition</span>
-                                        <span class="separator">|</span>
-                                        <span class="story-count">${storyList.length} Stories</span>
-                                    </div>
-                                    <h1 class="title">NewsWatch</h1>
-                                    <div class="tagline">Daily Software Economy Brief for Private Equity Investors</div>
-                                </header>
-                                <main class="content">
-                                    <div class="story-grid-compact">
-                                        ${storiesHtml}
-                                    </div>
-                                    <div style="text-align: center; margin-top: 30px; padding: 20px;">
-                                        <a href="archive.html" style="display: inline-block; padding: 10px 20px; background-color: #1a1a1a; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">View Full Archive</a>
-                                    </div>
-                                </main>
-                                <footer class="footer">
-                                    <p>NewsWatch delivers curated software economy news daily.</p>
-                                    <p class="copyright">© ${new Date().getFullYear()} NewsWatch. All rights reserved.</p>
-                                </footer>
-                            </div>
-                            <script src="script.js"></script>
-                        </body>
-                    </html>`;
-}
-
+/**
+ * Create the HTML for a single story page.
+ */
 function generateStoryHtml(story) {
-    // Helper to safely format dates (duplicated for scope, or could be shared)
-    const formatDate = (dateObj, options = {}) => {
-        if (!dateObj) return '';
-        let date;
-        if (dateObj && typeof dateObj.toDate === 'function') {
-            date = dateObj.toDate();
-        } else {
-            date = new Date(dateObj);
-        }
-        if (isNaN(date.getTime())) return '';
-        return date.toLocaleString('en-US', options);
-    };
+    const peAnalysis = story.pe_analysis || {};
+    const impactBox = story.pe_impact_score ? `
+    <div class="impact-box" style="border: 3px double #333; padding: 15px; margin-bottom: 25px; background-color: rgba(0,0,0,0.05);">
+      <h3 style="font-family: 'Playfair Display', serif; margin-top: 0;">Private Equity Analysis</h3>
+      <p><strong>Impact Score:</strong> ${story.pe_impact_score}/10</p>
+      <ul style="font-family: 'Times New Roman', serif;">
+        ${(peAnalysis.key_insights || []).map(i => `<li>${i}</li>`).join('')}
+      </ul>
+    </div>` : '';
+
+    const bodyContent = story.content
+        ? story.content.split('\n').map(p => `<p>${p}</p>`).join('')
+        : `<p>${story.summary}</p>`;
 
     return `<!DOCTYPE html>
-                    <html lang="en">
-                        <head>
-                            <meta charset="UTF-8">
-                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                    <title>${story.headline} - NewsWatch</title>
-                                    <link rel="stylesheet" href="../styles.css">
-                                    </head>
-                                    <body>
-                                        <div class="newspaper">
-                                            <header class="masthead">
-                                                <div class="edition-info">
-                                                    <a href="../index.html" style="text-decoration: none; color: #666;">&larr; Back to Today's Edition</a>
-                                                </div>
-                                            </header>
-                                            <main class="content">
-                                                <article class="story-detail">
-                                                    <h1 class="headline-large">${story.headline}</h1>
-                                                    <div class="story-meta-large">
-                                                        <span class="source">${story.source}</span>
-                                                        <span class="separator">|</span>
-                                                        <span class="time">${formatDate(story.published_at)}</span>
-                                                    </div>
-                                                    
-                                                    <div class="story-tags-large" style="margin-top: 10px; margin-bottom: 15px;">
-                                                        ${(() => {
-            const peAnalysis = story.pe_analysis || {};
-            const categories = peAnalysis.categories || peAnalysis.sectors || [];
-            const location = peAnalysis.location || '';
-            const companies = peAnalysis.companies || [];
-            const allTags = [];
-
-            categories.forEach(cat => {
-                const cleaned = cleanTag(cat);
-                if (cleaned) allTags.push({ text: cleaned, type: 'category' });
-            });
-            if (location && location !== 'Unspecified' && location !== 'Global') {
-                const cleaned = cleanTag(location);
-                if (cleaned) allTags.push({ text: cleaned, type: 'location' });
-            }
-            companies.forEach(company => {
-                const cleaned = cleanTag(company);
-                if (cleaned) allTags.push({ text: cleaned, type: 'company' });
-            });
-
-            return allTags.map(tag =>
-                `<span style="display: inline-block; background-color: #f0f0f0; color: #333; font-size: 12px; padding: 4px 8px; border-radius: 4px; margin-right: 6px; margin-bottom: 6px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500;">${tag.text}</span>`
-            ).join('');
-        })()}
-                                                    </div>
-
-                                                    ${story.pe_impact_score ? `
-                <div class="pe-analysis-box">
-                    <h3>PE Investor Analysis</h3>
-                    <div class="score">Impact Score: <strong>${story.pe_impact_score}/10</strong></div>
-                    <ul class="insights">
-                        ${(story.pe_analysis?.key_insights || []).map(i => `<li>${i}</li>`).join('')}
-                    </ul>
-                </div>
-                ` : ''}
-
-                                                    <div class="story-body">
-                                                        ${story.content ? story.content.split('\n').map(p => `<p>${p}</p>`).join('') : `<p>${story.summary}</p>`}
-                                                    </div>
-
-                                                    <div class="original-link">
-                                                        <a href="${story.url}" target="_blank">Read original article at ${story.source} &rarr;</a>
-                                                    </div>
-                                                </article>
-                                            </main>
-                                        </div>
-                                        <script src="../script.js"></script>
-                                    </body>
-                                </html>`;
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${story.headline} - NewsWatch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chomsky&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@400;700;900&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <div class="newspaper">
+    <header class="masthead">
+      <div class="ears">
+        <div class="ear-left">NewsWatch</div>
+        <div class="title-wrapper">
+          <h1 class="paper-title" style="font-size: 3rem; margin: 0;"><a href="../index.html" style="text-decoration: none; color: inherit;">NewsWatch</a></h1>
+        </div>
+        <div class="ear-right"><a href="../index.html">Back to Front Page</a></div>
+      </div>
+    </header>
+    <main class="content">
+      <div class="story-detail" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+        <h1 class="headline" style="font-size: 2.5rem; text-align: center; margin-bottom: 20px;">${story.headline}</h1>
+        <div class="meta" style="text-align: center; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+          <span class="source-badge">${story.source || 'Unknown Source'}</span>
+          <span class="separator">•</span>
+          <span>${new Date(story.published_at).toLocaleString()}</span>
+        </div>
+        ${impactBox}
+        <div class="story-body" style="font-family: 'Times New Roman', serif; font-size: 1.1rem; line-height: 1.6; text-align: justify;">
+          ${bodyContent}
+        </div>
+        <div class="original-link" style="margin-top: 40px; text-align: center;">
+          <a href="${story.url}" target="_blank" style="font-family: 'Times New Roman', serif; font-style: italic;">Read original article at ${story.source} →</a>
+        </div>
+      </div>
+    </main>
+    <footer class="footer">
+      <div class="separator-line-single"></div>
+      <p>© ${new Date().getFullYear()} NewsWatch. All rights reserved.</p>
+    </footer>
+  </div>
+</body>
+</html>`;
 }
 
-// Run if called directly
 if (require.main === module) {
     generateStaticSite()
         .then(() => process.exit(0))
