@@ -341,4 +341,181 @@ router.get('/logs', checkAuth, async (req, res) => {
     }
 });
 
+/**
+ * GET /api/admin/users
+ * List all users
+ */
+router.get('/users', checkAuth, async (req, res) => {
+    try {
+        const { subscribers } = require('../database/firestore');
+        const users = await subscribers.getAll();
+
+        res.json({
+            users: users.map(user => ({
+                id: user.id,
+                email: user.email,
+                subscribed: user.subscribed || false,
+                is_test_user: user.is_test_user || false,
+                created_at: user.created_at,
+                last_feedback_at: user.last_feedback_at
+            })),
+            total: users.length
+        });
+    } catch (error) {
+        console.error('Error listing users:', error);
+        res.status(500).json({
+            error: 'Failed to list users',
+            message: error.message
+        });
+    }
+});
+
+/**
+ * GET /api/admin/users/:id
+ * Get specific user details
+ */
+router.get('/users/:id', checkAuth, async (req, res) => {
+    try {
+        const { subscribers } = require('../database/firestore');
+        const user = await subscribers.get(req.params.id);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.json({ user });
+    } catch (error) {
+        console.error('Error getting user:', error);
+        res.status(500).json({
+            error: 'Failed to get user',
+            message: error.message
+        });
+    }
+});
+
+/**
+ * POST /api/admin/users
+ * Create new user
+ */
+router.post('/users', checkAuth, async (req, res) => {
+    try {
+        const { email, is_test_user, subscribed } = req.body;
+
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return res.status(400).json({
+                error: 'Invalid email address'
+            });
+        }
+
+        const { subscribers } = require('../database/firestore');
+
+        // Check if user already exists
+        const existing = await subscribers.getByEmail(email);
+        if (existing) {
+            return res.status(409).json({
+                error: 'User already exists',
+                userId: existing.id
+            });
+        }
+
+        // Create user
+        const userData = {
+            email,
+            subscribed: subscribed !== false,
+            is_test_user: is_test_user === true,
+            created_at: new Date()
+        };
+
+        const userId = await subscribers.create(userData);
+
+        res.status(201).json({
+            success: true,
+            userId,
+            user: { id: userId, ...userData }
+        });
+    } catch (error) {
+        console.error('Error creating user:', error);
+        res.status(500).json({
+            error: 'Failed to create user',
+            message: error.message
+        });
+    }
+});
+
+/**
+ * PUT /api/admin/users/:id
+ * Update user (including test flag and subscription status)
+ */
+router.put('/users/:id', checkAuth, async (req, res) => {
+    try {
+        const { subscribed, is_test_user } = req.body;
+        const { subscribers, collections } = require('../database/firestore');
+
+        // Get existing user
+        const user = await subscribers.get(req.params.id);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Build update object
+        const updates = {};
+        if (typeof subscribed === 'boolean') {
+            updates.subscribed = subscribed;
+        }
+        if (typeof is_test_user === 'boolean') {
+            updates.is_test_user = is_test_user;
+        }
+
+        if (Object.keys(updates).length === 0) {
+            return res.status(400).json({
+                error: 'No valid updates provided'
+            });
+        }
+
+        // Update user
+        await collections.subscribers.doc(req.params.id).update(updates);
+
+        res.json({
+            success: true,
+            updates
+        });
+    } catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).json({
+            error: 'Failed to update user',
+            message: error.message
+        });
+    }
+});
+
+/**
+ * DELETE /api/admin/users/:id
+ * Remove user
+ */
+router.delete('/users/:id', checkAuth, async (req, res) => {
+    try {
+        const { subscribers, collections } = require('../database/firestore');
+
+        // Check if user exists
+        const user = await subscribers.get(req.params.id);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Delete user
+        await collections.subscribers.doc(req.params.id).delete();
+
+        res.json({
+            success: true,
+            message: `User ${user.email} deleted`
+        });
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        res.status(500).json({
+            error: 'Failed to delete user',
+            message: error.message
+        });
+    }
+});
+
 module.exports = router;

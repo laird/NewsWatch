@@ -325,6 +325,7 @@
                     <button class="tab active" onclick="switchTab('guidance')">🤖 Guidance</button>
                     <button class="tab" onclick="switchTab('analytics')">📊 Analytics</button>
                     <button class="tab" onclick="switchTab('logs')">📋 Logs</button>
+                    <button class="tab" onclick="switchTab('users')">👥 Users</button>
                 </div>
 
                 <!-- Guidance Tab -->
@@ -447,6 +448,41 @@
 
                     <div class="log-viewer" id="log-content">Select a log file to view its contents...</div>
                 </div>
+
+                <!-- Users Tab -->
+                <div id="tab-users" class="tab-content">
+                    <h2 style="margin-bottom: 20px;">User Management</h2>
+
+                    <!-- Add New User Form -->
+                    <div class="card" style="margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 15px; font-size: 18px;">Add New User</h3>
+                        <div class="form-group">
+                            <label for="new-user-email">Email Address:</label>
+                            <input type="email" id="new-user-email" placeholder="user@example.com"
+                                style="margin-bottom: 10px;">
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" id="new-user-test" checked>
+                                <span>Test User (receives AI guidance in newsletters)</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" id="new-user-subscribed" checked>
+                                <span>Subscribed</span>
+                            </label>
+                        </div>
+                        <button class="btn btn-primary" onclick="createUser()">➕ Add User</button>
+                        <div id="add-user-status"></div>
+                    </div>
+
+                    <!-- Users List -->
+                    <div class="card">
+                        <h3 style="margin-bottom: 15px; font-size: 18px;">All Users</h3>
+                        <div id="users-list">Loading users...</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -469,6 +505,9 @@
             // Load tab-specific data if needed
             if (tabName === 'logs' && adminPassword) {
                 loadLogFileList();
+            }
+            if (tabName === 'users' && adminPassword) {
+                loadUsers();
             }
         }
 
@@ -813,6 +852,190 @@
                 textarea.addEventListener('input', updateCharCount);
             }
         });
+
+        // ===== User Management Functions =====
+
+        async function loadUsers() {
+            try {
+                const response = await fetch(`/api/admin/users?auth=${adminPassword}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to load users');
+                }
+
+                const usersList = document.getElementById('users-list');
+
+                if (data.users.length === 0) {
+                    usersList.innerHTML = '<p style="color: #666;">No users found.</p>';
+                    return;
+                }
+
+                // Sort users: test users first, then by email
+                const sortedUsers = data.users.sort((a, b) => {
+                    if (a.is_test_user && !b.is_test_user) return -1;
+                    if (!a.is_test_user && b.is_test_user) return 1;
+                    return a.email.localeCompare(b.email);
+                });
+
+                usersList.innerHTML = `
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #ddd;">
+                                <th style="text-align: left; padding: 12px;">Email</th>
+                                <th style="text-align: center; padding: 12px;">Test User</th>
+                                <th style="text-align: center; padding: 12px;">Subscribed</th>
+                                <th style="text-align: center; padding: 12px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sortedUsers.map(user => `
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <td style="padding: 12px;">
+                                        ${user.email}
+                                        ${user.is_test_user ? '<span style="background: #4CAF50; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px; margin-left: 8px;">TEST</span>' : ''}
+                                    </td>
+                                    <td style="text-align: center; padding: 12px;">
+                                        <input type="checkbox" ${user.is_test_user ? 'checked' : ''} 
+                                            onchange="toggleUserTest('${user.id}', this.checked)"
+                                            style="cursor: pointer;">
+                                    </td>
+                                    <td style="text-align: center; padding: 12px;">
+                                        <input type="checkbox" ${user.subscribed ? 'checked' : ''} 
+                                            onchange="toggleUserSubscription('${user.id}', this.checked)"
+                                            style="cursor: pointer;">
+                                    </td>
+                                    <td style="text-align: center; padding: 12px;">
+                                        <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" 
+                                            onclick="deleteUser('${user.id}', '${user.email}')">
+                                            🗑️ Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                        Total: ${data.total} users (${sortedUsers.filter(u => u.is_test_user).length} test users)
+                    </p>
+                `;
+            } catch (error) {
+                document.getElementById('users-list').innerHTML =
+                    `<p style="color: #f44336;">Error loading users: ${error.message}</p>`;
+            }
+        }
+
+        async function createUser() {
+            const emailInput = document.getElementById('new-user-email');
+            const testCheckbox = document.getElementById('new-user-test');
+            const subscribedCheckbox = document.getElementById('new-user-subscribed');
+            const statusDiv = document.getElementById('add-user-status');
+
+            const email = emailInput.value.trim();
+
+            if (!email) {
+                showStatus(statusDiv, '⚠️ Please enter an email address', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        password: adminPassword,
+                        email,
+                        is_test_user: testCheckbox.checked,
+                        subscribed: subscribedCheckbox.checked
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to create user');
+                }
+
+                showStatus(statusDiv, `✓ User ${email} created successfully`, 'success');
+                emailInput.value = '';
+
+                // Reload users list
+                await loadUsers();
+            } catch (error) {
+                showStatus(statusDiv, `✗ ${error.message}`, 'error');
+            }
+        }
+
+        async function toggleUserTest(userId, isTest) {
+            try {
+                const response = await fetch(`/api/admin/users/${userId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        password: adminPassword,
+                        is_test_user: isTest
+                    })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Failed to update user');
+                }
+
+                // Reload users to show updated badge
+                await loadUsers();
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+                // Reload to revert checkbox state
+                await loadUsers();
+            }
+        }
+
+        async function toggleUserSubscription(userId, subscribed) {
+            try {
+                const response = await fetch(`/api/admin/users/${userId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        password: adminPassword,
+                        subscribed
+                    })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Failed to update user');
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+                // Reload to revert checkbox state
+                await loadUsers();
+            }
+        }
+
+        async function deleteUser(userId, email) {
+            if (!confirm(`Are you sure you want to delete user ${email}? This action cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: adminPassword })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Failed to delete user');
+                }
+
+                // Reload users list
+                await loadUsers();
+            } catch (error) {
+                alert(`Error deleting user: ${error.message}`);
+            }
+        }
     </script>
 </body>
 

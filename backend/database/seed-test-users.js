@@ -15,6 +15,11 @@ async function seedTestUsers() {
             email: 'lairdapopkin@hotmail.com',
             is_test_user: true,
             subscribed: true
+        },
+        {
+            email: 'juliette@popk.in',
+            is_test_user: true,
+            subscribed: true
         }
     ];
 
