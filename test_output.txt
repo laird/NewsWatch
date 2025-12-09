@@ -1,0 +1,26 @@
+
+Running 2 tests using 2 workers
+
+[1A[2K[1/2] [chromium] ΓÇ║ tests\static-site.spec.js:6:5 ΓÇ║ Static Site Regression Tests ΓÇ║ should load the front page with newspaper aesthetic
+[1A[2K[2/2] [chromium] ΓÇ║ tests\static-site.spec.js:69:5 ΓÇ║ Static Site Regression Tests ΓÇ║ should display teasers correctly on front page
+[1A[2K  1) [chromium] ΓÇ║ tests\static-site.spec.js:6:5 ΓÇ║ Static Site Regression Tests ΓÇ║ should load the front page with newspaper aesthetic 
+
+    Error: locator._expect: expectedNumber: expected float, got object
+
+      17 |         // Check stories exist
+      18 |         const stories = page.locator('.story');
+    > 19 |         await expect(stories).toHaveCount(expect.any(Number));
+         |                               ^
+      20 |         expect(await stories.count()).toBeGreaterThan(0);
+      21 |
+      22 |         // Check date in ear
+        at C:\Users\Laird\src\NewsWatch\tests\static-site.spec.js:19:31
+
+    Error Context: test-results\static-site-Static-Site-Re-3c7e3-ge-with-newspaper-aesthetic-chromium\error-context.md
+
+
+[1A[2K  1 failed
+    [chromium] ΓÇ║ tests\static-site.spec.js:6:5 ΓÇ║ Static Site Regression Tests ΓÇ║ should load the front page with newspaper aesthetic 
+  1 passed (1.5s)
+
+[36m  Serving HTML report at http://localhost:53953. Press Ctrl+C to quit.[39m

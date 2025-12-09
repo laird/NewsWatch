@@ -16,7 +16,7 @@ test.describe('Static Site Regression Tests', () => {
 
         // Check stories exist
         const stories = page.locator('.story');
-        await expect(stories).toHaveCount(expect.any(Number));
+        await expect(stories).not.toHaveCount(0);
         expect(await stories.count()).toBeGreaterThan(0);
 
         // Check date in ear
